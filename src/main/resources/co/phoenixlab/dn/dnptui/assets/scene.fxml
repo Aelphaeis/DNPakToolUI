@@ -49,13 +49,58 @@
                      </styleClass>
                   </Button>
                </children></AnchorPane>
-            <HBox prefHeight="100.0" prefWidth="200.0" styleClass="toolbar">
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="4.0" styleClass="toolbar">
                <children>
-                  <Button mnemonicParsing="false" text="Open PAK">
+                  <Button fx:id="openPakBtn" mnemonicParsing="false" text="Open PAK">
                      <graphic>
-                        <ImageView fitHeight="26.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@toolbar/open.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="openVirtualPakBtn" layoutX="14.0" layoutY="10.0" mnemonicParsing="false" text="Virtual Pak">
+                     <graphic>
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@toolbar/open.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="findBtn" layoutX="98.0" layoutY="10.0" mnemonicParsing="false" text="Find">
+                     <graphic>
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@toolbar/search.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" text="Export File">
+                     <graphic>
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@toolbar/export.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="exportFolderBtn" layoutX="266.0" layoutY="10.0" mnemonicParsing="false" text="Export Dir">
+                     <graphic>
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@toolbar/export_folder.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="closePakBtn" layoutX="350.0" layoutY="10.0" mnemonicParsing="false" text="Close PAK">
+                     <graphic>
+                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@toolbar/closepak.png" />
                            </image>
                         </ImageView>
                      </graphic>
