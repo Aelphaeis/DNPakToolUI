@@ -64,8 +64,49 @@
       -fx-text-fill: @color-topbar-window-button-text-hover;
     }
   }
-  .window-x-button:hover {
-    -fx-text-fill: @color-topbar-window-xbutton-text-hover;
+
+  .window-iconify-button {
+    -fx-background-image: url("iconify.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+    -fx-background-position: 0 0;
+    &:hover {
+      -fx-text-fill: @color-topbar-window-button-text-hover;
+      -fx-background-image: url("iconify_hover.png");
+    }
+  }
+
+  .window-restore-button {
+    -fx-background-image: url("restore.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+    -fx-background-position: 0 0;
+    &:hover {
+      -fx-text-fill: @color-topbar-window-button-text-hover;
+      -fx-background-image: url("restore_hover.png");
+    }
+  }
+
+  .window-max-button {
+    -fx-background-image: url("max.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+    -fx-background-position: 0 0;
+    &:hover {
+      -fx-text-fill: @color-topbar-window-button-text-hover;
+      -fx-background-image: url("max_hover.png");
+    }
+  }
+
+  .window-x-button {
+    -fx-background-image: url("close.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+    -fx-background-position: 0 0;
+    &:hover {
+      -fx-text-fill: @color-topbar-window-xbutton-text-hover;
+      -fx-background-image: url("close_hover.png");
+    }
   }
 }
 
