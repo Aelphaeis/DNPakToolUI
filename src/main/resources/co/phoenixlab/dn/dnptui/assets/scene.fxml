@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <SplitPane dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
+         <items>
+            <VBox maxHeight="1.7976931348623157E308" prefWidth="240.0" styleClass="navpane">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
+                  <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" minViewportHeight="100.0" minViewportWidth="230.0" prefViewportHeight="578.0" prefViewportWidth="230.0" vbarPolicy="ALWAYS">
+                     <content>
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </VBox>
+            <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+         </items>
+      </SplitPane>
+   </center>
+   <top>
+      <VBox prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="topbar">
+               <children>
+                  <Label fx:id="titleLbl" layoutX="14.0" layoutY="6.0" text="DN Pak Tool" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="6.0" />
+               </children></AnchorPane>
+            <HBox prefHeight="100.0" prefWidth="200.0" styleClass="toolbar" />
+         </children>
+      </VBox>
+   </top>
+</BorderPane>
