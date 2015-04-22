@@ -42,6 +42,8 @@
 
 .button {
   -fx-cursor: hand;
+  -fx-border-radius: 0;
+  -fx-background-radius: 0;
 }
 
 .topbar {
@@ -133,7 +135,9 @@
     -fx-min-height: @size-toolbar-button-height;
     -fx-max-height: @size-toolbar-button-height;
     -fx-font-size: 14px;
-    -fx-graphic-text-gap: 5px;
+    -fx-graphic-text-gap: 2px;
+    -fx-content-display: TOP;
+    -fx-text-fill: @color-text-light;
     &:hover {
       -fx-background-color: @color-toolbar-button-hover;
       -fx-border-color: @color-toolbar-button-bar-hover;
