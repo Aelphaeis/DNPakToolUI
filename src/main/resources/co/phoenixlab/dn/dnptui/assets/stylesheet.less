@@ -1,0 +1,84 @@
+@color-background: #0F0F0F;
+@color-text-light: #E5E5E5;
+
+@color-topbar-background: #1A1A1A;
+@size-topbar-height: 60px;
+@color-topbar-titletext: #FFFFFF;
+@color-topbar-window-button: #141414;
+@color-topbar-window-button-text: #666666;
+@color-topbar-window-button-text-hover: #0078FF;
+@color-topbar-window-xbutton-text-hover: #E40101;
+@color-topbar-window-button-hover: #1F1F1F;
+@size-topbar-window-button-width: 30px;
+@size-topbar-window-button-height: 30px;
+
+@color-toolbar-background: transparent;
+@size-toolbar-height: 60px;
+@color-toolbar-button: transparent;
+@color-toolbar-button-bar: #999999;
+@color-toolbar-button-hover: #4D4D4D;
+@color-toolbar-button-bar-hover: #FFFFFF;
+@size-toolbar-button-width: 80px;
+@size-toolbar-button-height: 60px;
+
+@color-navpane-header: #0A0A0A;
+@color-navpane-background: #141414;
+@color-navpane-entry: transparent;
+@color-navpane-entry-selected: #1F1F1F;
+@color-navpane-entry-hover: #282828;
+
+@color-scrollbar-handle: #999999;
+@color-scrollbar-track: #000000;
+
+@color-file-toolbar-background: #141414;
+
+@font-default: "Segoe UI";
+
+.topbar {
+  -fx-background-color: @color-topbar-background;
+  -fx-background-image: url("toolbar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: contain;
+  -fx-background-position: 0 0;
+  -fx-font-family: @font-default;
+  -fx-text-fill: @color-text-light;
+  -fx-min-height: @size-topbar-height;
+  -fx-max-height: @size-topbar-height;
+  .window-btn {
+    -fx-background-color: @color-topbar-window-button;
+    -fx-min-width: @size-topbar-window-button-width;
+    -fx-max-width: @size-topbar-window-button-width;
+    -fx-min-height: @size-topbar-window-button-height;
+    -fx-max-height: @size-topbar-window-button-height;
+    &:hover {
+      -fx-background-color: @color-topbar-window-button-hover;
+      -fx-text-fill: @color-topbar-window-button-text-hover;
+    }
+  }
+  .window-x-button:hover {
+    -fx-text-fill: @color-topbar-window-xbutton-text-hover;
+  }
+}
+
+.toolbar {
+  -fx-background-color: @color-toolbar-background;
+  .button {
+    -fx-background-color: @color-toolbar-button;
+    -fx-background-insets: 0;
+    -fx-border-color: @color-toolbar-button-bar;
+    -fx-border-width: 0 0 4px 0;
+    -fx-border-insets: 0;
+    -fx-min-width: @size-toolbar-button-width;
+    -fx-max-width: @size-toolbar-button-width;
+    -fx-min-height: @size-toolbar-button-height;
+    -fx-max-height: @size-toolbar-button-height;
+    -fx-font-size: 14px;
+    -fx-graphic-text-gap: 5px;
+    &:hover {
+      -fx-background-color: @color-toolbar-button-hover;
+      -fx-border-color: @color-toolbar-button-bar-hover;
+    }
+  }
+}
+
+

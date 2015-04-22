@@ -39,7 +39,8 @@
                 <artifactId>lesscss-maven-plugin</artifactId>
                 <version>1.7.0.1.1</version>
                 <configuration>
-                    <sourceDirectory>${project.basedir}/src/main/resources/co/phoenixlab/dn/dnptui</sourceDirectory>
+                    <sourceDirectory>${project.basedir}/src/main/resources/co/phoenixlab/dn/dnptui/assets</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                     <compress>false</compress>
                 </configuration>
                 <executions>
