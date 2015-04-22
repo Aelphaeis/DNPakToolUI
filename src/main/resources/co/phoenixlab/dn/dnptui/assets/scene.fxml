@@ -51,7 +51,7 @@
                </children></AnchorPane>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="4.0" styleClass="toolbar">
                <children>
-                  <Button fx:id="openPakBtn" mnemonicParsing="false" text="Open PAK">
+                  <Button fx:id="openPakBtn" mnemonicParsing="false" text="Open Pak">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -96,7 +96,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="closePakBtn" layoutX="350.0" layoutY="10.0" mnemonicParsing="false" text="Close PAK">
+                  <Button fx:id="closePakBtn" layoutX="350.0" layoutY="10.0" mnemonicParsing="false" text="Close Pak">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
