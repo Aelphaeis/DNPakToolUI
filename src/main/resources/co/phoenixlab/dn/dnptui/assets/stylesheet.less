@@ -2,7 +2,7 @@
 @color-text-light: #E5E5E5;
 
 @color-topbar-background: #1A1A1A;
-@size-topbar-height: 60px;
+@size-topbar-height: 30px;
 @color-topbar-titletext: #FFFFFF;
 @color-topbar-window-button: #141414;
 @color-topbar-window-button-text: #666666;
@@ -12,7 +12,7 @@
 @size-topbar-window-button-width: 30px;
 @size-topbar-window-button-height: 30px;
 
-@color-toolbar-background: transparent;
+@color-toolbar-background: #1A1A1A;
 @size-toolbar-height: 60px;
 @color-toolbar-button: transparent;
 @color-toolbar-button-bar: #999999;
@@ -26,22 +26,31 @@
 @color-navpane-entry: transparent;
 @color-navpane-entry-selected: #1F1F1F;
 @color-navpane-entry-hover: #282828;
+@size-navpane-header-height: 20px;
 
 @color-scrollbar-handle: #999999;
 @color-scrollbar-track: #000000;
+@color-scrollbar-thickness: 10px;
 
 @color-file-toolbar-background: #141414;
 
 @font-default: "Segoe UI";
 
+.root {
+  -fx-background-color: @color-background;
+}
+
 .topbar {
   -fx-background-color: @color-topbar-background;
   -fx-background-image: url("toolbar.png");
   -fx-background-repeat: no-repeat;
-  -fx-background-size: contain;
+  -fx-background-size: 97px 80px;
   -fx-background-position: 0 0;
-  -fx-font-family: @font-default;
-  -fx-text-fill: @color-text-light;
+  .label {
+    -fx-font-family: @font-default;
+    -fx-text-fill: @color-text-light;
+    -fx-font-size: 14px;
+  }
   -fx-min-height: @size-topbar-height;
   -fx-max-height: @size-topbar-height;
   .window-btn {
@@ -62,6 +71,12 @@
 
 .toolbar {
   -fx-background-color: @color-toolbar-background;
+  -fx-background-image: url("toolbar.png");
+  -fx-background-repeat: no-repeat;
+  -fx-background-size: 97px 80px;
+  -fx-background-position: 0 -@size-topbar-height;
+  -fx-min-height: @size-toolbar-button-height;
+  -fx-max-height: @size-toolbar-button-height;
   .button {
     -fx-background-color: @color-toolbar-button;
     -fx-background-insets: 0;
@@ -79,6 +94,67 @@
       -fx-border-color: @color-toolbar-button-bar-hover;
     }
   }
+}
+
+.split {
+  -fx-background-color: @color-background;
+  .split-pane-divider {
+    -fx-padding: 0 1px;
+    -fx-background-color: @color-navpane-background;
+  }
+}
+
+.navpane {
+  -fx-background-color: @color-navpane-background;
+  .header {
+    -fx-padding: 0 6px;
+    -fx-background-color: @color-navpane-header;
+    -fx-font-size: 12px;
+    -fx-text-fill: @color-text-light;
+    -fx-min-height: @size-navpane-header-height;
+    -fx-max-height: @size-navpane-header-height;
+  }
+  .scroll-pane {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: @color-navpane-background;
+    &:focused {
+      -fx-border-width: 0;
+    }
+    .viewport {
+      -fx-border-color: transparent;
+      -fx-background-color: @color-navpane-background;
+    }
+    .scroll-bar {
+      -fx-background-color: @color-scrollbar-track;
+      -fx-background-insets: 0;
+      &:horizontal {
+        -fx-min-height: @color-scrollbar-thickness;
+        -fx-max-height: @color-scrollbar-thickness;
+      }
+      &:vertical {
+        -fx-min-width: @color-scrollbar-thickness;
+        -fx-max-width: @color-scrollbar-thickness;
+      }
+      .thumb {
+        -fx-background-color: @color-scrollbar-handle;
+        -fx-background-insets: 0;
+        -fx-background-radius: 0;
+      }
+      .increment-button,
+      .decrement-button {
+        -fx-background-color: transparent;
+        -fx-background-insets: 0;
+        -fx-padding: 0;
+        .increment-arrow,
+        .decrement-arrow {
+          -fx-shape: " ";
+        }
+      }
+    }
+
+  }
+
 }
 
 
