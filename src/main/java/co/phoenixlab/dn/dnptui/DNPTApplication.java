@@ -25,7 +25,11 @@
 package co.phoenixlab.dn.dnptui;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class DNPTApplication extends Application {
 
@@ -34,7 +38,16 @@ public class DNPTApplication extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-
+    public void start(Stage primaryStage) throws Exception {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
+            Scene scene = new Scene(root, 1000, 700);
+            primaryStage.initStyle(StageStyle.UNDECORATED);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
