@@ -142,6 +142,7 @@ public class DNPTUIController {
 
     private void loadPak(Path path) {
         lastOpenedDir = path.getParent();
+        openedFilePathProperty.set(path.toString());
 
     }
 
@@ -151,11 +152,12 @@ public class DNPTUIController {
         dirChooser.setTitle("Choose a Pak file");
         Optional.ofNullable(dirChooser.showDialog(stage)).
                 map(File::toPath).
-                ifPresent(this::loadPak);
+                ifPresent(this::loadVirtualPak);
     }
 
     private void loadVirtualPak(Path dir) {
         lastOpenedDir = dir;
+        openedFilePathProperty.set(dir.toString() + " (Virtual)");
         //  Show loading dialog
 
         //  Dispatch job
