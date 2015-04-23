@@ -187,12 +187,16 @@ public class DNPTUIController {
     }
 
     public void windowDragging(MouseEvent event) {
-        stage.setX(event.getScreenX() - xOff);
-        stage.setY(event.getScreenY() - yOff);
+        if (!maximizedProperty.get()) {
+            stage.setX(event.getScreenX() - xOff);
+            stage.setY(event.getScreenY() - yOff);
+        }
     }
 
     public void windowDragStart(MouseEvent event) {
-        xOff = event.getSceneX();
-        yOff = event.getSceneY();
+        if (!maximizedProperty.get()) {
+            xOff = event.getSceneX();
+            yOff = event.getSceneY();
+        }
     }
 }
