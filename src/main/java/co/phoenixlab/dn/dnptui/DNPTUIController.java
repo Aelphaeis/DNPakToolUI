@@ -34,6 +34,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -51,12 +53,16 @@ public class DNPTUIController {
     private Stage stage;
     private Scene scene;
 
+    @FXML private AnchorPane topBar;
     @FXML private Label titleLbl;
     @FXML private Button maxRestoreBtn;
     @FXML private Button findBtn;
     @FXML private Button exportBtn;
     @FXML private Button exportFolderBtn;
     @FXML private Button closePakBtn;
+
+    private double xOff;
+    private double yOff;
 
     private final BooleanProperty noPakLoadedProperty;
     private final StringProperty openedFilePathProperty;
@@ -178,5 +184,15 @@ public class DNPTUIController {
 
     public void closePak(ActionEvent event) {
 
+    }
+
+    public void windowDragging(MouseEvent event) {
+        stage.setX(event.getScreenX() - xOff);
+        stage.setY(event.getScreenY() - yOff);
+    }
+
+    public void windowDragStart(MouseEvent event) {
+        xOff = event.getSceneX();
+        yOff = event.getSceneY();
     }
 }
