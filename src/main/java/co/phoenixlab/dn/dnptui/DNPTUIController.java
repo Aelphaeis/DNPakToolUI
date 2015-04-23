@@ -51,6 +51,8 @@ import java.util.Optional;
 
 public class DNPTUIController {
 
+    public static final int MIN_WIDTH = 550;
+    public static final int MIN_HEIGHT = 400;
     private DNPTApplication application;
     private Stage stage;
     private Scene scene;
@@ -110,6 +112,8 @@ public class DNPTUIController {
                 topBar.setId("top-drag");
             }
         });
+        stage.setMinWidth(MIN_WIDTH);
+        stage.setMinHeight(MIN_HEIGHT);
 
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.125D), scene.getRoot());
         fadeTransition.setFromValue(0D);
@@ -219,7 +223,7 @@ public class DNPTUIController {
     public void windowVerticalResize(MouseEvent event) {
         if (!maximizedProperty.get()) {
             double y = event.getScreenY() - stage.getY();
-            if (y > 400) {
+            if (y > MIN_HEIGHT) {
                 stage.setHeight(y);
             }
         }
@@ -228,7 +232,7 @@ public class DNPTUIController {
     public void windowHorizontalResize(MouseEvent event) {
         if (!maximizedProperty.get()) {
             double x = event.getScreenX() - stage.getX();
-            if (x > 500) {
+            if (x > MIN_WIDTH) {
                 stage.setWidth(x);
             }
         }
