@@ -44,7 +44,15 @@
 
 
 .root {
-  -fx-background-color: @color-background;
+  -fx-background-color: @color-topbar-background, @color-background;
+  -fx-background-insets: 0, 2px;
+
+  .bottom-drag {
+    -fx-cursor: v_resize;
+  }
+  .side-drag {
+    -fx-cursor: h_resize;
+  }
 }
 
 .button {

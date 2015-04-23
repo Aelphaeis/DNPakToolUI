@@ -112,4 +112,7 @@
          </children>
       </VBox>
    </top>
+   <bottom>
+      <VBox fx:id="bottomDrag" maxHeight="2.0" maxWidth="1.7976931348623157E308" minHeight="2.0" onMouseDragged="#windowVerticalResize" prefHeight="2.0" styleClass="bottom-drag" BorderPane.alignment="CENTER" />
+   </bottom>
 </BorderPane>

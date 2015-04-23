@@ -199,4 +199,13 @@ public class DNPTUIController {
             yOff = event.getSceneY();
         }
     }
+
+    public void windowVerticalResize(MouseEvent event) {
+        if (!maximizedProperty.get()) {
+            double y = event.getScreenY() - stage.getY();
+            if (y > 400) {
+                stage.setHeight(y);
+            }
+        }
+    }
 }
