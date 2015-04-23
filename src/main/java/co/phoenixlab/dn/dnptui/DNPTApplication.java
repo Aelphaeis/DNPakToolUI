@@ -28,6 +28,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -40,14 +41,24 @@ public class DNPTApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
+            Parent root = loader.load();
+            DNPTUIController controller = loader.getController();
             Scene scene = new Scene(root, 1000, 700);
-            primaryStage.initStyle(StageStyle.UNDECORATED);
+            scene.setFill(Color.TRANSPARENT);
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
             primaryStage.setScene(scene);
+            controller.setStageSceneApp(primaryStage, scene, this);
             primaryStage.show();
+            controller.init();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @Override
+    public void stop() {
+        System.exit(0);
     }
 }

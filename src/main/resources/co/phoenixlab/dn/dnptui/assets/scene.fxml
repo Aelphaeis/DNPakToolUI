@@ -6,7 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.DNPTUIController">
    <center>
       <SplitPane dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
          <items>
@@ -30,7 +30,7 @@
             <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="topbar">
                <children>
                   <Label fx:id="titleLbl" layoutX="14.0" layoutY="6.0" text="DN Pak Tool" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="6.0" />
-                  <Button fx:id="exitBtn" layoutX="962.0" layoutY="2.0" mnemonicParsing="false" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Button fx:id="exitBtn" layoutX="962.0" layoutY="2.0" mnemonicParsing="false" onAction="#showClosePrompt" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <styleClass>
                         <String fx:value="window-btn" />
                         <String fx:value="window-x-button" />
@@ -42,7 +42,7 @@
                         <String fx:value="window-max-button" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="iconifyBtn" layoutX="980.0" layoutY="10.0" mnemonicParsing="false" AnchorPane.rightAnchor="62.0" AnchorPane.topAnchor="0.0">
+                  <Button fx:id="iconifyBtn" layoutX="980.0" layoutY="10.0" mnemonicParsing="false" onAction="#iconify" AnchorPane.rightAnchor="62.0" AnchorPane.topAnchor="0.0">
                      <styleClass>
                         <String fx:value="window-btn" />
                         <String fx:value="window-iconify-button" />
