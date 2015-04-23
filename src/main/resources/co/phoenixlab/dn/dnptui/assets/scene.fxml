@@ -10,7 +10,7 @@
    <center>
       <SplitPane dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
          <items>
-            <VBox maxHeight="1.7976931348623157E308" prefWidth="240.0" styleClass="navpane">
+            <VBox maxHeight="1.7976931348623157E308" minWidth="240.0" prefWidth="240.0" styleClass="navpane">
                <children>
                   <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
                   <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="ALWAYS">
@@ -27,7 +27,7 @@
    <top>
       <VBox prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane fx:id="topBar" onMouseDragged="#windowDragging" onMousePressed="#windowDragStart" prefHeight="200.0" prefWidth="200.0" styleClass="topbar">
+            <AnchorPane id="top-drag" fx:id="topBar" onMouseDragged="#windowDragging" onMousePressed="#windowDragStart" prefHeight="200.0" prefWidth="200.0" styleClass="topbar">
                <children>
                   <Label fx:id="titleLbl" layoutX="14.0" layoutY="6.0" text="DN Pak Tool" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="6.0" />
                   <Button fx:id="exitBtn" layoutX="962.0" layoutY="2.0" mnemonicParsing="false" onAction="#showClosePrompt" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -113,12 +113,12 @@
       </VBox>
    </top>
    <bottom>
-      <VBox fx:id="bottomDrag" maxHeight="4.0" maxWidth="1.7976931348623157E308" minHeight="4.0" onMouseDragged="#windowVerticalResize" prefHeight="4.0" styleClass="bottom-drag" BorderPane.alignment="CENTER" />
+      <VBox id="bottom-drag" fx:id="bottomDrag" maxHeight="4.0" maxWidth="1.7976931348623157E308" minHeight="4.0" onMouseDragged="#windowVerticalResize" prefHeight="4.0" BorderPane.alignment="CENTER" />
    </bottom>
    <right>
-      <HBox fx:id="rightDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" styleClass="side-drag" BorderPane.alignment="CENTER" />
+      <HBox id="side-drag" fx:id="rightDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" BorderPane.alignment="CENTER" />
    </right>
    <left>
-      <HBox fx:id="leftDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" styleClass="side-drag" BorderPane.alignment="CENTER" />
+      <HBox id="side-drag" fx:id="leftDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" BorderPane.alignment="CENTER" />
    </left>
 </BorderPane>

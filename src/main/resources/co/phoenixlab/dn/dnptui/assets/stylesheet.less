@@ -45,12 +45,12 @@
 
 .root {
   -fx-background-color: @color-topbar-background, @color-background;
-  -fx-background-insets: 0, 2px;
+  -fx-background-insets: 0, 4px;
 
-  .bottom-drag {
+  #bottom-drag {
     -fx-cursor: v_resize;
   }
-  .side-drag {
+  #side-drag {
     -fx-cursor: h_resize;
   }
 }
@@ -61,13 +61,16 @@
   -fx-background-radius: 0;
 }
 
+#top-drag {
+  -fx-cursor: move;
+}
+
 .topbar {
   -fx-background-color: @color-topbar-background;
   -fx-background-image: url("toolbar/toolbar.png");
   -fx-background-repeat: no-repeat;
   -fx-background-size: 97px 80px;
   -fx-background-position: 3 0;
-  -fx-cursor: move;
   .label {
     -fx-font-family: @font-default;
     -fx-text-fill: @color-text-light;

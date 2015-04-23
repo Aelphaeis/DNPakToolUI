@@ -36,6 +36,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -54,6 +56,9 @@ public class DNPTUIController {
     private Scene scene;
 
     @FXML private AnchorPane topBar;
+    @FXML private VBox bottomDrag;
+    @FXML private HBox rightDrag;
+    @FXML private HBox leftDrag;
     @FXML private Label titleLbl;
     @FXML private Button maxRestoreBtn;
     @FXML private Button findBtn;
@@ -85,14 +90,25 @@ public class DNPTUIController {
     }
 
     public void init() {
-        maximizedProperty.bind(stage.maximizedProperty());
         findBtn.disableProperty().bind(noPakLoadedProperty);
         exportBtn.disableProperty().bind(noPakLoadedProperty);
         exportFolderBtn.disableProperty().bind(noPakLoadedProperty);
         closePakBtn.disableProperty().bind(noPakLoadedProperty);
         titleLbl.textProperty().bind(Bindings.concat("DN Pak Tool - ").concat(openedFilePathProperty));
+        maximizedProperty.bind(stage.maximizedProperty());
         maximizedProperty.addListener((observable, oldValue, newValue) -> {
             maxRestoreBtn.setId(newValue ? "window-restore-button" : null);
+            if (newValue) {
+                leftDrag.setId(null);
+                rightDrag.setId(null);
+                bottomDrag.setId(null);
+                topBar.setId(null);
+            } else {
+                leftDrag.setId("side-drag");
+                rightDrag.setId("side-drag");
+                bottomDrag.setId("bottom-drag");
+                topBar.setId("top-drag");
+            }
         });
 
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.125D), scene.getRoot());
