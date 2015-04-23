@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -8,18 +9,22 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.DNPTUIController">
    <center>
-      <SplitPane dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
          <items>
-            <VBox maxHeight="1.7976931348623157E308" minWidth="240.0" prefWidth="240.0" styleClass="navpane">
+            <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
-                  <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="ALWAYS">
-                     <content>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
-                     </content>
-                  </ScrollPane>
+                  <VBox maxHeight="1.7976931348623157E308" minWidth="240.0" prefWidth="240.0" styleClass="navpane">
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
+                        <ScrollPane fx:id="navScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="ALWAYS">
+                           <content>
+                              <TreeView />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
                </children>
-            </VBox>
+            </HBox>
             <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
          </items>
       </SplitPane>

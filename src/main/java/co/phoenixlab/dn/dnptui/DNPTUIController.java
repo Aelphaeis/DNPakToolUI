@@ -25,6 +25,7 @@
 package co.phoenixlab.dn.dnptui;
 
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -67,6 +68,8 @@ public class DNPTUIController {
     @FXML private Button exportBtn;
     @FXML private Button exportFolderBtn;
     @FXML private Button closePakBtn;
+    @FXML private ScrollPane navScrollPane;
+    @FXML private SplitPane splitPane;
 
     private double xOff;
     private double yOff;
@@ -114,6 +117,9 @@ public class DNPTUIController {
         });
         stage.setMinWidth(MIN_WIDTH);
         stage.setMinHeight(MIN_HEIGHT);
+        Platform.runLater(() ->
+                navScrollPane.prefViewportHeightProperty().
+                        bind(splitPane.heightProperty().subtract(20)));
 
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.125D), scene.getRoot());
         fadeTransition.setFromValue(0D);
@@ -184,7 +190,7 @@ public class DNPTUIController {
     private void loadVirtualPak(Path dir) {
         lastOpenedDir = dir;
         openedFilePathProperty.set(dir.toString() + " (Virtual)");
-        //  Show loading dialog
+        //  Show loading indicator
 
         //  Dispatch job
 
