@@ -6,14 +6,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.DNPTUIController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.DNPTUIController">
    <center>
       <SplitPane dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
          <items>
             <VBox maxHeight="1.7976931348623157E308" prefWidth="240.0" styleClass="navpane">
                <children>
                   <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
-                  <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" minViewportHeight="100.0" minViewportWidth="230.0" prefViewportHeight="578.0" prefViewportWidth="230.0" vbarPolicy="ALWAYS">
+                  <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="ALWAYS">
                      <content>
                         <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
                      </content>
@@ -113,6 +113,12 @@
       </VBox>
    </top>
    <bottom>
-      <VBox fx:id="bottomDrag" maxHeight="2.0" maxWidth="1.7976931348623157E308" minHeight="2.0" onMouseDragged="#windowVerticalResize" prefHeight="2.0" styleClass="bottom-drag" BorderPane.alignment="CENTER" />
+      <VBox fx:id="bottomDrag" maxHeight="4.0" maxWidth="1.7976931348623157E308" minHeight="4.0" onMouseDragged="#windowVerticalResize" prefHeight="4.0" styleClass="bottom-drag" BorderPane.alignment="CENTER" />
    </bottom>
+   <right>
+      <HBox fx:id="rightDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" styleClass="side-drag" BorderPane.alignment="CENTER" />
+   </right>
+   <left>
+      <HBox fx:id="leftDrag" maxWidth="4.0" minWidth="4.0" onMouseDragged="#windowHorizontalResize" prefWidth="4.0" styleClass="side-drag" BorderPane.alignment="CENTER" />
+   </left>
 </BorderPane>

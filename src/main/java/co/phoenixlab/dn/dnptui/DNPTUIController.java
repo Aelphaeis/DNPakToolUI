@@ -208,4 +208,13 @@ public class DNPTUIController {
             }
         }
     }
+
+    public void windowHorizontalResize(MouseEvent event) {
+        if (!maximizedProperty.get()) {
+            double x = event.getScreenX() - stage.getX();
+            if (x > 500) {
+                stage.setWidth(x);
+            }
+        }
+    }
 }
