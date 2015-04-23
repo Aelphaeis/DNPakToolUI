@@ -36,7 +36,7 @@
                         <String fx:value="window-x-button" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="maxRestoreBtn" layoutX="980.0" layoutY="10.0" mnemonicParsing="false" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="0.0">
+                  <Button fx:id="maxRestoreBtn" layoutX="980.0" layoutY="10.0" mnemonicParsing="false" onAction="#toggleMax" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="0.0">
                      <styleClass>
                         <String fx:value="window-btn" />
                         <String fx:value="window-max-button" />
@@ -51,7 +51,7 @@
                </children></AnchorPane>
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="4.0" styleClass="toolbar">
                <children>
-                  <Button fx:id="openPakBtn" mnemonicParsing="false" text="Open Pak">
+                  <Button fx:id="openPakBtn" mnemonicParsing="false" onAction="#openPak" text="Open Pak">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -60,7 +60,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="openVirtualPakBtn" layoutX="14.0" layoutY="10.0" mnemonicParsing="false" text="Virtual Pak">
+                  <Button fx:id="openVirtualPakBtn" layoutX="14.0" layoutY="10.0" mnemonicParsing="false" onAction="#openVirtualPak" text="Virtual Pak">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -69,7 +69,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="findBtn" layoutX="98.0" layoutY="10.0" mnemonicParsing="false" text="Find">
+                  <Button fx:id="findBtn" layoutX="98.0" layoutY="10.0" mnemonicParsing="false" onAction="#find" text="Find">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -78,7 +78,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" text="Export File">
+                  <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" onAction="#exportFile" text="Export File">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -87,7 +87,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="exportFolderBtn" layoutX="266.0" layoutY="10.0" mnemonicParsing="false" text="Export Dir">
+                  <Button fx:id="exportFolderBtn" layoutX="266.0" layoutY="10.0" mnemonicParsing="false" onAction="#exportFolder" text="Export Dir">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -96,7 +96,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="closePakBtn" layoutX="350.0" layoutY="10.0" mnemonicParsing="false" text="Close Pak">
+                  <Button fx:id="closePakBtn" layoutX="350.0" layoutY="10.0" mnemonicParsing="false" onAction="#closePak" text="Close Pak">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
