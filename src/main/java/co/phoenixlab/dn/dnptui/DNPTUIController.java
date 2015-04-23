@@ -35,6 +35,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class DNPTUIController {
@@ -85,8 +86,14 @@ public class DNPTUIController {
     public void showClosePrompt(ActionEvent event) {
         Dialog<ButtonType> exitDialog = new Dialog<>();
         DialogPane dialogPane = new DialogPane();
-        dialogPane.setContentText("Are you sure you want to quit?");
+        dialogPane.getStylesheets().add(getClass().
+                getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm());
+        dialogPane.getStyleClass().add("exit-dialog");
+        Label label = new Label("Are you sure you want to quit?");
+        label.getStyleClass().add("exit-dialog-lbl");
+        dialogPane.setContent(label);
         dialogPane.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+        exitDialog.initStyle(StageStyle.TRANSPARENT);
         exitDialog.setDialogPane(dialogPane);
         exitDialog.setTitle("DN Pak Tool");
         exitDialog.showAndWait().

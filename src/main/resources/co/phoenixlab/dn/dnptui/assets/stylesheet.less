@@ -36,6 +36,13 @@
 
 @font-default: "Segoe UI";
 
+@color-dialog: #1A1A1A;
+@color-dialog-border: #282828;
+
+@size-exit-dialog-width: 270px;
+@size-exit-dialog-height: 90px;
+
+
 .root {
   -fx-background-color: @color-background;
 }
@@ -205,4 +212,34 @@
   }
 }
 
+
+.exit-dialog {
+  -fx-background-color: @color-dialog;
+  -fx-border-color: @color-dialog-border;
+  -fx-min-width: @size-exit-dialog-width;
+  -fx-max-width: @size-exit-dialog-width;
+  -fx-min-height: @size-exit-dialog-height;
+  -fx-max-height: @size-exit-dialog-height;
+  -fx-alignment: CENTER;
+  .exit-dialog-lbl {
+    -fx-text-fill: @color-text-light;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+  }
+  .button {
+    -fx-background-color: @color-toolbar-button;
+    -fx-background-insets: 0;
+    -fx-border-color: @color-toolbar-button-bar;
+    -fx-border-width: 0 0 4px 0;
+    -fx-border-insets: 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: @color-text-light;
+    -fx-padding: 0;
+    -fx-alignment: CENTER;
+    &:hover {
+      -fx-background-color: @color-toolbar-button-hover;
+      -fx-border-color: @color-toolbar-button-bar-hover;
+    }
+  }
+}
 
