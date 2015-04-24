@@ -94,7 +94,11 @@
     </build>
 
     <dependencies>
-
+        <dependency>
+            <groupId>co.phoenixlab.dn</groupId>
+            <artifactId>DNPakTool</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 
 </project>
