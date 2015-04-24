@@ -37,6 +37,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -58,6 +59,7 @@ public class DNPTUIController {
     private Stage stage;
     private Scene scene;
 
+    @FXML private BorderPane root;
     @FXML private AnchorPane topBar;
     @FXML private VBox bottomDrag;
     @FXML private HBox rightDrag;
@@ -119,7 +121,7 @@ public class DNPTUIController {
         stage.setMinHeight(MIN_HEIGHT);
         Platform.runLater(() ->
                 navScrollPane.prefViewportHeightProperty().
-                        bind(splitPane.heightProperty().subtract(20)));
+                        bind(root.heightProperty().subtract(126)));
 
         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.125D), scene.getRoot());
         fadeTransition.setFromValue(0D);
@@ -160,6 +162,7 @@ public class DNPTUIController {
     public void toggleMax(ActionEvent event) {
         boolean old = stage.isMaximized();
         stage.setMaximized(!old);
+        root.requestLayout();
     }
 
     public void openPak(ActionEvent event) {
