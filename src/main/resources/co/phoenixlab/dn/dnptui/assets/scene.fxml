@@ -9,14 +9,14 @@
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.DNPTUIController">
    <center>
-      <SplitPane fx:id="splitPane" dividerPositions="0.5" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" dividerPositions="0.24" maxHeight="1.7976931348623157E308" styleClass="split" BorderPane.alignment="CENTER">
          <items>
             <VBox maxHeight="1.7976931348623157E308" minWidth="240.0" prefWidth="240.0" styleClass="navpane">
                <children>
                   <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
-                  <ScrollPane fx:id="navScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" vbarPolicy="ALWAYS">
+                  <ScrollPane fx:id="navScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="240.0" vbarPolicy="ALWAYS">
                      <content>
-                        <TreeView />
+                        <TreeView fx:id="treeView" styleClass="nav-tree-view" />
                      </content>
                   </ScrollPane>
                </children>

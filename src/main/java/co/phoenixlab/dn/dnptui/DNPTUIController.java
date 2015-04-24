@@ -72,6 +72,7 @@ public class DNPTUIController {
     @FXML private Button closePakBtn;
     @FXML private ScrollPane navScrollPane;
     @FXML private SplitPane splitPane;
+    @FXML private TreeView treeView;
 
     private double xOff;
     private double yOff;
