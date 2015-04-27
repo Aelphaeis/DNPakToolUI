@@ -32,7 +32,16 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 public class DNPTApplication extends Application {
+
+    public static final ScheduledExecutorService EXECUTOR_SERVICE;
+
+    static {
+        EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
+    }
 
     public static void main(String[] args) {
         launch(args);
