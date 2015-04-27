@@ -32,17 +32,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PakLoadTask extends Task<PakHandler> {
 
     private final List<Path> paths;
+    private final Consumer<PakHandler> onDone;
 
-    public PakLoadTask(Path path) {
+    public PakLoadTask(Path path, Consumer<PakHandler> onDone) {
         paths = Collections.singletonList(path);
+        this.onDone = onDone;
     }
 
-    public PakLoadTask(List<Path> paths) {
+    public PakLoadTask(List<Path> paths, Consumer<PakHandler> onDone) {
         this.paths = paths;
+        this.onDone = onDone;
     }
 
     @Override
@@ -50,7 +54,6 @@ public class PakLoadTask extends Task<PakHandler> {
         try {
             int numPaths = paths.size();
             PakFileReader reader = new PakFileReader();
-            updateProgress(0, 1);
             List<PakFile> paks = new ArrayList<>(numPaths);
             Path path;
             for (int i = 0; i < numPaths; i++) {
@@ -66,5 +69,10 @@ public class PakLoadTask extends Task<PakHandler> {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @Override
+    protected void succeeded() {
+        onDone.accept(getValue());
     }
 }

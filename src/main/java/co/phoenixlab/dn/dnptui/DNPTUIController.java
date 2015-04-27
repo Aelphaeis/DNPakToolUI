@@ -47,9 +47,16 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DNPTUIController {
 
@@ -82,6 +89,8 @@ public class DNPTUIController {
     private final BooleanProperty maximizedProperty;
 
     private Path lastOpenedDir;
+
+    private PakHandler handler;
 
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
@@ -179,7 +188,13 @@ public class DNPTUIController {
     private void loadPak(Path path) {
         lastOpenedDir = path.getParent();
         openedFilePathProperty.set(path.toString());
+        PakLoadTask task = new PakLoadTask(path, this::onLoadFinished);
+        //  Show loading indicator
 
+        //  Wire up properties
+
+        //  Dispatch job
+        DNPTApplication.EXECUTOR_SERVICE.submit(task);
     }
 
     public void openVirtualPak(ActionEvent event) {
@@ -194,9 +209,28 @@ public class DNPTUIController {
     private void loadVirtualPak(Path dir) {
         lastOpenedDir = dir;
         openedFilePathProperty.set(dir.toString() + " (Virtual)");
+        //  Build path list
+        List<Path> paths;
+        BiPredicate<Path, BasicFileAttributes> test = (p, a) -> p.getFileName().toString().endsWith(".pak");
+        test = test.and((p, a) -> !a.isDirectory());
+        try (Stream<Path> matches = Files.find(dir, 1, test)) {
+            paths = matches.collect(Collectors.toList());
+        } catch (IOException e) {
+            //  Err
+            e.printStackTrace();
+            return;
+        }
+        PakLoadTask task = new PakLoadTask(paths, this::onLoadFinished);
         //  Show loading indicator
 
+        //  Wire up properties
+
         //  Dispatch job
+        DNPTApplication.EXECUTOR_SERVICE.submit(task);
+    }
+
+    public void onLoadFinished(PakHandler handler) {
+        this.handler = handler;
 
     }
 
