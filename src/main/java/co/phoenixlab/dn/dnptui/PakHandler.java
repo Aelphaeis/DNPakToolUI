@@ -27,6 +27,7 @@ package co.phoenixlab.dn.dnptui;
 import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeView;
 
+import java.io.IOException;
 import java.util.List;
 
 public class PakHandler {
@@ -39,6 +40,20 @@ public class PakHandler {
 
     public void populate(TreeView treeView) {
 
+    }
+
+
+    public void unload() {
+        paks.forEach(this::tryClosePak);
+        paks.clear();
+    }
+
+    private void tryClosePak(PakFile pakFile) {
+        try {
+            pakFile.close();
+        } catch (IOException e) {
+            //  Don't care
+        }
     }
 
 }
