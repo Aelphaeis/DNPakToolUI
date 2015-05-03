@@ -63,8 +63,11 @@ public class PakLoadTask extends Task<PakHandler> {
                 paks.add(pakFile);
                 updateProgress(i + 1, numPaths);
             }
+            PakHandler handler = new PakHandler(paks);
+            updateMessage("Building file tree");
+            handler.build(d -> updateProgress(d, 1D));
             updateMessage("Done");
-            return new PakHandler(paks);
+            return handler;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

@@ -24,18 +24,46 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.pak.DirEntry;
+import co.phoenixlab.dn.pak.FileEntry;
 import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.DoubleConsumer;
 
 public class PakHandler {
 
     private final List<PakFile> paks;
+    private final DirEntry root;
+
+    private int numSubfiles;
+    private int subfilesIndexed;
+    private DoubleConsumer buildListner;
 
     public PakHandler(List<PakFile> paks) {
         this.paks = paks;
+        root = new DirEntry("", null);
+    }
+
+    public void build(DoubleConsumer progressListener) {
+        buildListner = progressListener;
+        numSubfiles = paks.stream().mapToInt(PakFile::getNumFiles).sum();
+        subfilesIndexed = 0;
+        buildListner.accept(0D);
+        paks.forEach(this::consolidate);
+    }
+    
+    private void consolidate(PakFile pakFile) {
+        Map<String, FileEntry> entryMap = pakFile.getEntryMap();
+        
+    }
+
+    private void incrProg() {
+        ++subfilesIndexed;
+        buildListner.accept((double) subfilesIndexed / (double) numSubfiles);
     }
 
     public void populate(TreeView treeView) {
