@@ -35,6 +35,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -261,21 +262,21 @@ public class DNPTUIController {
     }
 
     @FXML private void windowDragging(MouseEvent event) {
-        if (!maximizedProperty.get()) {
+        if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             stage.setX(event.getScreenX() - xOff);
             stage.setY(event.getScreenY() - yOff);
         }
     }
 
     @FXML private void windowDragStart(MouseEvent event) {
-        if (!maximizedProperty.get()) {
+        if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             xOff = event.getSceneX();
             yOff = event.getSceneY();
         }
     }
 
     @FXML private void windowVerticalResize(MouseEvent event) {
-        if (!maximizedProperty.get()) {
+        if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             double y = event.getScreenY() - stage.getY();
             if (y > MIN_HEIGHT) {
                 stage.setHeight(y);
@@ -288,7 +289,7 @@ public class DNPTUIController {
         if (event.getSource() == leftDrag) {
             left = true;
         }
-        if (!maximizedProperty.get()) {
+        if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             double x = event.getScreenX() - stage.getX();
             if (left) {
                 double newWidth = -x + stage.getWidth();
