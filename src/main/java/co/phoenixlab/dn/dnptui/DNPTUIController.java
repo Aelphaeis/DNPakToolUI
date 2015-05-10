@@ -284,10 +284,22 @@ public class DNPTUIController {
     }
 
     @FXML private void windowHorizontalResize(MouseEvent event) {
+        boolean left = false;
+        if (event.getSource() == leftDrag) {
+            left = true;
+        }
         if (!maximizedProperty.get()) {
             double x = event.getScreenX() - stage.getX();
-            if (x > MIN_WIDTH) {
-                stage.setWidth(x);
+            if (left) {
+                double newWidth = -x + stage.getWidth();
+                if (newWidth > MIN_WIDTH) {
+                    stage.setX(stage.getX() + x);
+                    stage.setWidth(newWidth);
+                }
+            } else {
+                if (x > MIN_WIDTH) {
+                    stage.setWidth(x);
+                }
             }
         }
     }
