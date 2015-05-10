@@ -153,7 +153,7 @@ public class DNPTUIController {
                         //  TODO Icon
                         setGraphic(null);
                     } else {
-                        setText(item.name + "\\");
+                        setText(item.name);
                         setGraphic(imageView);
                     }
                 }
