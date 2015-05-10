@@ -61,4 +61,9 @@ public class PakTreeEntry {
         result = 31 * result + path.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return name + "\\";
+    }
 }

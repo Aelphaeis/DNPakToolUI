@@ -233,7 +233,7 @@ public class DNPTUIController {
     public void onLoadFinished(PakHandler handler) {
         this.handler = handler;
         noPakLoadedProperty.set(false);
-
+        this.handler.populate(treeView);
     }
 
     @FXML private void find(ActionEvent event) {
