@@ -46,7 +46,7 @@ public class PakHandler {
         if (null1 == null2) {
             return o1.getValue().name.compareToIgnoreCase(o2.getValue().name);
         }
-        return Boolean.compare(null1, null2);
+        return -Boolean.compare(null1, null2);
     };
 
     private final List<PakFile> paks;
