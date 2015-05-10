@@ -14,7 +14,7 @@
             <VBox maxHeight="1.7976931348623157E308" minWidth="240.0" prefWidth="240.0" styleClass="navpane">
                <children>
                   <Label maxWidth="1.7976931348623157E308" styleClass="header" text="NAVIGATION" />
-                  <ScrollPane fx:id="navScrollPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="240.0" vbarPolicy="ALWAYS">
+                  <ScrollPane fx:id="navScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="240.0" vbarPolicy="NEVER">
                      <content>
                         <TreeView fx:id="treeView" styleClass="nav-tree-view" />
                      </content>
