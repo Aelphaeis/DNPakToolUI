@@ -278,6 +278,7 @@ public class DNPTUIController {
     }
 
     private void connectTaskToUI(PakLoadTask task) {
+        resetProperties();
         //  Show loading indicator
 
         //  Wire up properties
@@ -286,6 +287,10 @@ public class DNPTUIController {
     }
 
     public void onLoadFinished(PakHandler handler) {
+        if (this.handler != null) {
+            this.handler.unload();
+            this.handler = null;
+        }
         this.handler = handler;
         treeView.setRoot(null);
         DNPTApplication.EXECUTOR_SERVICE.submit(() -> {
@@ -318,14 +323,19 @@ public class DNPTUIController {
     }
 
     public void closePak() {
-        noPakLoadedProperty.set(true);
+        resetProperties();
         openedFilePathProperty.setValue("No File");
-        selectionTypeProperty.set(SelectionType.NONE);
-        selectedProperty.set(null);
         treeView.setRoot(null);
         if (this.handler != null) {
             this.handler.unload();
+            this.handler = null;
         }
+    }
+
+    private void resetProperties() {
+        noPakLoadedProperty.set(true);
+        selectionTypeProperty.set(SelectionType.NONE);
+        selectedProperty.set(null);
     }
 
     @FXML
