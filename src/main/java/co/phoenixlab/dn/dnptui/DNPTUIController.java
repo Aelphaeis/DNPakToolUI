@@ -27,10 +27,7 @@ package co.phoenixlab.dn.dnptui;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -269,8 +266,14 @@ public class DNPTUIController {
 
     public void onLoadFinished(PakHandler handler) {
         this.handler = handler;
-        noPakLoadedProperty.set(false);
-        this.handler.populate(treeView);
+        treeView.setRoot(null);
+        DNPTApplication.EXECUTOR_SERVICE.submit(() -> {
+            TreeItem<PakTreeEntry> root = this.handler.populate();
+            Platform.runLater(() -> {
+                treeView.setRoot(root);
+                noPakLoadedProperty.set(false);
+            });
+        });
     }
 
     @FXML

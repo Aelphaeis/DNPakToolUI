@@ -27,7 +27,6 @@ package co.phoenixlab.dn.dnptui;
 import co.phoenixlab.dn.pak.FileEntry;
 import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -56,7 +55,7 @@ public class PakHandler {
         this.paks = paks;
     }
 
-    public void populate(TreeView<PakTreeEntry> treeView) {
+    public TreeItem<PakTreeEntry> populate() {
         root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
         for (PakFile pakFile : paks) {
             Map<String, FileEntry> entries = pakFile.getEntryMap();
@@ -70,7 +69,7 @@ public class PakHandler {
             });
         }
         sort(root);
-        treeView.setRoot(root);
+        return root;
     }
 
     private void sort(TreeItem<PakTreeEntry> item) {
