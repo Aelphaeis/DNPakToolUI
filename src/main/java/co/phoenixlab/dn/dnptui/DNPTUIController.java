@@ -320,6 +320,8 @@ public class DNPTUIController {
     public void closePak() {
         noPakLoadedProperty.set(true);
         openedFilePathProperty.setValue("No File");
+        selectionTypeProperty.set(SelectionType.NONE);
+        selectedProperty.set(null);
         treeView.setRoot(null);
         if (this.handler != null) {
             this.handler.unload();
