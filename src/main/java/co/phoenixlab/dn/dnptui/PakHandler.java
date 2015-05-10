@@ -69,7 +69,13 @@ public class PakHandler {
                 insert(root, entry, path);
             });
         }
+        sort(root);
         treeView.setRoot(root);
+    }
+
+    private void sort(TreeItem<PakTreeEntry> item) {
+        item.getChildren().sort(TREE_ITEM_COMPARATOR);
+        item.getChildren().forEach(this::sort);
     }
 
     private TreeItem<PakTreeEntry> insert(TreeItem<PakTreeEntry> treeItem, PakTreeEntry entry, Path path) {
@@ -85,7 +91,6 @@ public class PakHandler {
             if (found == null) {
                 found = new TreeItem<>(entry);
                 treeItem.getChildren().add(found);
-                treeItem.getChildren().sort(TREE_ITEM_COMPARATOR);
             } else {
                 found.setValue(entry);
             }
@@ -100,7 +105,6 @@ public class PakHandler {
         if (found == null) {
             found = new TreeItem<>(new PakTreeEntry(sub, treeItem.getValue().path.resolve(sub), null, null));
             treeItem.getChildren().add(found);
-            treeItem.getChildren().sort(TREE_ITEM_COMPARATOR);
         }
         return insert(found, entry, path.subpath(1, path.getNameCount()));
     }
