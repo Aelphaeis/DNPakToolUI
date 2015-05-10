@@ -35,6 +35,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -49,6 +51,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,6 +85,8 @@ public class DNPTUIController {
     @FXML private SplitPane splitPane;
     @FXML private TreeView<PakTreeEntry> treeView;
 
+    private Image navFolderIcon;
+
     private double xOff;
     private double yOff;
 
@@ -92,6 +97,7 @@ public class DNPTUIController {
     private Path lastOpenedDir;
 
     private PakHandler handler;
+    private ImageView folderIconView;
 
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
@@ -128,6 +134,32 @@ public class DNPTUIController {
                 topBar.setId("top-drag");
             }
         });
+        try (InputStream inputStream =
+                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/nav/folder.png")) {
+            navFolderIcon = new Image(inputStream);
+        } catch (IOException e) {
+            //  TODO Exception handling
+        }
+        folderIconView = new ImageView(navFolderIcon);
+        treeView.setCellFactory(param -> new TreeCell<PakTreeEntry>() {
+            @Override
+            protected void updateItem(PakTreeEntry item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    if (item.entry != null) {
+                        setText(item.name);
+                        //  TODO Icon
+                    } else {
+                        setText(item.name + "\\");
+                        setGraphic(folderIconView);
+                    }
+                }
+            }
+        });
+
         stage.setMinWidth(MIN_WIDTH);
         stage.setMinHeight(MIN_HEIGHT);
         Platform.runLater(() ->
@@ -140,7 +172,8 @@ public class DNPTUIController {
         fadeTransition.playFromStart();
     }
 
-    @FXML private void showClosePrompt(ActionEvent event) {
+    @FXML
+    private void showClosePrompt(ActionEvent event) {
         Dialog<ButtonType> exitDialog = new Dialog<>();
         DialogPane dialogPane = new DialogPane();
         dialogPane.getStylesheets().add(getClass().
@@ -166,17 +199,20 @@ public class DNPTUIController {
         fadeTransition.playFromStart();
     }
 
-    @FXML private void iconify(ActionEvent event) {
+    @FXML
+    private void iconify(ActionEvent event) {
         stage.setIconified(true);
     }
 
-    @FXML private void toggleMax(ActionEvent event) {
+    @FXML
+    private void toggleMax(ActionEvent event) {
         boolean old = stage.isMaximized();
         stage.setMaximized(!old);
         root.requestLayout();
     }
 
-    @FXML private void openPak(ActionEvent event) {
+    @FXML
+    private void openPak(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(lastOpenedDir.toFile());
         fileChooser.setTitle("Choose a Pak file");
@@ -194,7 +230,8 @@ public class DNPTUIController {
         DNPTApplication.EXECUTOR_SERVICE.submit(task);
     }
 
-    @FXML private void openVirtualPak(ActionEvent event) {
+    @FXML
+    private void openVirtualPak(ActionEvent event) {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setInitialDirectory(lastOpenedDir.toFile());
         dirChooser.setTitle("Choose a Pak file");
@@ -236,19 +273,23 @@ public class DNPTUIController {
         this.handler.populate(treeView);
     }
 
-    @FXML private void find(ActionEvent event) {
+    @FXML
+    private void find(ActionEvent event) {
 
     }
 
-    @FXML private void exportFile(ActionEvent event) {
+    @FXML
+    private void exportFile(ActionEvent event) {
 
     }
 
-    @FXML private void exportFolder(ActionEvent event) {
+    @FXML
+    private void exportFolder(ActionEvent event) {
 
     }
 
-    @FXML private void closePak(ActionEvent event) {
+    @FXML
+    private void closePak(ActionEvent event) {
         closePak();
     }
 
@@ -261,21 +302,24 @@ public class DNPTUIController {
         }
     }
 
-    @FXML private void windowDragging(MouseEvent event) {
+    @FXML
+    private void windowDragging(MouseEvent event) {
         if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             stage.setX(event.getScreenX() - xOff);
             stage.setY(event.getScreenY() - yOff);
         }
     }
 
-    @FXML private void windowDragStart(MouseEvent event) {
+    @FXML
+    private void windowDragStart(MouseEvent event) {
         if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             xOff = event.getSceneX();
             yOff = event.getSceneY();
         }
     }
 
-    @FXML private void windowVerticalResize(MouseEvent event) {
+    @FXML
+    private void windowVerticalResize(MouseEvent event) {
         if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             double y = event.getScreenY() - stage.getY();
             if (y > MIN_HEIGHT) {
@@ -284,7 +328,8 @@ public class DNPTUIController {
         }
     }
 
-    @FXML private void windowHorizontalResize(MouseEvent event) {
+    @FXML
+    private void windowHorizontalResize(MouseEvent event) {
         boolean left = false;
         if (event.getSource() == leftDrag) {
             left = true;

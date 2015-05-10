@@ -27,6 +27,7 @@
 @color-navpane-entry-selected: #1F1F1F;
 @color-navpane-entry-hover: #282828;
 @size-navpane-header-height: 20px;
+@font-size-navpane-entry: 12px;
 
 @color-scrollbar-handle: #999999;
 @color-scrollbar-track: #000000;
@@ -231,7 +232,13 @@
   -fx-border-width: 0;
   -fx-border-radius: 0;
   .tree-cell {
-    -fx-background-color: transparent;
+    -fx-background-color: @color-navpane-entry;
+    -fx-text-fill: @color-text-light;
+    -fx-font-size: @font-size-navpane-entry;
+    -fx-padding: 1px;
+    &:selected {
+      -fx-background-color: @color-navpane-entry-selected;
+    }
   }
 }
 
