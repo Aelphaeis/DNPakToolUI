@@ -28,10 +28,12 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -57,6 +59,14 @@ public class DNPTApplication extends Application {
             scene.setFill(Color.TRANSPARENT);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             primaryStage.setScene(scene);
+            int[] iconSizes = {24, 32, 64, 128};
+            for (int i : iconSizes) {
+                try (InputStream stream =
+                             getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/window/icon_" + i +
+                                     ".png")) {
+                    primaryStage.getIcons().add(new Image(stream));
+                }
+            }
             controller.setStageSceneApp(primaryStage, scene, this);
             primaryStage.show();
             controller.init();
