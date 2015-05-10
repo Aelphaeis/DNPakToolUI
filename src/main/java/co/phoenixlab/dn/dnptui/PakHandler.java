@@ -24,6 +24,7 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.pak.FileEntry;
 import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -31,10 +32,22 @@ import javafx.scene.control.TreeView;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PakHandler {
+
+    private static final Comparator<TreeItem<PakTreeEntry>> TREE_ITEM_COMPARATOR = (o1, o2) -> {
+        boolean null1 = o1.getValue().entry == null;
+        boolean null2 = o2.getValue().entry == null;
+        //  Only true if both are null or not null
+        if (null1 == null2) {
+            return o1.getValue().name.compareToIgnoreCase(o2.getValue().name);
+        }
+        return Boolean.compare(null1, null2);
+    };
 
     private final List<PakFile> paks;
     private TreeItem<PakTreeEntry> root;
@@ -45,9 +58,51 @@ public class PakHandler {
 
     public void populate(TreeView<PakTreeEntry> treeView) {
         root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
-
-
+        for (PakFile pakFile : paks) {
+            Map<String, FileEntry> entries = pakFile.getEntryMap();
+            entries.forEach((s, e) -> {
+                if (s.startsWith("\\")) {
+                    s = s.substring(1);
+                }
+                Path path = Paths.get(s);
+                PakTreeEntry entry = new PakTreeEntry(e.name, path, e, pakFile);
+                insert(root, entry, path);
+            });
+        }
         treeView.setRoot(root);
+    }
+
+    private TreeItem<PakTreeEntry> insert(TreeItem<PakTreeEntry> treeItem, PakTreeEntry entry, Path path) {
+        TreeItem<PakTreeEntry> found = null;
+        String sub = path.getName(0).toString();
+        if (path.getNameCount() == 1) {
+            for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
+                if (item.getValue().name.equals(sub)) {
+                    found = item;
+                    break;
+                }
+            }
+            if (found == null) {
+                found = new TreeItem<>(entry);
+                treeItem.getChildren().add(found);
+                treeItem.getChildren().sort(TREE_ITEM_COMPARATOR);
+            } else {
+                found.setValue(entry);
+            }
+            return found;
+        }
+        for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
+            if (item.getValue().name.equals(sub)) {
+                found = item;
+                break;
+            }
+        }
+        if (found == null) {
+            found = new TreeItem<>(new PakTreeEntry(sub, treeItem.getValue().path.resolve(sub), null, null));
+            treeItem.getChildren().add(found);
+            treeItem.getChildren().sort(TREE_ITEM_COMPARATOR);
+        }
+        return insert(found, entry, path.subpath(1, path.getNameCount()));
     }
 
     public PakTreeEntry find(Path path) {
@@ -55,17 +110,17 @@ public class PakHandler {
     }
 
     private TreeItem<PakTreeEntry> find(TreeItem<PakTreeEntry> treeItem, Path path) {
+        String sub = path.getName(0).toString();
         if (path.getNameCount() == 1) {
             for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
-                if (item.getValue().name.equals(path.toString())) {
+                if (item.getValue().name.equals(sub)) {
                     return item;
                 }
             }
             return null;
         }
-        Path sub = path.getName(0);
         for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
-            if (item.getValue().name.equals(sub.toString())) {
+            if (item.getValue().name.equals(sub)) {
                 return find(item, path.subpath(1, path.getNameCount()));
             }
         }
