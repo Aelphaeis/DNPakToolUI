@@ -67,6 +67,12 @@ public class DNPTUIController {
     private Stage stage;
     private Scene scene;
 
+    enum SelectionType {
+        FOLDER,
+        FILE,
+        NONE
+    }
+
     @FXML private BorderPane root;
     @FXML private AnchorPane topBar;
     @FXML private VBox bottomDrag;
@@ -88,6 +94,7 @@ public class DNPTUIController {
     private double yOff;
 
     private final BooleanProperty noPakLoadedProperty;
+    private final ObjectProperty<SelectionType> selectionTypeProperty;
     private final StringProperty openedFilePathProperty;
     private final BooleanProperty maximizedProperty;
 
@@ -97,6 +104,7 @@ public class DNPTUIController {
 
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
+        selectionTypeProperty = new SimpleObjectProperty<>(this, "selectionType", SelectionType.NONE);
         openedFilePathProperty = new SimpleStringProperty(this, "openedFilePath", "No File");
         maximizedProperty = new SimpleBooleanProperty(this, "maximized", false);
         lastOpenedDir = Paths.get(System.getProperty("user.dir"));
@@ -111,8 +119,10 @@ public class DNPTUIController {
 
     public void init() {
         findBtn.disableProperty().bind(noPakLoadedProperty);
-        exportBtn.disableProperty().bind(noPakLoadedProperty);
-        exportFolderBtn.disableProperty().bind(noPakLoadedProperty);
+        exportBtn.disableProperty().bind(noPakLoadedProperty.
+                or(selectionTypeProperty.isNotEqualTo(SelectionType.FILE)));
+        exportFolderBtn.disableProperty().bind(noPakLoadedProperty.
+                or(selectionTypeProperty.isNotEqualTo(SelectionType.FOLDER)));
         closePakBtn.disableProperty().bind(noPakLoadedProperty);
         titleLbl.textProperty().bind(Bindings.concat("DN Pak Tool - ").concat(openedFilePathProperty));
         maximizedProperty.bind(stage.maximizedProperty());
@@ -153,6 +163,14 @@ public class DNPTUIController {
                         setText(item.name);
                         setGraphic(imageView);
                     }
+                }
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(selected);
+                if (selected) {
+                    selectionTypeProperty.set(getItem().entry == null ? SelectionType.FOLDER : SelectionType.FILE);
                 }
             }
         });
