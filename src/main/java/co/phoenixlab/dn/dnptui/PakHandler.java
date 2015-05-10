@@ -29,22 +29,47 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 public class PakHandler {
 
     private final List<PakFile> paks;
+    private TreeItem<PakTreeEntry> root;
 
     public PakHandler(List<PakFile> paks) {
         this.paks = paks;
     }
 
     public void populate(TreeView<PakTreeEntry> treeView) {
-        TreeItem<PakTreeEntry> root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
+        root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
 
 
         treeView.setRoot(root);
+    }
+
+    public PakTreeEntry find(Path path) {
+        return Optional.ofNullable(find(root, path)).map(TreeItem::getValue).orElse(null);
+    }
+
+    private TreeItem<PakTreeEntry> find(TreeItem<PakTreeEntry> treeItem, Path path) {
+        if (path.getNameCount() == 1) {
+            for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
+                if (item.getValue().name.equals(path.toString())) {
+                    return item;
+                }
+            }
+            return null;
+        }
+        Path sub = path.getName(0);
+        for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
+            if (item.getValue().name.equals(sub.toString())) {
+                return find(item, path.subpath(1, path.getNameCount()));
+            }
+        }
+        return null;
     }
 
 
