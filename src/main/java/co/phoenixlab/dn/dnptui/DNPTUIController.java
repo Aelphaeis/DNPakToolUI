@@ -97,7 +97,6 @@ public class DNPTUIController {
     private Path lastOpenedDir;
 
     private PakHandler handler;
-    private ImageView folderIconView;
 
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
@@ -140,7 +139,6 @@ public class DNPTUIController {
         } catch (IOException e) {
             //  TODO Exception handling
         }
-        folderIconView = new ImageView(navFolderIcon);
         treeView.setCellFactory(param -> new TreeCell<PakTreeEntry>() {
             @Override
             protected void updateItem(PakTreeEntry item, boolean empty) {
@@ -149,12 +147,14 @@ public class DNPTUIController {
                     setText(null);
                     setGraphic(null);
                 } else {
+                    ImageView imageView = new ImageView(navFolderIcon);
                     if (item.entry != null) {
                         setText(item.name);
                         //  TODO Icon
+                        setGraphic(null);
                     } else {
                         setText(item.name + "\\");
-                        setGraphic(folderIconView);
+                        setGraphic(imageView);
                     }
                 }
             }
