@@ -230,8 +230,8 @@ public class DNPTUIController {
     }
 
     public void onLoadFinished(PakHandler handler) {
-        closePak(null);
         this.handler = handler;
+        noPakLoadedProperty.set(false);
 
     }
 
@@ -252,10 +252,12 @@ public class DNPTUIController {
     }
 
     public void closePak() {
+        noPakLoadedProperty.set(true);
+        openedFilePathProperty.setValue("No File");
+        treeView.setRoot(null);
         if (this.handler != null) {
             this.handler.unload();
         }
-        treeView.setRoot(null);
     }
 
     @FXML private void windowDragging(MouseEvent event) {
