@@ -190,11 +190,7 @@ public class DNPTUIController {
         lastOpenedDir = path.getParent();
         openedFilePathProperty.set(path.toString());
         PakLoadTask task = new PakLoadTask(path, this::onLoadFinished);
-        //  Show loading indicator
-
-        //  Wire up properties
-
-        //  Dispatch job
+        connectTaskToUI(task);
         DNPTApplication.EXECUTOR_SERVICE.submit(task);
     }
 
@@ -222,12 +218,16 @@ public class DNPTUIController {
             return;
         }
         PakLoadTask task = new PakLoadTask(paths, this::onLoadFinished);
+        connectTaskToUI(task);
+        DNPTApplication.EXECUTOR_SERVICE.submit(task);
+    }
+
+    private void connectTaskToUI(PakLoadTask task) {
         //  Show loading indicator
 
         //  Wire up properties
 
         //  Dispatch job
-        DNPTApplication.EXECUTOR_SERVICE.submit(task);
     }
 
     public void onLoadFinished(PakHandler handler) {
