@@ -95,6 +95,7 @@ public class DNPTUIController {
 
     private final BooleanProperty noPakLoadedProperty;
     private final ObjectProperty<SelectionType> selectionTypeProperty;
+    private final ObjectProperty<PakTreeEntry> selectedProperty;
     private final StringProperty openedFilePathProperty;
     private final BooleanProperty maximizedProperty;
 
@@ -105,6 +106,7 @@ public class DNPTUIController {
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
         selectionTypeProperty = new SimpleObjectProperty<>(this, "selectionType", SelectionType.NONE);
+        selectedProperty = new SimpleObjectProperty<>(this, "selected", null);
         openedFilePathProperty = new SimpleStringProperty(this, "openedFilePath", "No File");
         maximizedProperty = new SimpleBooleanProperty(this, "maximized", false);
         lastOpenedDir = Paths.get(System.getProperty("user.dir"));
@@ -171,6 +173,7 @@ public class DNPTUIController {
                 super.updateSelected(selected);
                 if (selected) {
                     selectionTypeProperty.set(getItem().entry == null ? SelectionType.FOLDER : SelectionType.FILE);
+                    selectedProperty.set(getItem());
                 }
             }
         });
