@@ -145,6 +145,19 @@ public class PakHandler {
         }
     }
 
+    public void exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath) throws IOException {
+        for (TreeItem<PakTreeEntry> child : treeItem.getChildren()) {
+            PakTreeEntry entry = child.getValue();
+            Path path = exportPath.resolve(entry.name);
+            if (entry.entry == null) {
+                Files.createDirectory(path);
+                exportDirectory(child, path);
+            } else {
+                exportFile(entry, path);
+            }
+        }
+    }
+
     public void unload() {
         paks.forEach(this::tryClosePak);
         paks.clear();

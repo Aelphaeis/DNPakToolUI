@@ -339,8 +339,33 @@ public class DNPTUIController {
 
     @FXML
     private void exportFolder(ActionEvent event) {
-
+        if (selectionTypeProperty.get() == SelectionType.FOLDER) {
+            exportFolder(selectedProperty.get());
+        }
     }
+
+    public void exportFolder(TreeItem<PakTreeEntry> entry) {
+        if (entry == null) {
+            return;
+        }
+        PakTreeEntry treeEntry = entry.getValue();
+        if (treeEntry == null || treeEntry.entry != null) {
+            return;
+        }
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Export into...");
+        chooser.setInitialDirectory(lastOpenedDir.toFile());
+        File file = chooser.showDialog(stage);
+        if (file == null) {
+            return;
+        }
+        try {
+            handler.exportDirectory(entry, file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();    //  TODO
+        }
+    }
+
 
     @FXML
     private void closePak(ActionEvent event) {
