@@ -49,15 +49,19 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.InflaterOutputStream;
 
 public class DNPTUIController {
 
@@ -95,7 +99,7 @@ public class DNPTUIController {
 
     private final BooleanProperty noPakLoadedProperty;
     private final ObjectProperty<SelectionType> selectionTypeProperty;
-    private final ObjectProperty<PakTreeEntry> selectedProperty;
+    private final ObjectProperty<TreeItem<PakTreeEntry>> selectedProperty;
     private final StringProperty openedFilePathProperty;
     private final BooleanProperty maximizedProperty;
 
@@ -173,7 +177,7 @@ public class DNPTUIController {
                 super.updateSelected(selected);
                 if (selected) {
                     selectionTypeProperty.set(getItem().entry == null ? SelectionType.FOLDER : SelectionType.FILE);
-                    selectedProperty.set(getItem());
+                    selectedProperty.set(getTreeItem());
                 }
             }
         });
@@ -309,6 +313,36 @@ public class DNPTUIController {
 
     @FXML
     private void exportFile(ActionEvent event) {
+        if (selectionTypeProperty.get() == SelectionType.FILE) {
+            exportFile(selectedProperty.get());
+        }
+    }
+
+    public void exportFile(TreeItem<PakTreeEntry> entry) {
+        if (entry == null) {
+            return;
+        }
+        PakTreeEntry treeEntry = entry.getValue();
+        if (treeEntry == null || treeEntry.entry == null) {
+            return;
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export as...");
+        chooser.setInitialDirectory(lastOpenedDir.toFile());
+        chooser.setInitialFileName(treeEntry.name);
+        File file = chooser.showSaveDialog(stage);
+        if (file == null) {
+            return;
+        }
+        Path path = file.toPath();
+        try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(path,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+            WritableByteChannel byteChannel = Channels.newChannel(outputStream);
+            treeEntry.parent.transferTo(treeEntry.entry.getFileInfo(), byteChannel);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
