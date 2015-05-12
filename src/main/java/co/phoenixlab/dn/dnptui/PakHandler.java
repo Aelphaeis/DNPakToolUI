@@ -29,12 +29,17 @@ import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeItem;
 
 import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.zip.InflaterOutputStream;
 
 public class PakHandler {
 
@@ -130,6 +135,14 @@ public class PakHandler {
         return null;
     }
 
+    public void exportFile(PakTreeEntry entry, Path exportPath) throws IOException {
+        try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(exportPath,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
+            WritableByteChannel byteChannel = Channels.newChannel(outputStream);
+            entry.parent.transferTo(entry.entry.getFileInfo(), byteChannel);
+            outputStream.flush();
+        }
+    }
 
     public void unload() {
         paks.forEach(this::tryClosePak);

@@ -49,19 +49,15 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.InflaterOutputStream;
 
 public class DNPTUIController {
 
@@ -334,16 +330,11 @@ public class DNPTUIController {
         if (file == null) {
             return;
         }
-        Path path = file.toPath();
-        try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(path,
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
-            WritableByteChannel byteChannel = Channels.newChannel(outputStream);
-            treeEntry.parent.transferTo(treeEntry.entry.getFileInfo(), byteChannel);
-            outputStream.flush();
+        try {
+            handler.exportFile(treeEntry, file.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace();    //  TODO
         }
-
     }
 
     @FXML
