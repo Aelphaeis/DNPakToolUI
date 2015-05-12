@@ -139,6 +139,7 @@ public class PakHandler {
         try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(exportPath,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
             WritableByteChannel byteChannel = Channels.newChannel(outputStream);
+            entry.parent.openIfNotOpen();
             entry.parent.transferTo(entry.entry.getFileInfo(), byteChannel);
             outputStream.flush();
         }
