@@ -199,8 +199,7 @@ public class DNPTUIController {
         dialogPane.setContent(label);
         dialogPane.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
         exitDialog.initStyle(StageStyle.TRANSPARENT);
-        Stage dialogStage = (Stage) exitDialog.getDialogPane().getScene().getWindow();
-        dialogStage.getIcons().addAll(stage.getIcons());
+        exitDialog.initOwner(stage);
         exitDialog.initModality(Modality.APPLICATION_MODAL);
         exitDialog.setDialogPane(dialogPane);
         exitDialog.setTitle("DN Pak Tool");
