@@ -40,10 +40,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -202,6 +199,9 @@ public class DNPTUIController {
         dialogPane.setContent(label);
         dialogPane.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
         exitDialog.initStyle(StageStyle.TRANSPARENT);
+        Stage dialogStage = (Stage) exitDialog.getDialogPane().getScene().getWindow();
+        dialogStage.getIcons().addAll(stage.getIcons());
+        exitDialog.initModality(Modality.APPLICATION_MODAL);
         exitDialog.setDialogPane(dialogPane);
         exitDialog.setTitle("DN Pak Tool");
         exitDialog.showAndWait().
