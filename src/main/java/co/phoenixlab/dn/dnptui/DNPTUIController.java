@@ -427,6 +427,7 @@ public class DNPTUIController {
             this.handler.unload();
             this.handler = null;
         }
+        System.gc();
     }
 
     private void resetProperties() {
