@@ -35,10 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.zip.InflaterOutputStream;
 
 public class PakHandler {
@@ -62,6 +59,7 @@ public class PakHandler {
 
     public TreeItem<PakTreeEntry> populate() {
         root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
+        Map<String, TreeItem<PakTreeEntry>> dirCache = new HashMap<>();
         for (PakFile pakFile : paks) {
             Map<String, FileEntry> entries = pakFile.getEntryMap();
             entries.forEach((s, e) -> {
@@ -70,48 +68,52 @@ public class PakHandler {
                 }
                 Path path = Paths.get(s);
                 PakTreeEntry entry = new PakTreeEntry(e.name, path, e, pakFile);
-                insert(root, entry, path);
+                insert(entry, dirCache);
             });
         }
         sort(root);
         return root;
     }
 
+    private void insert(PakTreeEntry entry, Map<String, TreeItem<PakTreeEntry>> dirCache) {
+        Path entryPath = entry.path.getParent();
+        if (entryPath == null) {
+            insert(entry, root);
+        } else {
+            TreeItem<PakTreeEntry> parent = dirCache.get(entryPath.toString());
+            if (parent == null) {
+                parent = root;
+                for (Path path : entryPath) {
+                    parent = createDir(path.toString(), parent, dirCache);
+                }
+            }
+            insert(entry, parent);
+        }
+    }
+
+    private void insert(PakTreeEntry entry, TreeItem<PakTreeEntry> parent) {
+        TreeItem<PakTreeEntry> entryTreeItem = new TreeItem<>(entry);
+        parent.getChildren().add(entryTreeItem);
+    }
+
+    private TreeItem<PakTreeEntry> createDir(String name, TreeItem<PakTreeEntry> parent,
+                                             Map<String, TreeItem<PakTreeEntry>> dirCache) {
+        Path newPath = parent.getValue().path.resolve(name);
+        TreeItem<PakTreeEntry> entryTreeItem = dirCache.get(newPath.toString());
+        if (entryTreeItem == null) {
+            entryTreeItem = new TreeItem<>(new PakTreeEntry(name, newPath,  null, null));
+            dirCache.put(newPath.toString(), entryTreeItem);
+            parent.getChildren().add(entryTreeItem);
+        }
+        return entryTreeItem;
+    }
+
+
     private void sort(TreeItem<PakTreeEntry> item) {
         item.getChildren().sort(TREE_ITEM_COMPARATOR);
         item.getChildren().forEach(this::sort);
     }
 
-    private TreeItem<PakTreeEntry> insert(TreeItem<PakTreeEntry> treeItem, PakTreeEntry entry, Path path) {
-        TreeItem<PakTreeEntry> found = null;
-        String sub = path.getName(0).toString();
-        if (path.getNameCount() == 1) {
-            for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
-                if (item.getValue().name.equals(sub)) {
-                    found = item;
-                    break;
-                }
-            }
-            if (found == null) {
-                found = new TreeItem<>(entry);
-                treeItem.getChildren().add(found);
-            } else {
-                found.setValue(entry);
-            }
-            return found;
-        }
-        for (TreeItem<PakTreeEntry> item : treeItem.getChildren()) {
-            if (item.getValue().name.equals(sub)) {
-                found = item;
-                break;
-            }
-        }
-        if (found == null) {
-            found = new TreeItem<>(new PakTreeEntry(sub, treeItem.getValue().path.resolve(sub), null, null));
-            treeItem.getChildren().add(found);
-        }
-        return insert(found, entry, path.subpath(1, path.getNameCount()));
-    }
 
     public PakTreeEntry find(Path path) {
         return Optional.ofNullable(find(root, path)).map(TreeItem::getValue).orElse(null);
