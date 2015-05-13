@@ -52,13 +52,14 @@ public class DNPTApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
+            //  Load the primary scene FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
             Parent root = loader.load();
-            DNPTUIController controller = loader.getController();
             Scene scene = new Scene(root, 1000, 700);
             scene.setFill(Color.TRANSPARENT);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             primaryStage.setScene(scene);
+            //  Load application icons
             int[] iconSizes = {24, 32, 64, 128};
             for (int i : iconSizes) {
                 try (InputStream stream =
@@ -67,10 +68,13 @@ public class DNPTApplication extends Application {
                     primaryStage.getIcons().add(new Image(stream));
                 }
             }
+            //  Set up controller
+            DNPTUIController controller = loader.getController();
             controller.setStageSceneApp(primaryStage, scene, this);
             primaryStage.show();
             controller.init();
         } catch (Exception e) {
+            //  TODO Better error handling
             e.printStackTrace();
             throw e;
         }
@@ -78,6 +82,8 @@ public class DNPTApplication extends Application {
 
     @Override
     public void stop() {
+        //  Nothing much to do here cleanup wise
+        //  Stop application
         System.exit(0);
     }
 }

@@ -40,6 +40,9 @@ import java.util.zip.InflaterOutputStream;
 
 public class PakHandler {
 
+    /**
+     * Compares two TreeItems by their values. Alphabetically sorts folders first and files second
+     */
     private static final Comparator<TreeItem<PakTreeEntry>> TREE_ITEM_COMPARATOR = (o1, o2) -> {
         boolean null1 = o1.getValue().entry == null;
         boolean null2 = o2.getValue().entry == null;
@@ -50,19 +53,38 @@ public class PakHandler {
         return -Boolean.compare(null1, null2);
     };
 
+    /**
+     * List of loaded pak files
+     */
     private final List<PakFile> paks;
+    /**
+     * Root TreeItem in the navigation pane
+     */
     private TreeItem<PakTreeEntry> root;
 
+    /**
+     * Constructs a new PakHandler with the given loaded paks
+     */
     public PakHandler(List<PakFile> paks) {
         this.paks = paks;
     }
 
+    /**
+     * Creates the tree structure for the navigation pane of all the loaded files.
+     *
+     * @return The TreeItem representing the root of the tree, directory "" (empty string).
+     */
     public TreeItem<PakTreeEntry> populate() {
         root = new TreeItem<>(new PakTreeEntry("", Paths.get(""), null, null));
+        //  Map cache to speed up the insertion process. We don't need to traverse the tree for every single entry
+        //  since we cache all the directories that have been created, so insertion goes from always O(n) (n = path
+        //  depth) to O(1) in best case. In reality, we see a massive speedup since many directories can contain a large
+        //  number of subfiles, so the map lookup (O(1)) becomes the most common operation.
         Map<String, TreeItem<PakTreeEntry>> dirCache = new HashMap<>();
         for (PakFile pakFile : paks) {
             Map<String, FileEntry> entries = pakFile.getEntryMap();
             entries.forEach((s, e) -> {
+                //  Strip leading \
                 if (s.startsWith("\\")) {
                     s = s.substring(1);
                 }
@@ -71,12 +93,26 @@ public class PakHandler {
                 insert(entry, dirCache);
             });
         }
+        //  Sort the tree recursively
         sort(root);
+        //  We no longer need the cache
         dirCache.clear();
         System.gc();
         return root;
     }
 
+    /**
+     * Inserts an entry into the tree recursively, utilizing the cache if possible.
+     * <p>
+     * Time Complexity
+     * <ul>
+     * <li>In the worst case, this operation is O(n), where every directory in the path must be created.</li>
+     * <li>In the best case, this operation is O(1), where the parent directory of the entry is in the cache.</li>
+     * </ul>
+     *
+     * @param entry    The entry to insert
+     * @param dirCache The directory cache to use
+     */
     private void insert(PakTreeEntry entry, Map<String, TreeItem<PakTreeEntry>> dirCache) {
         Path entryPath = entry.path.getParent();
         if (entryPath == null) {
@@ -93,34 +129,66 @@ public class PakHandler {
         }
     }
 
+    /**
+     * Inserts an entry into its parent.
+     *
+     * @param entry  The entry to insert
+     * @param parent The parent for the given entry
+     */
+    //  TODO This should be inlined
     private void insert(PakTreeEntry entry, TreeItem<PakTreeEntry> parent) {
         TreeItem<PakTreeEntry> entryTreeItem = new TreeItem<>(entry);
         parent.getChildren().add(entryTreeItem);
     }
 
+    /**
+     * Creates a directory and inserts it as a child of the given parent.
+     *
+     * @param name     The directory's name
+     * @param parent   The parent directory to add the new entry as a child
+     * @param dirCache The directory cache for this directory to be added to
+     * @return The created directory TreeItem
+     */
     private TreeItem<PakTreeEntry> createDir(String name, TreeItem<PakTreeEntry> parent,
                                              Map<String, TreeItem<PakTreeEntry>> dirCache) {
         Path newPath = parent.getValue().path.resolve(name);
         TreeItem<PakTreeEntry> entryTreeItem = dirCache.get(newPath.toString());
         if (entryTreeItem == null) {
-            entryTreeItem = new TreeItem<>(new PakTreeEntry(name, newPath,  null, null));
+            entryTreeItem = new TreeItem<>(new PakTreeEntry(name, newPath, null, null));
             dirCache.put(newPath.toString(), entryTreeItem);
             parent.getChildren().add(entryTreeItem);
         }
         return entryTreeItem;
     }
 
-
+    /**
+     * Recursively sorts the given tree.
+     *
+     * @param item The TreeItem node to start sorting from.
+     */
     private void sort(TreeItem<PakTreeEntry> item) {
         item.getChildren().sort(TREE_ITEM_COMPARATOR);
         item.getChildren().forEach(this::sort);
     }
 
 
+    /**
+     * Finds the PakTreeEntry found at path, or null if the path does not exist.
+     *
+     * @param path The path of the entry to find
+     * @return The PakTreeEntry at path, or null if no such element exists
+     */
     public PakTreeEntry find(Path path) {
         return Optional.ofNullable(find(root, path)).map(TreeItem::getValue).orElse(null);
     }
 
+    /**
+     * Recursive implementation for find.
+     *
+     * @param treeItem The parent TreeItem to search in
+     * @param path     The desired path to find, relative to treeItem
+     * @return The found TreeItem, or null if no such element exists
+     */
     private TreeItem<PakTreeEntry> find(TreeItem<PakTreeEntry> treeItem, Path path) {
         String sub = path.getName(0).toString();
         if (path.getNameCount() == 1) {
@@ -139,6 +207,13 @@ public class PakHandler {
         return null;
     }
 
+    /**
+     * Exports a file to the provided path.
+     *
+     * @param entry      The entry of the file to export
+     * @param exportPath The location to export the file
+     * @throws IOException If there was an I/O error during exporting
+     */
     public void exportFile(PakTreeEntry entry, Path exportPath) throws IOException {
         try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(exportPath,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
@@ -149,6 +224,14 @@ public class PakHandler {
         }
     }
 
+    /**
+     * Exports an entire directory and all of its children into the provided directory. Recursively operates on
+     * subdirectories.
+     *
+     * @param treeItem   The directory TreeItem to export
+     * @param exportPath The directory to export the contents of treeItem into
+     * @throws IOException If there was an I/O error during exporting
+     */
     public void exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath) throws IOException {
         for (TreeItem<PakTreeEntry> child : treeItem.getChildren()) {
             PakTreeEntry entry = child.getValue();
@@ -162,11 +245,18 @@ public class PakHandler {
         }
     }
 
+    /**
+     * Unloads all the pak files managed by this handler
+     */
     public void unload() {
         paks.forEach(this::tryClosePak);
         paks.clear();
     }
 
+    /**
+     * Helper method for unload()
+     * @param pakFile The pakFile to attempt to unload
+     */
     private void tryClosePak(PakFile pakFile) {
         try {
             pakFile.close();
