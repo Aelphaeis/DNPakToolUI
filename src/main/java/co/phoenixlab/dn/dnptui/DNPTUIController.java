@@ -24,6 +24,7 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.pak.DNPakTool;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -66,6 +67,8 @@ public class DNPTUIController {
 
     public static final int MIN_WIDTH = 550;
     public static final int MIN_HEIGHT = 400;
+    private static final String STYLESHEET = DNPakTool.class.
+            getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm();
     private DNPTApplication application;
     private Stage stage;
     private Scene scene;
@@ -197,8 +200,7 @@ public class DNPTUIController {
     private void showClosePrompt(ActionEvent event) {
         Dialog<ButtonType> exitDialog = new Dialog<>();
         DialogPane dialogPane = new DialogPane();
-        dialogPane.getStylesheets().add(getClass().
-                getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm());
+        dialogPane.getStylesheets().add(STYLESHEET);
         dialogPane.getStyleClass().add("dialog");
         Label label = new Label("Are you sure you want to quit?");
         label.getStyleClass().add("exit-dialog-lbl");
@@ -291,8 +293,7 @@ public class DNPTUIController {
         VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
         Scene scene = new Scene(root, 140, 100, Color.color(0.1, 0.1, 0.1, 0.25));
-        scene.getStylesheets().add(getClass().
-                getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm());
+        scene.getStylesheets().add(STYLESHEET);
         root.getStyleClass().add("dialog");
         loadingStage.setScene(scene);
         Image spinnerImage;
