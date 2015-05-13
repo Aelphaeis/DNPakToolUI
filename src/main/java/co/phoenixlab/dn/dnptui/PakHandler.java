@@ -72,6 +72,8 @@ public class PakHandler {
             });
         }
         sort(root);
+        dirCache.clear();
+        System.gc();
         return root;
     }
 
