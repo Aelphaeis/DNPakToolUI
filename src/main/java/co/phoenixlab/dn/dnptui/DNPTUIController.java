@@ -24,12 +24,16 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -40,6 +44,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
 import javafx.util.Duration;
 
@@ -193,7 +199,7 @@ public class DNPTUIController {
         DialogPane dialogPane = new DialogPane();
         dialogPane.getStylesheets().add(getClass().
                 getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm());
-        dialogPane.getStyleClass().add("exit-dialog");
+        dialogPane.getStyleClass().add("dialog");
         Label label = new Label("Are you sure you want to quit?");
         label.getStyleClass().add("exit-dialog-lbl");
         dialogPane.setContent(label);
@@ -279,25 +285,66 @@ public class DNPTUIController {
     private void connectTaskToUI(PakLoadTask task) {
         resetProperties();
         //  Show loading indicator
+        Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
+        loadingStage.initOwner(stage);
+        loadingStage.setTitle("Loading");
+        VBox root = new VBox(10);
+        root.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(root, 140, 100, Color.color(0.1, 0.1, 0.1, 0.25));
+        scene.getStylesheets().add(getClass().
+                getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm());
+        root.getStyleClass().add("dialog");
+        loadingStage.setScene(scene);
+        Image spinnerImage;
+        try (InputStream inputStream =
+                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/spinner.png")) {
+            spinnerImage = new Image(inputStream);
+        } catch (IOException e) {
+            //  TODO Exception handling
+            throw new RuntimeException(e);
+        }
+        ImageView spinner = new ImageView(spinnerImage);
+        spinner.setFitHeight(32);
+        spinner.setFitWidth(32);
+        spinner.setViewport(new Rectangle2D(0, 0, 32, 32));
+        SpriteAnimation spriteAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
+        spriteAnimation.setCycleCount(Animation.INDEFINITE);
 
+        Label infoLbl = new Label();
+        infoLbl.setTextAlignment(TextAlignment.CENTER);
+        infoLbl.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(spinner, infoLbl);
         //  Wire up properties
-
-        //  Dispatch job
+        infoLbl.textProperty().bind(task.messageProperty());
+        ChangeListener<Number> xPosListener = (observable, oldValue, newValue) ->
+                loadingStage.setX(newValue.doubleValue() + stage.getWidth() / 2 - loadingStage.getWidth() / 2);
+        ChangeListener<Number> yPosListener = (observable, oldValue, newValue) ->
+                loadingStage.setY(newValue.doubleValue() + stage.getHeight() / 2 - loadingStage.getHeight() / 2);
+        task.setOnSucceeded(e -> {
+            spriteAnimation.stop();
+            loadingStage.close();
+            infoLbl.textProperty().unbind();
+            stage.xProperty().removeListener(xPosListener);
+            stage.yProperty().removeListener(yPosListener);
+        });
+        stage.xProperty().addListener(xPosListener);
+        stage.yProperty().addListener(yPosListener);
+        loadingStage.show();
+        spriteAnimation.play();
+        xPosListener.changed(null, null, stage.getX());
+        yPosListener.changed(null, null, stage.getY());
     }
 
-    public void onLoadFinished(PakHandler handler) {
+    public void onLoadFinished(PakHandler handler, TreeItem<PakTreeEntry> treeRoot) {
         if (this.handler != null) {
             this.handler.unload();
             this.handler = null;
         }
         this.handler = handler;
         treeView.setRoot(null);
-        DNPTApplication.EXECUTOR_SERVICE.submit(() -> {
-            TreeItem<PakTreeEntry> root = this.handler.populate();
-            Platform.runLater(() -> {
-                treeView.setRoot(root);
-                noPakLoadedProperty.set(false);
-            });
+        Platform.runLater(() -> {
+            treeView.setRoot(treeRoot);
+            noPakLoadedProperty.set(false);
         });
     }
 

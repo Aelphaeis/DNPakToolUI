@@ -27,30 +27,31 @@ package co.phoenixlab.dn.dnptui;
 import co.phoenixlab.dn.pak.PakFile;
 import co.phoenixlab.dn.pak.PakFileReader;
 import javafx.concurrent.Task;
+import javafx.scene.control.TreeItem;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
-public class PakLoadTask extends Task<PakHandler> {
+public class PakLoadTask extends Task<PakLoadTask.Tuple> {
 
     private final List<Path> paths;
-    private final Consumer<PakHandler> onDone;
+    private final BiConsumer<PakHandler, TreeItem<PakTreeEntry>> onDone;
 
-    public PakLoadTask(Path path, Consumer<PakHandler> onDone) {
+    public PakLoadTask(Path path, BiConsumer<PakHandler, TreeItem<PakTreeEntry>> onDone) {
         paths = Collections.singletonList(path);
         this.onDone = onDone;
     }
 
-    public PakLoadTask(List<Path> paths, Consumer<PakHandler> onDone) {
+    public PakLoadTask(List<Path> paths, BiConsumer<PakHandler, TreeItem<PakTreeEntry>> onDone) {
         this.paths = paths;
         this.onDone = onDone;
     }
 
     @Override
-    protected PakHandler call() throws Exception {
+    protected Tuple call() throws Exception {
         try {
             int numPaths = paths.size();
             PakFileReader reader = new PakFileReader();
@@ -64,8 +65,13 @@ public class PakLoadTask extends Task<PakHandler> {
                 updateProgress(i + 1, numPaths);
             }
             PakHandler handler = new PakHandler(paks);
+            updateMessage("Building file tree");
+            TreeItem<PakTreeEntry> root = handler.populate();
             updateMessage("Done");
-            return handler;
+            Tuple tuple = new Tuple();
+            tuple.handler = handler;
+            tuple.root = root;
+            return tuple;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -74,6 +80,14 @@ public class PakLoadTask extends Task<PakHandler> {
 
     @Override
     protected void succeeded() {
-        onDone.accept(getValue());
+        Tuple tuple = getValue();
+        onDone.accept(tuple.handler, tuple.root);
     }
+
+    class Tuple {
+        PakHandler handler;
+        TreeItem<PakTreeEntry> root;
+    }
+
 }
+
