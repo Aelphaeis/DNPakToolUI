@@ -28,6 +28,7 @@ mvn install:install-file -Dfile=DNPakTool-1.0.1.jar -DgroupId=co.phoenixlab.dn -
 
 ##Dependencies
 - [DNPakTool](https://github.com/vincentzhang96/DNPakTool)
+- Java 8u40 (Dialogs support)
 
 ##Contributing
 Simply submit a pull request and I'll review it for inclusion.
@@ -55,7 +56,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
-
-
