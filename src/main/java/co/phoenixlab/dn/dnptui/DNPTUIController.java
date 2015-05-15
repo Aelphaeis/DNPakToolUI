@@ -31,6 +31,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -400,7 +401,7 @@ public class DNPTUIController {
         DNPTApplication.EXECUTOR_SERVICE.submit(task);
     }
 
-    private void connectTaskToUI(PakLoadTask task) {
+    private void connectTaskToUI(Task task) {
         resetProperties();
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
