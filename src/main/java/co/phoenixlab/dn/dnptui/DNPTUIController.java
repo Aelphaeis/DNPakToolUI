@@ -24,11 +24,10 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.dnptui.fx.FadeTransitionUtil;
 import co.phoenixlab.dn.dnptui.fx.SpriteAnimation;
 import co.phoenixlab.dn.pak.DNPakTool;
 import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -267,11 +266,8 @@ public class DNPTUIController {
                         bind(root.heightProperty().subtract(126)));
 
         //  Fade the window in
-        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.25D), scene.getRoot());
-        fadeTransition.setInterpolator(Interpolator.EASE_OUT);
-        fadeTransition.setFromValue(0D);
-        fadeTransition.setToValue(1D);
-        fadeTransition.playFromStart();
+        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), scene.getRoot()).
+                play();
     }
 
     /**
@@ -305,12 +301,8 @@ public class DNPTUIController {
      * @param dummy Any value (including null). Only present to allow for method reference in lambda
      */
     private void quit(Object dummy) {
-        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.5D), scene.getRoot());
-        fadeTransition.setInterpolator(Interpolator.EASE_IN);
-        fadeTransition.setFromValue(1D);
-        fadeTransition.setToValue(0D);
-        fadeTransition.setOnFinished(e -> application.stop());
-        fadeTransition.playFromStart();
+        FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), application::stop).
+                play();
     }
 
     /**
@@ -446,30 +438,22 @@ public class DNPTUIController {
         ChangeListener<Number> yPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setY(newValue.doubleValue() + stage.getHeight() / 2 - loadingStage.getHeight() / 2);
         task.setOnSucceeded(e -> {
-            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.5D), scene.getRoot());
-            fadeTransition.setInterpolator(Interpolator.EASE_IN);
-            fadeTransition.setFromValue(1D);
-            fadeTransition.setToValue(0D);
-            fadeTransition.setOnFinished(ae -> {
+            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
                 //  Stop animations, destroy window, remove listeners
                 spriteAnimation.stop();
                 loadingStage.close();
                 infoLbl.textProperty().unbind();
                 stage.xProperty().removeListener(xPosListener);
                 stage.yProperty().removeListener(yPosListener);
-            });
-            fadeTransition.playFromStart();
+            }).play();
         });
         stage.xProperty().addListener(xPosListener);
         stage.yProperty().addListener(yPosListener);
         //  Display
+        scene.getRoot().setOpacity(0D);
         loadingStage.show();
-        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.25D), scene.getRoot());
-        fadeTransition.setInterpolator(Interpolator.EASE_OUT);
-        fadeTransition.setFromValue(0D);
-        fadeTransition.setToValue(1D);
-        fadeTransition.playFromStart();
-        spriteAnimation.play();
+        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), scene.getRoot()).
+                play();
         //  Center the window
         xPosListener.changed(null, null, stage.getX());
         yPosListener.changed(null, null, stage.getY());
