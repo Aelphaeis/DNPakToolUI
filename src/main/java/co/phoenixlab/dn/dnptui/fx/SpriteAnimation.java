@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui;
+package co.phoenixlab.dn.dnptui.fx;
 
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;

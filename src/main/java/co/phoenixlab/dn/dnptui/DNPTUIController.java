@@ -24,6 +24,7 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.dnptui.fx.SpriteAnimation;
 import co.phoenixlab.dn.pak.DNPakTool;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
