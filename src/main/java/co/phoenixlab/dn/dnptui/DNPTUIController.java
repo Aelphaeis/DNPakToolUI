@@ -257,6 +257,7 @@ public class DNPTUIController {
                 }
             }
         });
+        treeView.setShowRoot(false);
         //  Enforce minimum window dimensions
         stage.setMinWidth(MIN_WIDTH);
         stage.setMinHeight(MIN_HEIGHT);
@@ -501,6 +502,7 @@ public class DNPTUIController {
         Platform.runLater(() -> {
             treeView.setRoot(treeRoot);
             noPakLoadedProperty.set(false);
+            treeRoot.setExpanded(true);
         });
     }
 
