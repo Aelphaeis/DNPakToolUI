@@ -277,22 +277,44 @@ public class DNPTUIController {
      */
     @FXML
     private void showClosePrompt(ActionEvent event) {
-        Dialog<ButtonType> exitDialog = new Dialog<>();
-        DialogPane dialogPane = new DialogPane();
-        dialogPane.getStylesheets().add(STYLESHEET);
-        dialogPane.getStyleClass().add("dialog");
-        Label label = new Label("Are you sure you want to quit?");
-        label.getStyleClass().add("exit-dialog-lbl");
-        dialogPane.setContent(label);
-        dialogPane.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
-        exitDialog.initStyle(StageStyle.TRANSPARENT);
-        exitDialog.initOwner(stage);
-        exitDialog.initModality(Modality.APPLICATION_MODAL);
-        exitDialog.setDialogPane(dialogPane);
-        exitDialog.setTitle("DN Pak Tool");
-        exitDialog.showAndWait().
-                filter(b -> ButtonType.YES == b).
-                ifPresent(this::quit);
+        //  Create popup window
+        Stage closeStage = new Stage(StageStyle.TRANSPARENT);
+        closeStage.initOwner(stage);
+        closeStage.initModality(Modality.APPLICATION_MODAL);
+        closeStage.setTitle("DN Pak Tool");
+        VBox root = new VBox(14);
+        root.setAlignment(Pos.CENTER);
+        Scene closeScene = new Scene(root, 200, 100, Color.TRANSPARENT);
+        closeScene.getStylesheets().add(STYLESHEET);
+        root.getStyleClass().add("dialog");
+        closeStage.setScene(closeScene);
+        Label promptLbl = new Label("Are you sure you want to quit?");
+        HBox buttonBar = new HBox(20);
+        buttonBar.setAlignment(Pos.CENTER);
+        buttonBar.setMaxWidth(Double.MAX_VALUE);
+        int buttonWidth = 60;
+        Button yesButton = new Button("Yes");
+        Button noButton = new Button("No");
+        yesButton.setOnAction(ae -> {
+            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root).
+                    play();
+            quit(null);
+        });
+        noButton.setOnAction(ae -> {
+            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root, closeStage::close).
+                    play();
+        });
+        yesButton.setPrefWidth(buttonWidth);
+        noButton.setPrefWidth(buttonWidth);
+        buttonBar.getChildren().addAll(yesButton, noButton);
+        root.getChildren().addAll(promptLbl, buttonBar);
+
+        closeScene.getRoot().setOpacity(0D);
+        closeStage.show();
+        closeStage.setX(stage.getX() + stage.getWidth() / 2 - closeStage.getWidth() / 2);
+        closeStage.setY(stage.getY() + stage.getHeight() / 2 - closeStage.getHeight() / 2);
+        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), closeScene.getRoot()).
+                play();
     }
 
     /**
