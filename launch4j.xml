@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>target\DNPakToolUI-1.0-SNAPSHOT-jar-with-dependencies.jar</jar>
+  <jar>target\DNPakToolUI-1.0.0-BETA-jar-with-dependencies.jar</jar>
   <outfile>target\DNPakToolUI.exe</outfile>
   <errTitle>DNPakToolUI</errTitle>
   <cmdLine></cmdLine>
@@ -18,7 +18,7 @@
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.8.0_40</minVersion>
+    <minVersion>1.8.0_31</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
@@ -31,11 +31,11 @@
   </splash>
   <versionInfo>
     <fileVersion>1.0.0.0</fileVersion>
-    <txtFileVersion>1.0.0</txtFileVersion>
+    <txtFileVersion>1.0.0 Beta</txtFileVersion>
     <fileDescription>Eyedentity/Dragon Nest pak file viewer</fileDescription>
     <copyright>2015 Vincent Zhang/PhoenixLAB</copyright>
     <productVersion>1.0.0.0</productVersion>
-    <txtProductVersion>1.0.0</txtProductVersion>
+    <txtProductVersion>1.0.0 Beta</txtProductVersion>
     <productName>DNPakToolUI</productName>
     <companyName></companyName>
     <internalName>DNPakToolUI</internalName>
