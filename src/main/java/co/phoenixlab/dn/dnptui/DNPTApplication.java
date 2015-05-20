@@ -59,6 +59,7 @@ public class DNPTApplication extends Application {
             scene.setFill(Color.TRANSPARENT);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             primaryStage.setScene(scene);
+            primaryStage.setTitle("DN Pak Tool");
             //  Load application icons
             int[] iconSizes = {24, 32, 64, 128};
             for (int i : iconSizes) {
