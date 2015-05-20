@@ -452,6 +452,7 @@ public class DNPTUIController {
         //  Display
         scene.getRoot().setOpacity(0D);
         loadingStage.show();
+        spriteAnimation.playFromStart();
         FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), scene.getRoot()).
                 play();
         //  Center the window
