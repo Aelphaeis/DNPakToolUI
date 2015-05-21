@@ -27,7 +27,7 @@ package co.phoenixlab.dn.dnptui;
 import co.phoenixlab.dn.dnptui.fx.FadeTransitionUtil;
 import co.phoenixlab.dn.dnptui.fx.SpriteAnimation;
 import co.phoenixlab.dn.pak.DNPakTool;
-import javafx.animation.Animation;
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -267,8 +267,16 @@ public class DNPTUIController {
                         bind(root.heightProperty().subtract(126)));
 
         //  Fade the window in
-        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), scene.getRoot()).
-                play();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
+        scaleTransition.setFromX(0.875D);
+        scaleTransition.setFromY(0.875D);
+        scaleTransition.setToX(1D);
+        scaleTransition.setToY(1D);
+        scaleTransition.setInterpolator(Interpolator.EASE_OUT);
+        FadeTransition fadeTransition = FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.15D), null);
+        ParallelTransition transition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
+        transition.playFromStart();
+
     }
 
     /**
@@ -324,8 +332,16 @@ public class DNPTUIController {
      * @param dummy Any value (including null). Only present to allow for method reference in lambda
      */
     private void quit(Object dummy) {
-        FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), application::stop).
-                play();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
+        scaleTransition.setFromX(1D);
+        scaleTransition.setFromY(1D);
+        scaleTransition.setToX(0.875D);
+        scaleTransition.setToY(0.875D);
+        scaleTransition.setInterpolator(Interpolator.EASE_IN);
+        FadeTransition fadeTransition = FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.15D), null);
+        ParallelTransition transition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
+        transition.setOnFinished(ae -> application.stop());
+        transition.playFromStart();
     }
 
     /**
