@@ -17,7 +17,7 @@ You may download the latest stable release [here](https://github.com/vincentzhan
 <img src="http://i.imgur.com/b4u6gqb.png" width="700">
 
 ##To Do
-- [ ] Add a throbber when exporting file(s)
+- [x] Add a throbber when exporting file(s)
 - [ ] Implement Search
 - [ ] Infrastructure for caching decompressed files to a temp directory
 - [ ] Infrastructure for in-tool viewing of files
