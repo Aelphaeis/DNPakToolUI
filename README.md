@@ -10,6 +10,12 @@ A GUI application for browsing Eyedentity/Dragon Nest resource pak files, as a U
 ##Download
 You may download the latest stable release [here](https://github.com/vincentzhang96/DNPakToolUI/releases/latest).
 
+##Screenshots
+
+<img src="http://i.imgur.com/hzxEAT1.png" width="700">
+
+<img src="http://i.imgur.com/b4u6gqb.png" width="700">
+
 ##To Do
 - [ ] Add a throbber when exporting file(s)
 - [ ] Implement Search
