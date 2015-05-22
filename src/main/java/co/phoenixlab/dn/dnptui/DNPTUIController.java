@@ -476,16 +476,14 @@ public class DNPTUIController {
                 loadingStage.setX(newValue.doubleValue() + stage.getWidth() / 2 - loadingStage.getWidth() / 2);
         ChangeListener<Number> yPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setY(newValue.doubleValue() + stage.getHeight() / 2 - loadingStage.getHeight() / 2);
-        task.setOnSucceeded(e -> {
-            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
-                //  Stop animations, destroy window, remove listeners
-                spriteAnimation.stop();
-                loadingStage.close();
-                infoLbl.textProperty().unbind();
-                stage.xProperty().removeListener(xPosListener);
-                stage.yProperty().removeListener(yPosListener);
-            }).play();
-        });
+        task.setOnSucceeded(e -> FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
+            //  Stop animations, destroy window, remove listeners
+            spriteAnimation.stop();
+            loadingStage.close();
+            infoLbl.textProperty().unbind();
+            stage.xProperty().removeListener(xPosListener);
+            stage.yProperty().removeListener(yPosListener);
+        }).play());
         stage.xProperty().addListener(xPosListener);
         stage.yProperty().addListener(yPosListener);
         //  Display
