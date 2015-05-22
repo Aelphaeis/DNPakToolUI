@@ -390,6 +390,7 @@ public class DNPTUIController {
     private void loadPak(Path path) {
         lastOpenedDir = path.getParent();
         openedFilePathProperty.set(path.toString());
+        resetProperties();
         PakLoadTask task = new PakLoadTask(path, this::onLoadFinished);
         connectTaskToUI(task);
         DNPTApplication.EXECUTOR_SERVICE.submit(task);
@@ -418,6 +419,7 @@ public class DNPTUIController {
     private void loadVirtualPak(Path dir) {
         lastOpenedDir = dir;
         openedFilePathProperty.set(dir.toString() + " (Virtual)");
+        resetProperties();
         //  Build path list
         List<Path> paths;
         //  Only accept files ending in .pak and not a directory
@@ -437,7 +439,6 @@ public class DNPTUIController {
     }
 
     private void connectTaskToUI(Task task) {
-        resetProperties();
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
         loadingStage.initOwner(stage);
@@ -569,11 +570,15 @@ public class DNPTUIController {
         if (file == null) {
             return;
         }
-        try {
-            handler.exportFile(treeEntry, file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();    //  TODO
-        }
+        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), false);
+        connectTaskToUI(exportTask);
+        DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
+
+//        try {
+//            handler.exportFile(treeEntry, file.toPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();    //  TODO
+//        }
     }
 
     /**
@@ -614,11 +619,15 @@ public class DNPTUIController {
         if (file == null) {
             return;
         }
-        try {
-            handler.exportDirectory(entry, file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();    //  TODO
-        }
+
+        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), true);
+        connectTaskToUI(exportTask);
+        DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
+//        try {
+//            handler.exportDirectory(entry, file.toPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();    //  TODO
+//        }
     }
 
 
