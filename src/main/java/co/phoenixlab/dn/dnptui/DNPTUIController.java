@@ -445,6 +445,7 @@ public class DNPTUIController {
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
         loadingStage.initOwner(stage);
+        loadingStage.initModality(Modality.WINDOW_MODAL);
         loadingStage.setTitle("Loading");
         VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
