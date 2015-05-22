@@ -33,7 +33,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -445,7 +448,7 @@ public class DNPTUIController {
         loadingStage.setTitle("Loading");
         VBox root = new VBox(10);
         root.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(root, 140, 100, Color.color(0.1, 0.1, 0.1, 0.25));
+        Scene scene = new Scene(root, 180, 100, Color.color(0.1, 0.1, 0.1, 0.25));
         scene.getStylesheets().add(STYLESHEET);
         root.getStyleClass().add("dialog");
         loadingStage.setScene(scene);
@@ -477,14 +480,38 @@ public class DNPTUIController {
                 loadingStage.setX(newValue.doubleValue() + stage.getWidth() / 2 - loadingStage.getWidth() / 2);
         ChangeListener<Number> yPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setY(newValue.doubleValue() + stage.getHeight() / 2 - loadingStage.getHeight() / 2);
-        task.setOnSucceeded(e -> FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
-            //  Stop animations, destroy window, remove listeners
+        EventHandler<WorkerStateEvent> okStateHandler = e ->
+                FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
+                    //  Stop animations, destroy window, remove listeners
+                    spriteAnimation.stop();
+                    loadingStage.close();
+                    infoLbl.textProperty().unbind();
+                    stage.xProperty().removeListener(xPosListener);
+                    stage.yProperty().removeListener(yPosListener);
+                }).play();
+        task.setOnSucceeded(okStateHandler);
+        task.setOnCancelled(okStateHandler);
+        task.setOnFailed(e -> {
             spriteAnimation.stop();
-            loadingStage.close();
             infoLbl.textProperty().unbind();
-            stage.xProperty().removeListener(xPosListener);
-            stage.yProperty().removeListener(yPosListener);
-        }).play());
+            root.getChildren().clear();
+            //  Cast is necessary - compiler keeps treating getSource() as returning Object
+            Throwable throwable = ((Worker) e.getSource()).getException();
+            if (throwable != null) {
+                infoLbl.setText("Unexpected error: " + throwable.getMessage());
+            } else {
+                infoLbl.setText("Unknown error occurred");
+            }
+            Button closeBtn = new Button("Close");
+            closeBtn.setPrefWidth(70);
+            closeBtn.setOnAction(event ->
+                    FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), scene.getRoot(), () -> {
+                        loadingStage.close();
+                        stage.xProperty().removeListener(xPosListener);
+                        stage.yProperty().removeListener(yPosListener);
+                    }).play());
+            root.getChildren().addAll(infoLbl, closeBtn);
+        });
         stage.xProperty().addListener(xPosListener);
         stage.yProperty().addListener(yPosListener);
         //  Display
