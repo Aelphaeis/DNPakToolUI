@@ -142,6 +142,11 @@
             <artifactId>DNPakTool</artifactId>
             <version>1.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>co.phoenixlab.dds</groupId>
+            <artifactId>DDS4J</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
