@@ -39,7 +39,7 @@ public class Viewers {
 
     static {
         //  Register Viewers here
-        
+        fileExtensionViewers.put(".dds", new DdsViewer());
     }
 
     private Viewers() {}

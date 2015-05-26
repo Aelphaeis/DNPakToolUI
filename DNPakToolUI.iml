@@ -13,5 +13,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="DNPakTool" />
+    <orderEntry type="library" name="Maven: co.phoenixlab.dds:DDS4J:1.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: ar.com.hjg:pngj:2.1.0" level="project" />
   </component>
 </module>
