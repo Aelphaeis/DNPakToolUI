@@ -39,6 +39,7 @@ import javafx.scene.text.TextAlignment;
 
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class DdsViewer implements Viewer {
 
@@ -61,6 +62,7 @@ public class DdsViewer implements Viewer {
     public void parse(ByteBuffer byteBuffer) {
         currentDds = new Dds();
         try {
+            byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
             currentDds.read(byteBuffer);
             byte[] png = decoder.convertToPNG(currentDds);
             image = new Image(new ByteArrayInputStream(png));
