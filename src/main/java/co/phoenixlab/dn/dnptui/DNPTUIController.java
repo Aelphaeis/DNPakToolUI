@@ -236,16 +236,16 @@ public class DNPTUIController {
                     setGraphic(null);
                 } else {
                     //  Nodes
-                    if (item.entry != null) {
-                        //  File/leaf nodes
-                        setText(item.name);
-                        //  TODO Icon
-                        setGraphic(null);
-                    } else {
+                    if (item.isDirectory()) {
                         //  Directory nodes
                         setText(item.name);
                         //  ImageView instances cannot be shared between cells
                         setGraphic(new ImageView(navFolderIcon));
+                    } else {
+                        //  File/leaf nodes
+                        setText(item.name);
+                        //  TODO Icon
+                        setGraphic(null);
                     }
                 }
             }
@@ -255,7 +255,7 @@ public class DNPTUIController {
                 super.updateSelected(selected);
                 if (selected) {
                     //  Update the selection type and selection properties
-                    selectionTypeProperty.set(getItem().entry == null ? SelectionType.FOLDER : SelectionType.FILE);
+                    selectionTypeProperty.set(getItem().isDirectory() ? SelectionType.FOLDER : SelectionType.FILE);
                     selectedProperty.set(getTreeItem());
                 }
             }
@@ -585,7 +585,7 @@ public class DNPTUIController {
         }
         PakTreeEntry treeEntry = entry.getValue();
         //  Not a valid entry or is a directory
-        if (treeEntry == null || treeEntry.entry == null) {
+        if (treeEntry == null || treeEntry.isDirectory()) {
             return;
         }
         //  Show file chooser
@@ -635,7 +635,7 @@ public class DNPTUIController {
         }
         PakTreeEntry treeEntry = entry.getValue();
         //  Not a valid entry or is a file
-        if (treeEntry == null || treeEntry.entry != null) {
+        if (treeEntry == null || !treeEntry.isDirectory()) {
             return;
         }
         //  Show directory chooser

@@ -43,6 +43,10 @@ public class PakTreeEntry {
         this.parent = parent;
     }
 
+    public boolean isDirectory() {
+        return entry == null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

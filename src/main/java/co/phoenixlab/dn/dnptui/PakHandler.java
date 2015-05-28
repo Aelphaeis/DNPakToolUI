@@ -44,8 +44,8 @@ public class PakHandler {
      * Compares two TreeItems by their values. Alphabetically sorts folders first and files second
      */
     private static final Comparator<TreeItem<PakTreeEntry>> TREE_ITEM_COMPARATOR = (o1, o2) -> {
-        boolean null1 = o1.getValue().entry == null;
-        boolean null2 = o2.getValue().entry == null;
+        boolean null1 = o1.getValue().isDirectory();
+        boolean null2 = o2.getValue().isDirectory();
         //  Only true if both are null or not null
         if (null1 == null2) {
             return o1.getValue().name.compareToIgnoreCase(o2.getValue().name);
