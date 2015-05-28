@@ -2,7 +2,7 @@ language: java
 before_install:
 - wget -O DNPakTool-1.0.2.jar https://github.com/vincentzhang96/DNPakTool/releases/download/v1.0.2/DNPakTool-1.0.2.jar
 - mvn install:install-file -Dfile=$TRAVIS_BUILD_DIR/DNPakTool-1.0.2.jar -DgroupId=co.phoenixlab.dn -DartifactId=DNPakTool -Dversion=1.0.2 -Dpackaging=jar
-- wget -O DDS4J-1.0.0.jar https://github.com/vincentzhang96/DDS4J/releases/download/v1.0.0/DDS4J-1.0.0.jar
-- mvn install:install-file -Dfile=$TRAVIS_BUILD_DIR/DDS4J-1.0.0.jar -DgroupId=co.phoenixlab.dds -DartifactId=DDS4J -Dversion=1.0.0 -Dpackaging=jar
+- wget -O DDS4J-1.0.1.jar https://github.com/vincentzhang96/DDS4J/releases/download/v1.0.1/DDS4J-1.0.1.jar
+- mvn install:install-file -Dfile=$TRAVIS_BUILD_DIR/DDS4J-1.0.1.jar -DgroupId=co.phoenixlab.dds -DartifactId=DDS4J -Dversion=1.0.1 -Dpackaging=jar
 jdk:
 - oraclejdk8
