@@ -30,6 +30,7 @@ import javafx.scene.control.TreeItem;
 
 import java.io.IOException;
 import java.nio.channels.Channels;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -218,8 +219,15 @@ public class PakHandler {
         try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(exportPath,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
             WritableByteChannel byteChannel = Channels.newChannel(outputStream);
-            entry.parent.openIfNotOpen();
-            entry.parent.transferTo(entry.entry.getFileInfo(), byteChannel);
+            do {
+                try {
+                    entry.parent.openIfNotOpen();
+                    entry.parent.transferTo(entry.entry.getFileInfo(), byteChannel);
+                    break;
+                } catch (ClosedChannelException ex) {
+                    entry.parent.reopen();
+                }
+            } while (true);
             outputStream.flush();
         }
     }
@@ -255,6 +263,7 @@ public class PakHandler {
 
     /**
      * Helper method for unload()
+     *
      * @param pakFile The pakFile to attempt to unload
      */
     private void tryClosePak(PakFile pakFile) {
