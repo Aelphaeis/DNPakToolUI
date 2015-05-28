@@ -26,12 +26,17 @@ package co.phoenixlab.dn.dnptui;
 
 import co.phoenixlab.dn.dnptui.fx.FadeTransitionUtil;
 import co.phoenixlab.dn.dnptui.fx.SpriteAnimation;
+import co.phoenixlab.dn.dnptui.viewers.Viewer;
+import co.phoenixlab.dn.dnptui.viewers.Viewers;
 import co.phoenixlab.dn.pak.DNPakTool;
+import co.phoenixlab.dn.pak.FileInfo;
+import co.phoenixlab.dn.pak.PakFile;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
@@ -58,9 +63,12 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +92,10 @@ public class DNPTUIController {
     private static final String STYLESHEET = DNPakTool.class.
             getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm();
     /**
+     * Temporary directory
+     */
+    private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"), "dnptui");
+    /**
      * Application instance
      */
     private DNPTApplication application;
@@ -96,17 +108,19 @@ public class DNPTUIController {
      */
     private Scene scene;
 
+
     /**
      * The type of item that's selected in the navigation pane
      */
     enum SelectionType {
         FOLDER,
         FILE,
-        NONE
+        NONE;
     }
 
     //  FXML elements
     @FXML private BorderPane root;
+
     @FXML private AnchorPane topBar;
     @FXML private VBox bottomDrag;
     @FXML private HBox rightDrag;
@@ -119,6 +133,7 @@ public class DNPTUIController {
     @FXML private Button closePakBtn;
     @FXML private ScrollPane navScrollPane;
     @FXML private SplitPane splitPane;
+    @FXML private BorderPane viewerPane;
     @FXML private TreeView<PakTreeEntry> treeView;
     /**
      * The folder icon used in the navigation pane. Shared instance
@@ -160,6 +175,10 @@ public class DNPTUIController {
      * The active PakHandler, or null if no pak/virtual pak is loaded
      */
     private PakHandler handler;
+    /**
+     * The current/last active file view load task
+     */
+    private Optional<Task<Void>> currentLoadTask;
 
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
@@ -168,6 +187,7 @@ public class DNPTUIController {
         openedFilePathProperty = new SimpleStringProperty(this, "openedFilePath", "No File");
         maximizedProperty = new SimpleBooleanProperty(this, "maximized", false);
         lastOpenedDir = Paths.get(System.getProperty("user.dir"));
+        currentLoadTask = Optional.empty();
     }
 
     /**
@@ -218,6 +238,8 @@ public class DNPTUIController {
                 topBar.setId("top-drag");
             }
         });
+        //  Change the displayed viewer when the selected item changes
+        selectedProperty.addListener(this::onSelectionChanged);
         //  Load the shared folder icon
         try (InputStream inputStream =
                      getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/nav/folder.png")) {
@@ -690,6 +712,71 @@ public class DNPTUIController {
         noPakLoadedProperty.set(true);
         selectionTypeProperty.set(SelectionType.NONE);
         selectedProperty.set(null);
+    }
+
+    private void onSelectionChanged(ObservableValue<? extends TreeItem<PakTreeEntry>> observable,
+                                    TreeItem<PakTreeEntry> oldValue,
+                                    TreeItem<PakTreeEntry> newValue) {
+        if (newValue == oldValue) {
+            return;
+        }
+        currentLoadTask.ifPresent(Task::cancel);
+        Viewer viewer = Viewers.getViewer(newValue);
+        viewer.onLoadStart(newValue);
+        if (newValue != null) {
+            PakTreeEntry entry = newValue.getValue();
+            if (entry != null && !entry.isDirectory()) {
+                Task<Void> task = new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        try {
+                            if (isCancelled()) {
+                                return null;
+                            }
+                            FileInfo fileInfo = entry.entry.getFileInfo();
+                            PakFile pakFile = entry.parent;
+                            pakFile.openIfNotOpen();
+                            //  For now, just write to disk and read it back in
+                            //  Would prefer to do this in memory, so we'll come back to this
+                            //  TODO Make viewing in-memory only
+                            String pakName = pakFile.getPath().getFileName().toString();
+                            int dotIndex = pakName.indexOf(".");
+                            if (dotIndex != -1) {
+                                pakName = pakName.substring(0, dotIndex);
+                            }
+                            Path temp = TEMP_DIR.resolve(pakName).resolve(fileInfo.getDiskOffset() + "." +
+                                    fileInfo.getDecompressedSize() + fileInfo.getFileName());
+                            Files.createDirectories(temp.getParent());
+                            if (Files.notExists(temp)) {
+                                Files.createFile(temp);
+                            }
+                            handler.exportFile(entry, temp);
+                            ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
+                            try (SeekableByteChannel fileChannel = Files.newByteChannel(temp,
+                                    StandardOpenOption.DELETE_ON_CLOSE)) {
+                                while ((fileChannel.read(buffer)) > 0) {
+                                    ;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            buffer.flip();
+                            viewer.parse(buffer);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                };
+                task.setOnSucceeded(e -> {
+                    viewerPane.setCenter(viewer.getDisplayNode());
+                });
+                currentLoadTask = Optional.of(task);
+                DNPTApplication.EXECUTOR_SERVICE.submit(task);
+                return;
+            }
+        }
+        viewerPane.setCenter(viewer.getDisplayNode());
     }
 
     /**
