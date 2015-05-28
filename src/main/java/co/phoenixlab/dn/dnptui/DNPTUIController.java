@@ -744,23 +744,40 @@ public class DNPTUIController {
                             if (dotIndex != -1) {
                                 pakName = pakName.substring(0, dotIndex);
                             }
+                            if (isCancelled()) {
+                                return null;
+                            }
                             Path temp = TEMP_DIR.resolve(pakName).resolve(fileInfo.getDiskOffset() + "." +
                                     fileInfo.getDecompressedSize() + fileInfo.getFileName());
                             Files.createDirectories(temp.getParent());
                             if (Files.notExists(temp)) {
                                 Files.createFile(temp);
                             }
+                            if (isCancelled()) {
+                                return null;
+                            }
                             handler.exportFile(entry, temp);
+                            if (isCancelled()) {
+                                return null;
+                            }
                             ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
                             try (SeekableByteChannel fileChannel = Files.newByteChannel(temp,
                                     StandardOpenOption.DELETE_ON_CLOSE)) {
                                 while ((fileChannel.read(buffer)) > 0) {
-                                    ;
+                                    if (isCancelled()) {
+                                        return null;
+                                    }
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                            if (isCancelled()) {
+                                return null;
+                            }
                             buffer.flip();
+                            if (isCancelled()) {
+                                return null;
+                            }
                             viewer.parse(buffer);
                         } catch (Exception e) {
                             e.printStackTrace();
