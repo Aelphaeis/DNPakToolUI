@@ -24,19 +24,37 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
-import co.phoenixlab.dn.pak.FileInfo;
+import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
 
 import java.nio.ByteBuffer;
 
 public class DefaultViewer implements Viewer {
 
-    //  TODO
+    private boolean isDirectory;
+    private boolean isBlank;
+
+    private final Group EMPTY_GROUP;
+
+    public DefaultViewer() {
+        EMPTY_GROUP = new Group();
+    }
 
     @Override
     public Node getDisplayNode() {
-        return new Label("todo");
+        if (isBlank) {
+            return EMPTY_GROUP;
+        } else {
+            if (isDirectory) {
+                //  TODO
+                return EMPTY_GROUP;
+            } else {
+                //  TODO
+                return EMPTY_GROUP;
+            }
+        }
     }
 
     @Override
@@ -45,8 +63,9 @@ public class DefaultViewer implements Viewer {
     }
 
     @Override
-    public void onLoadStart(FileInfo fileInfo) {
-
+    public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
+        isBlank = pakTreeEntry == null || pakTreeEntry.getValue() == null;
+        isDirectory = !isBlank && pakTreeEntry.getValue().isDirectory();
     }
 
     @Override

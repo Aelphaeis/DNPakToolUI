@@ -24,8 +24,9 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
-import co.phoenixlab.dn.pak.FileInfo;
+import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import javafx.scene.Node;
+import javafx.scene.control.TreeItem;
 
 import java.nio.ByteBuffer;
 
@@ -46,10 +47,12 @@ public interface Viewer {
     void parse(ByteBuffer byteBuffer);
 
     /**
-     * Called from the UI thread just before the file data is loaded and decompressed
-     * @param fileInfo The file that will be loaded
+     * Called from the UI thread when the selection changes. For leaf nodes (subfiles), the system will load the data
+     * from the pak asynchronously and call {@link #parse(ByteBuffer)}) when finished. For directories, the Viewer
+     * itself must make arrangements to load children nodes, as by default no children files will be loaded.
+     * @param treeItem The TreeItem of the item to load
      */
-    void onLoadStart(FileInfo fileInfo);
+    void onLoadStart(TreeItem<PakTreeEntry> treeItem);
 
     /**
      * Resets/clears this viewer for later reuse

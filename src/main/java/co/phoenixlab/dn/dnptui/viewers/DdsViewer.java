@@ -27,11 +27,12 @@ package co.phoenixlab.dn.dnptui.viewers;
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
 import co.phoenixlab.dds.InvalidDdsException;
-import co.phoenixlab.dn.pak.FileInfo;
+import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextAlignment;
@@ -77,7 +78,7 @@ public class DdsViewer implements Viewer {
     }
 
     @Override
-    public void onLoadStart(FileInfo fileInfo) {
+    public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
 
     }
 

@@ -24,7 +24,8 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
-import co.phoenixlab.dn.pak.FileInfo;
+import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.scene.control.TreeItem;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -33,7 +34,7 @@ public class Viewers {
 
     private static final Viewer DEFAULT_VIEWER = new DefaultViewer();
 
-    private static final List<Pair<Predicate<String>, Viewer>> matcherViewers = new ArrayList<>();
+    private static final List<Pair<Predicate<TreeItem<PakTreeEntry>>, Viewer>> matcherViewers = new ArrayList<>();
 
     private static final Map<String, Viewer> fileExtensionViewers = new HashMap<>();
 
@@ -44,14 +45,18 @@ public class Viewers {
 
     private Viewers() {}
 
-    public static Viewer getViewer(FileInfo fileInfo) {
-        String path = fileInfo.getFullPath();
+    public static Viewer getViewer(TreeItem<PakTreeEntry> pakTreeItem) {
+        if (pakTreeItem == null || pakTreeItem.getValue() == null) {
+            return DEFAULT_VIEWER;
+        }
+        PakTreeEntry pakTreeEntry = pakTreeItem.getValue();
+        String path = pakTreeEntry.path.toString();
         Optional<Viewer> viewer = matcherViewers.stream().
-                filter(p -> p.t.test(path)).
+                filter(p -> p.t.test(pakTreeItem)).
                 map(Pair::u).
                 findFirst();
 
-        return viewer.orElse(getViewerByFileExtension(fileInfo.getFileName()));
+        return viewer.orElse(getViewerByFileExtension(pakTreeEntry.path.getFileName().toString()));
     }
 
     private static Viewer getViewerByFileExtension(String fileName) {
