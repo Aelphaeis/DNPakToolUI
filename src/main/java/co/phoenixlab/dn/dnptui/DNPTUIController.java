@@ -60,21 +60,22 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.Channels;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.InflaterOutputStream;
 
 public class DNPTUIController {
 
@@ -180,6 +181,8 @@ public class DNPTUIController {
      */
     private Optional<Task<Void>> currentLoadTask;
 
+    private final Object loadLock;
+
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
         selectionTypeProperty = new SimpleObjectProperty<>(this, "selectionType", SelectionType.NONE);
@@ -188,6 +191,7 @@ public class DNPTUIController {
         maximizedProperty = new SimpleBooleanProperty(this, "maximized", false);
         lastOpenedDir = Paths.get(System.getProperty("user.dir"));
         currentLoadTask = Optional.empty();
+        loadLock = new Object();
     }
 
     /**
@@ -720,6 +724,30 @@ public class DNPTUIController {
         if (newValue == oldValue) {
             return;
         }
+        //  Create the throbber/spinner
+        Image spinnerImage;
+        try (InputStream inputStream =
+                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/spinner.png")) {
+            spinnerImage = new Image(inputStream);
+        } catch (IOException e) {
+            //  TODO Exception handling
+            throw new RuntimeException(e);
+        }
+        ImageView spinner = new ImageView(spinnerImage);
+        spinner.setFitHeight(32);
+        spinner.setFitWidth(32);
+        spinner.setViewport(new Rectangle2D(0, 0, 64, 64));
+        SpriteAnimation spriteAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
+        spriteAnimation.setCycleCount(Animation.INDEFINITE);
+        //  Task information (e.g. loading Resource00.pak, building file tree)
+        Label infoLbl = new Label("Loading");
+        infoLbl.setTextAlignment(TextAlignment.CENTER);
+        infoLbl.setAlignment(Pos.CENTER);
+        VBox vBox = new VBox(30, infoLbl, spinner);
+        spriteAnimation.playFromStart();
+        viewerPane.setCenter(vBox);
+
+
         currentLoadTask.ifPresent(Task::cancel);
         Viewer viewer = Viewers.getViewer(newValue);
         viewer.onLoadStart(newValue);
@@ -736,9 +764,6 @@ public class DNPTUIController {
                             FileInfo fileInfo = entry.entry.getFileInfo();
                             PakFile pakFile = entry.parent;
                             pakFile.openIfNotOpen();
-                            //  For now, just write to disk and read it back in
-                            //  Would prefer to do this in memory, so we'll come back to this
-                            //  TODO Make viewing in-memory only
                             String pakName = pakFile.getPath().getFileName().toString();
                             int dotIndex = pakName.indexOf(".");
                             if (dotIndex != -1) {
@@ -756,30 +781,38 @@ public class DNPTUIController {
                             if (isCancelled()) {
                                 return null;
                             }
-                            handler.exportFile(entry, temp);
-                            if (isCancelled()) {
-                                return null;
-                            }
-                            ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
-                            try (SeekableByteChannel fileChannel = Files.newByteChannel(temp,
-                                    StandardOpenOption.DELETE_ON_CLOSE)) {
-                                while ((fileChannel.read(buffer)) > 0) {
-                                    if (isCancelled()) {
+                            ByteArrayOutputStream bao = new ByteArrayOutputStream((int) fileInfo.getDecompressedSize());
+                            OutputStream out = new InflaterOutputStream(bao);
+                            WritableByteChannel writableByteChannel = Channels.newChannel(out);
+                            do {
+                                if (isCancelled()) {
+                                    return null;
+                                }
+                                synchronized (loadLock) {
+                                    try {
+                                        entry.parent.openIfNotOpen();
+                                        entry.parent.transferTo(entry.entry.getFileInfo(), writableByteChannel);
+                                        break;
+                                    } catch (ClosedByInterruptException cbie) {
                                         return null;
+                                    } catch (ClosedChannelException ex) {
+                                        entry.parent.reopen();
                                     }
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            } while (true);
                             if (isCancelled()) {
                                 return null;
                             }
+                            out.flush();
+                            ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
+                            buffer.put(bao.toByteArray());
                             buffer.flip();
                             if (isCancelled()) {
                                 return null;
                             }
                             viewer.parse(buffer);
                         } catch (Exception e) {
+                            System.err.println("exception while loading " + entry.entry.getFileInfo().getFullPath() + " in " + entry.parent.getPath().getFileName().toString());
                             e.printStackTrace();
                         }
                         return null;
@@ -787,6 +820,7 @@ public class DNPTUIController {
                 };
                 task.setOnSucceeded(e -> {
                     viewerPane.setCenter(viewer.getDisplayNode());
+                    spriteAnimation.stop();
                 });
                 currentLoadTask = Optional.of(task);
                 DNPTApplication.EXECUTOR_SERVICE.submit(task);
@@ -794,6 +828,7 @@ public class DNPTUIController {
             }
         }
         viewerPane.setCenter(viewer.getDisplayNode());
+        spriteAnimation.stop();
     }
 
     /**
