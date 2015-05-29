@@ -334,11 +334,13 @@ public class DNPTUIController {
         Button yesButton = new Button("Yes");
         Button noButton = new Button("No");
         yesButton.setOnAction(ae -> {
+            buttonBar.setDisable(true);
             FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root).
                     play();
             quit(null);
         });
         noButton.setOnAction(ae -> {
+            buttonBar.setDisable(true);
             FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root, closeStage::close).
                     play();
         });
