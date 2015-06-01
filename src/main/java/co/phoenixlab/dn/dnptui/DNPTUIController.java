@@ -257,9 +257,8 @@ public class DNPTUIController {
         //  Change the displayed viewer when the selected item changes
         selectedProperty.addListener(this::onSelectionChanged);
         //  Load the shared folder icon
-        try (InputStream inputStream =
-                     getClass().getResourceAsStream(NAV_FOLDER_ICON_PATH)) {
-            navFolderIcon = new Image(inputStream);
+        try (InputStream navFolderIconInputStream = getClass().getResourceAsStream(NAV_FOLDER_ICON_PATH)) {
+            navFolderIcon = new Image(navFolderIconInputStream);
         } catch (IOException e) {
             //  TODO Exception handling
         }
@@ -315,8 +314,8 @@ public class DNPTUIController {
         scaleTransition.setToY(1D);
         scaleTransition.setInterpolator(Interpolator.EASE_OUT);
         FadeTransition fadeTransition = FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.15D), null);
-        ParallelTransition transition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
-        transition.playFromStart();
+        ParallelTransition enterTransition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
+        enterTransition.playFromStart();
 
     }
 
@@ -329,23 +328,23 @@ public class DNPTUIController {
     private void showClosePrompt(ActionEvent event) {
         try {
             //  Create popup window
-            Stage closeStage = new Stage(StageStyle.TRANSPARENT);
-            closeStage.initOwner(stage);
-            closeStage.initModality(Modality.APPLICATION_MODAL);
-            closeStage.setTitle("DN Pak Tool");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(EXIT_DIALOG_FXML_PATH));
-            VBox root = loader.load();
-            ExitDialogController controller = loader.getController();
-            controller.setQuitAction(this::quit);
-            controller.setStage(closeStage);
-            Scene closeScene = new Scene(root, 200, 100, Color.TRANSPARENT);
-            closeScene.getStylesheets().add(STYLESHEET);
-            closeStage.setScene(closeScene);
-            closeScene.getRoot().setOpacity(0D);
-            closeStage.show();
-            closeStage.setX(stage.getX() + stage.getWidth() / 2 - closeStage.getWidth() / 2);
-            closeStage.setY(stage.getY() + stage.getHeight() / 2 - closeStage.getHeight() / 2);
-            FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), closeScene.getRoot()).
+            Stage promptStage = new Stage(StageStyle.TRANSPARENT);
+            promptStage.initOwner(stage);
+            promptStage.initModality(Modality.APPLICATION_MODAL);
+            promptStage.setTitle("DN Pak Tool");
+            FXMLLoader promptFxmlLoader = new FXMLLoader(getClass().getResource(EXIT_DIALOG_FXML_PATH));
+            VBox promptRoot = promptFxmlLoader.load();
+            ExitDialogController promptController = promptFxmlLoader.getController();
+            promptController.setQuitAction(this::quit);
+            promptController.setStage(promptStage);
+            Scene promptScene = new Scene(promptRoot, 200, 100, Color.TRANSPARENT);
+            promptScene.getStylesheets().add(STYLESHEET);
+            promptStage.setScene(promptScene);
+            promptScene.getRoot().setOpacity(0D);
+            promptStage.show();
+            promptStage.setX(stage.getX() + stage.getWidth() / 2 - promptStage.getWidth() / 2);
+            promptStage.setY(stage.getY() + stage.getHeight() / 2 - promptStage.getHeight() / 2);
+            FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), promptScene.getRoot()).
                     play();
         } catch (IOException e) {
             //  If an error occurs showing the exit dialog, just quit
@@ -364,9 +363,9 @@ public class DNPTUIController {
         scaleTransition.setToY(0.875D);
         scaleTransition.setInterpolator(Interpolator.EASE_IN);
         FadeTransition fadeTransition = FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.15D), null);
-        ParallelTransition transition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
-        transition.setOnFinished(ae -> application.stop());
-        transition.playFromStart();
+        ParallelTransition closeTransition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
+        closeTransition.setOnFinished(ae -> application.stop());
+        closeTransition.playFromStart();
     }
 
     /**
@@ -386,8 +385,8 @@ public class DNPTUIController {
      */
     @FXML
     private void toggleMax(ActionEvent event) {
-        boolean old = stage.isMaximized();
-        stage.setMaximized(!old);
+        boolean wasMaximized = stage.isMaximized();
+        stage.setMaximized(!wasMaximized);
         root.requestLayout();
     }
 
@@ -398,11 +397,11 @@ public class DNPTUIController {
      */
     @FXML
     private void openPak(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(lastOpenedDir.toFile());
-        fileChooser.setTitle("Choose a Pak file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Dragon Nest Package File", "*.pak"));
-        Optional.ofNullable(fileChooser.showOpenDialog(stage)).
+        FileChooser pakFileChooser = new FileChooser();
+        pakFileChooser.setInitialDirectory(lastOpenedDir.toFile());
+        pakFileChooser.setTitle("Choose a Pak file");
+        pakFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Dragon Nest Package File", "*.pak"));
+        Optional.ofNullable(pakFileChooser.showOpenDialog(stage)).
                 map(File::toPath).
                 ifPresent(this::loadPak);
     }
@@ -410,15 +409,15 @@ public class DNPTUIController {
     /**
      * Dispatches a task to load a single pak file and displays a loading dialog.
      *
-     * @param path The path to the pak file to load
+     * @param pakPath The path to the pak file to load
      */
-    private void loadPak(Path path) {
-        lastOpenedDir = path.getParent();
-        openedFilePathProperty.set(path.toString());
+    private void loadPak(Path pakPath) {
+        lastOpenedDir = pakPath.getParent();
+        openedFilePathProperty.set(pakPath.toString());
         resetProperties();
-        PakLoadTask task = new PakLoadTask(path, this::onLoadFinished);
-        connectTaskToUI(task);
-        DNPTApplication.EXECUTOR_SERVICE.submit(task);
+        PakLoadTask pakLoadTask = new PakLoadTask(pakPath, this::onLoadFinished);
+        connectTaskToUI(pakLoadTask);
+        DNPTApplication.EXECUTOR_SERVICE.submit(pakLoadTask);
     }
 
     /**
@@ -428,10 +427,10 @@ public class DNPTUIController {
      */
     @FXML
     private void openVirtualPak(ActionEvent event) {
-        DirectoryChooser dirChooser = new DirectoryChooser();
-        dirChooser.setInitialDirectory(lastOpenedDir.toFile());
-        dirChooser.setTitle("Choose a Pak file");
-        Optional.ofNullable(dirChooser.showDialog(stage)).
+        DirectoryChooser virtualPakDirChooser = new DirectoryChooser();
+        virtualPakDirChooser.setInitialDirectory(lastOpenedDir.toFile());
+        virtualPakDirChooser.setTitle("Choose a Pak file");
+        Optional.ofNullable(virtualPakDirChooser.showDialog(stage)).
                 map(File::toPath).
                 ifPresent(this::loadVirtualPak);
     }
@@ -439,28 +438,28 @@ public class DNPTUIController {
     /**
      * Dispatches a task to load a directory of paks (virtual pak) and displays a loading dialog.
      *
-     * @param dir The path to the directory containing the paks to load
+     * @param virtualPakDirPath The path to the directory containing the paks to load
      */
-    private void loadVirtualPak(Path dir) {
-        lastOpenedDir = dir;
-        openedFilePathProperty.set(dir.toString() + " (Virtual)");
+    private void loadVirtualPak(Path virtualPakDirPath) {
+        lastOpenedDir = virtualPakDirPath;
+        openedFilePathProperty.set(virtualPakDirPath.toString() + " (Virtual)");
         resetProperties();
         //  Build path list
-        List<Path> paths;
+        List<Path> acceptedPakPaths;
         //  Only accept files ending in .pak and not a directory
-        BiPredicate<Path, BasicFileAttributes> test = (p, a) -> p.getFileName().toString().endsWith(".pak");
-        test = test.and((p, a) -> !a.isDirectory());
-        try (Stream<Path> matches = Files.find(dir, 1, test)) {
-            paths = matches.collect(Collectors.toList());
+        BiPredicate<Path, BasicFileAttributes> pakFilter = (p, a) -> p.getFileName().toString().endsWith(".pak");
+        pakFilter = pakFilter.and((p, a) -> !a.isDirectory());
+        try (Stream<Path> matches = Files.find(virtualPakDirPath, 1, pakFilter)) {
+            acceptedPakPaths = matches.collect(Collectors.toList());
         } catch (IOException e) {
             //  TODO Error handling
             e.printStackTrace();
             return;
         }
         //  Create task
-        PakLoadTask task = new PakLoadTask(paths, this::onLoadFinished);
-        connectTaskToUI(task);
-        DNPTApplication.EXECUTOR_SERVICE.submit(task);
+        PakLoadTask virtualPakLoadTask = new PakLoadTask(acceptedPakPaths, this::onLoadFinished);
+        connectTaskToUI(virtualPakLoadTask);
+        DNPTApplication.EXECUTOR_SERVICE.submit(virtualPakLoadTask);
     }
 
     private void connectTaskToUI(Task task) {
@@ -469,17 +468,16 @@ public class DNPTUIController {
         loadingStage.initOwner(stage);
         loadingStage.initModality(Modality.WINDOW_MODAL);
         loadingStage.setTitle("Loading");
-        VBox root = new VBox(10);
-        root.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(root, 180, 100, Color.color(0.1, 0.1, 0.1, 0.25));
-        scene.getStylesheets().add(STYLESHEET);
-        root.getStyleClass().add("dialog");
-        loadingStage.setScene(scene);
+        VBox loadingRoot = new VBox(10);
+        loadingRoot.setAlignment(Pos.CENTER);
+        Scene loadingScene = new Scene(loadingRoot, 180, 100, Color.color(0.1, 0.1, 0.1, 0.25));
+        loadingScene.getStylesheets().add(STYLESHEET);
+        loadingRoot.getStyleClass().add("dialog");
+        loadingStage.setScene(loadingScene);
         //  Create the throbber/spinner
         Image spinnerImage;
-        try (InputStream inputStream =
-                     getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
-            spinnerImage = new Image(inputStream);
+        try (InputStream spinnerInputStream = getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
+            spinnerImage = new Image(spinnerInputStream);
         } catch (IOException e) {
             //  TODO Exception handling
             throw new RuntimeException(e);
@@ -488,61 +486,61 @@ public class DNPTUIController {
         spinner.setFitHeight(32);
         spinner.setFitWidth(32);
         spinner.setViewport(new Rectangle2D(0, 0, 32, 32));
-        SpriteAnimation spriteAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
-        spriteAnimation.setCycleCount(Animation.INDEFINITE);
+        SpriteAnimation spinnerAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
+        spinnerAnimation.setCycleCount(Animation.INDEFINITE);
         //  Task information (e.g. loading Resource00.pak, building file tree)
-        Label infoLbl = new Label();
-        infoLbl.setTextAlignment(TextAlignment.CENTER);
-        infoLbl.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(spinner, infoLbl);
+        Label loadingInfoLbl = new Label();
+        loadingInfoLbl.setTextAlignment(TextAlignment.CENTER);
+        loadingInfoLbl.setAlignment(Pos.CENTER);
+        loadingRoot.getChildren().addAll(spinner, loadingInfoLbl);
         //  Wire up properties
         //  Task information
-        infoLbl.textProperty().bind(task.messageProperty());
+        loadingInfoLbl.textProperty().bind(task.messageProperty());
         //  Keep the window centered relative to parent
         ChangeListener<Number> xPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setX(newValue.doubleValue() + stage.getWidth() / 2 - loadingStage.getWidth() / 2);
         ChangeListener<Number> yPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setY(newValue.doubleValue() + stage.getHeight() / 2 - loadingStage.getHeight() / 2);
         EventHandler<WorkerStateEvent> okStateHandler = e ->
-                FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), scene.getRoot(), () -> {
+                FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.5D), loadingScene.getRoot(), () -> {
                     //  Stop animations, destroy window, remove listeners
-                    spriteAnimation.stop();
+                    spinnerAnimation.stop();
                     loadingStage.close();
-                    infoLbl.textProperty().unbind();
+                    loadingInfoLbl.textProperty().unbind();
                     stage.xProperty().removeListener(xPosListener);
                     stage.yProperty().removeListener(yPosListener);
                 }).play();
         task.setOnSucceeded(okStateHandler);
         task.setOnCancelled(okStateHandler);
         task.setOnFailed(e -> {
-            spriteAnimation.stop();
-            infoLbl.textProperty().unbind();
-            root.getChildren().clear();
+            spinnerAnimation.stop();
+            loadingInfoLbl.textProperty().unbind();
+            loadingRoot.getChildren().clear();
             //  Cast is necessary - compiler keeps treating getSource() as returning Object
             @SuppressWarnings("RedundantCast")
-            Throwable throwable = ((Worker) e.getSource()).getException();
-            if (throwable != null) {
-                infoLbl.setText("Unexpected error: " + throwable.getMessage());
+            Throwable taskThrowable = ((Worker) e.getSource()).getException();
+            if (taskThrowable != null) {
+                loadingInfoLbl.setText("Unexpected error: " + taskThrowable.getMessage());
             } else {
-                infoLbl.setText("Unknown error occurred");
+                loadingInfoLbl.setText("Unknown error occurred");
             }
             Button closeBtn = new Button("Close");
             closeBtn.setPrefWidth(70);
             closeBtn.setOnAction(event ->
-                    FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), scene.getRoot(), () -> {
+                    FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), loadingScene.getRoot(), () -> {
                         loadingStage.close();
                         stage.xProperty().removeListener(xPosListener);
                         stage.yProperty().removeListener(yPosListener);
                     }).play());
-            root.getChildren().addAll(infoLbl, closeBtn);
+            loadingRoot.getChildren().addAll(loadingInfoLbl, closeBtn);
         });
         stage.xProperty().addListener(xPosListener);
         stage.yProperty().addListener(yPosListener);
         //  Display
-        scene.getRoot().setOpacity(0D);
+        loadingScene.getRoot().setOpacity(0D);
         loadingStage.show();
-        spriteAnimation.playFromStart();
-        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), scene.getRoot()).
+        spinnerAnimation.playFromStart();
+        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), loadingScene.getRoot()).
                 play();
         //  Center the window
         xPosListener.changed(null, null, stage.getX());
@@ -606,22 +604,22 @@ public class DNPTUIController {
         if (entry == null) {
             return;
         }
-        PakTreeEntry treeEntry = entry.getValue();
+        PakTreeEntry selectedPakTreeEntry = entry.getValue();
         //  Not a valid entry or is a directory
-        if (treeEntry == null || treeEntry.isDirectory()) {
+        if (selectedPakTreeEntry == null || selectedPakTreeEntry.isDirectory()) {
             return;
         }
         //  Show file chooser
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Export as...");
-        chooser.setInitialDirectory(lastOpenedDir.toFile());
-        chooser.setInitialFileName(treeEntry.name);
-        File file = chooser.showSaveDialog(stage);
+        FileChooser exportFilePathChooser = new FileChooser();
+        exportFilePathChooser.setTitle("Export as...");
+        exportFilePathChooser.setInitialDirectory(lastOpenedDir.toFile());
+        exportFilePathChooser.setInitialFileName(selectedPakTreeEntry.name);
+        File exportFile = exportFilePathChooser.showSaveDialog(stage);
         //  User hit cancel
-        if (file == null) {
+        if (exportFile == null) {
             return;
         }
-        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), false);
+        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportFile.toPath(), false);
         connectTaskToUI(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
@@ -650,22 +648,21 @@ public class DNPTUIController {
         if (entry == null) {
             return;
         }
-        PakTreeEntry treeEntry = entry.getValue();
+        PakTreeEntry selectedDirPakTreeEntry = entry.getValue();
         //  Not a valid entry or is a file
-        if (treeEntry == null || !treeEntry.isDirectory()) {
+        if (selectedDirPakTreeEntry == null || !selectedDirPakTreeEntry.isDirectory()) {
             return;
         }
         //  Show directory chooser
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Export into...");
-        chooser.setInitialDirectory(lastOpenedDir.toFile());
-        File file = chooser.showDialog(stage);
+        DirectoryChooser exportDirPathChooser = new DirectoryChooser();
+        exportDirPathChooser.setTitle("Export into...");
+        exportDirPathChooser.setInitialDirectory(lastOpenedDir.toFile());
+        File exportDir = exportDirPathChooser.showDialog(stage);
         //  User hit cancel
-        if (file == null) {
+        if (exportDir == null) {
             return;
         }
-
-        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), true);
+        SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportDir.toPath(), true);
         connectTaskToUI(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
@@ -712,9 +709,8 @@ public class DNPTUIController {
         }
         //  Create the throbber/spinner
         Image spinnerImage;
-        try (InputStream inputStream =
-                     getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
-            spinnerImage = new Image(inputStream);
+        try (InputStream spinnerInputStream = getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
+            spinnerImage = new Image(spinnerInputStream);
         } catch (IOException e) {
             //  TODO Exception handling
             throw new RuntimeException(e);
@@ -723,14 +719,14 @@ public class DNPTUIController {
         spinner.setFitHeight(32);
         spinner.setFitWidth(32);
         spinner.setViewport(new Rectangle2D(0, 0, 64, 64));
-        SpriteAnimation spriteAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
-        spriteAnimation.setCycleCount(Animation.INDEFINITE);
+        SpriteAnimation spinnerAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
+        spinnerAnimation.setCycleCount(Animation.INDEFINITE);
         //  Task information (e.g. loading Resource00.pak, building file tree)
         Label infoLbl = new Label("Loading");
         infoLbl.setTextAlignment(TextAlignment.CENTER);
         infoLbl.setAlignment(Pos.CENTER);
         VBox vBox = new VBox(30, infoLbl, spinner);
-        spriteAnimation.playFromStart();
+        spinnerAnimation.playFromStart();
         viewerPane.setCenter(vBox);
 
 
@@ -806,7 +802,7 @@ public class DNPTUIController {
                 };
                 task.setOnSucceeded(e -> {
                     viewerPane.setCenter(viewer.getDisplayNode());
-                    spriteAnimation.stop();
+                    spinnerAnimation.stop();
                 });
                 currentLoadTask = Optional.of(task);
                 DNPTApplication.EXECUTOR_SERVICE.submit(task);
@@ -814,7 +810,7 @@ public class DNPTUIController {
             }
         }
         viewerPane.setCenter(viewer.getDisplayNode());
-        spriteAnimation.stop();
+        spinnerAnimation.stop();
     }
 
     /**
@@ -865,13 +861,13 @@ public class DNPTUIController {
      */
     @FXML
     private void windowHorizontalResize(MouseEvent event) {
-        boolean left = false;
+        boolean isLeftEdge = false;
         if (event.getSource() == leftDrag) {
-            left = true;
+            isLeftEdge = true;
         }
         if (!maximizedProperty.get() && event.getButton() == MouseButton.PRIMARY) {
             double x = event.getScreenX() - stage.getX();
-            if (left) {
+            if (isLeftEdge) {
                 double newWidth = -x + stage.getWidth();
                 if (newWidth > MIN_WIDTH) {
                     stage.setX(stage.getX() + x);
