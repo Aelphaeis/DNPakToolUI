@@ -43,6 +43,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -314,51 +315,34 @@ public class DNPTUIController {
      */
     @FXML
     private void showClosePrompt(ActionEvent event) {
-        //  Create popup window
-        Stage closeStage = new Stage(StageStyle.TRANSPARENT);
-        closeStage.initOwner(stage);
-        closeStage.initModality(Modality.APPLICATION_MODAL);
-        closeStage.setTitle("DN Pak Tool");
-        VBox root = new VBox(14);
-        root.setAlignment(Pos.CENTER);
-        Scene closeScene = new Scene(root, 200, 100, Color.TRANSPARENT);
-        closeScene.getStylesheets().add(STYLESHEET);
-        root.getStyleClass().add("dialog");
-        closeStage.setScene(closeScene);
-        Label promptLbl = new Label("Are you sure you want to quit?");
-        HBox buttonBar = new HBox(20);
-        buttonBar.setAlignment(Pos.CENTER);
-        buttonBar.setMaxWidth(Double.MAX_VALUE);
-        int buttonWidth = 60;
-        Button yesButton = new Button("Yes");
-        Button noButton = new Button("No");
-        yesButton.setOnAction(ae -> {
-            buttonBar.setDisable(true);
-            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root).
+        try {
+            //  Create popup window
+            Stage closeStage = new Stage(StageStyle.TRANSPARENT);
+            closeStage.initOwner(stage);
+            closeStage.initModality(Modality.APPLICATION_MODAL);
+            closeStage.setTitle("DN Pak Tool");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/exitdialog.fxml"));
+            VBox root = loader.load();
+            ExitDialogController controller = loader.getController();
+            controller.setQuitAction(this::quit);
+            controller.setStage(closeStage);
+            Scene closeScene = new Scene(root, 200, 100, Color.TRANSPARENT);
+            closeScene.getStylesheets().add(STYLESHEET);
+            closeStage.setScene(closeScene);
+            closeScene.getRoot().setOpacity(0D);
+            closeStage.show();
+            closeStage.setX(stage.getX() + stage.getWidth() / 2 - closeStage.getWidth() / 2);
+            closeStage.setY(stage.getY() + stage.getHeight() / 2 - closeStage.getHeight() / 2);
+            FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), closeScene.getRoot()).
                     play();
+        } catch (IOException e) {
+            //  If an error occurs showing the exit dialog, just quit
             quit();
-        });
-        noButton.setOnAction(ae -> {
-            buttonBar.setDisable(true);
-            FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root, closeStage::close).
-                    play();
-        });
-        yesButton.setPrefWidth(buttonWidth);
-        noButton.setPrefWidth(buttonWidth);
-        buttonBar.getChildren().addAll(yesButton, noButton);
-        root.getChildren().addAll(promptLbl, buttonBar);
-
-        closeScene.getRoot().setOpacity(0D);
-        closeStage.show();
-        closeStage.setX(stage.getX() + stage.getWidth() / 2 - closeStage.getWidth() / 2);
-        closeStage.setY(stage.getY() + stage.getHeight() / 2 - closeStage.getHeight() / 2);
-        FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), closeScene.getRoot()).
-                play();
+        }
     }
 
     /**
      * Quits the application
-     *
      */
     private void quit() {
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
