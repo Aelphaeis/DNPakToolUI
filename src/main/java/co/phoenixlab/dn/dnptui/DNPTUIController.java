@@ -94,6 +94,18 @@ public class DNPTUIController {
     private static final String STYLESHEET = DNPakTool.class.
             getResource("/co/phoenixlab/dn/dnptui/assets/stylesheet.css").toExternalForm();
     /**
+     * Path to the FXML for the exit dialog
+     */
+    public static final String EXIT_DIALOG_FXML_PATH = "/co/phoenixlab/dn/dnptui/assets/exitdialog.fxml";
+    /**
+     * Path to the navigation pane folder icon image
+     */
+    public static final String NAV_FOLDER_ICON_PATH = "/co/phoenixlab/dn/dnptui/assets/nav/folder.png";
+    /**
+     * Path to the loading spinner/throbber spritesheet
+     */
+    public static final String LOADING_SPINNER_PATH = "/co/phoenixlab/dn/dnptui/assets/spinner.png";
+    /**
      * Temporary directory
      */
     private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"), "dnptui");
@@ -246,7 +258,7 @@ public class DNPTUIController {
         selectedProperty.addListener(this::onSelectionChanged);
         //  Load the shared folder icon
         try (InputStream inputStream =
-                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/nav/folder.png")) {
+                     getClass().getResourceAsStream(NAV_FOLDER_ICON_PATH)) {
             navFolderIcon = new Image(inputStream);
         } catch (IOException e) {
             //  TODO Exception handling
@@ -321,7 +333,7 @@ public class DNPTUIController {
             closeStage.initOwner(stage);
             closeStage.initModality(Modality.APPLICATION_MODAL);
             closeStage.setTitle("DN Pak Tool");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/exitdialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(EXIT_DIALOG_FXML_PATH));
             VBox root = loader.load();
             ExitDialogController controller = loader.getController();
             controller.setQuitAction(this::quit);
@@ -466,7 +478,7 @@ public class DNPTUIController {
         //  Create the throbber/spinner
         Image spinnerImage;
         try (InputStream inputStream =
-                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/spinner.png")) {
+                     getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
             spinnerImage = new Image(inputStream);
         } catch (IOException e) {
             //  TODO Exception handling
@@ -712,7 +724,7 @@ public class DNPTUIController {
         //  Create the throbber/spinner
         Image spinnerImage;
         try (InputStream inputStream =
-                     getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/spinner.png")) {
+                     getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
             spinnerImage = new Image(inputStream);
         } catch (IOException e) {
             //  TODO Exception handling
