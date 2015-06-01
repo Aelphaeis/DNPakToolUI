@@ -624,12 +624,6 @@ public class DNPTUIController {
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), false);
         connectTaskToUI(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
-
-//        try {
-//            handler.exportFile(treeEntry, file.toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();    //  TODO
-//        }
     }
 
     /**
@@ -674,11 +668,6 @@ public class DNPTUIController {
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, file.toPath(), true);
         connectTaskToUI(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
-//        try {
-//            handler.exportDirectory(entry, file.toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();    //  TODO
-//        }
     }
 
 
