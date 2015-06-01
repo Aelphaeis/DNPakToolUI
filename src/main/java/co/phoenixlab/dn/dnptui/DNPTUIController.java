@@ -116,7 +116,7 @@ public class DNPTUIController {
     enum SelectionType {
         FOLDER,
         FILE,
-        NONE;
+        NONE
     }
 
     //  FXML elements
@@ -133,7 +133,6 @@ public class DNPTUIController {
     @FXML private Button exportFolderBtn;
     @FXML private Button closePakBtn;
     @FXML private ScrollPane navScrollPane;
-    @FXML private SplitPane splitPane;
     @FXML private BorderPane viewerPane;
     @FXML private TreeView<PakTreeEntry> treeView;
     /**
@@ -337,7 +336,7 @@ public class DNPTUIController {
             buttonBar.setDisable(true);
             FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.125D), root).
                     play();
-            quit(null);
+            quit();
         });
         noButton.setOnAction(ae -> {
             buttonBar.setDisable(true);
@@ -360,9 +359,8 @@ public class DNPTUIController {
     /**
      * Quits the application
      *
-     * @param dummy Any value (including null). Only present to allow for method reference in lambda
      */
-    private void quit(Object dummy) {
+    private void quit() {
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
         scaleTransition.setFromX(1D);
         scaleTransition.setFromY(1D);
@@ -525,6 +523,7 @@ public class DNPTUIController {
             infoLbl.textProperty().unbind();
             root.getChildren().clear();
             //  Cast is necessary - compiler keeps treating getSource() as returning Object
+            @SuppressWarnings("RedundantCast")
             Throwable throwable = ((Worker) e.getSource()).getException();
             if (throwable != null) {
                 infoLbl.setText("Unexpected error: " + throwable.getMessage());
