@@ -725,7 +725,10 @@ public class DNPTUIController {
         Label infoLbl = new Label("Loading");
         infoLbl.setTextAlignment(TextAlignment.CENTER);
         infoLbl.setAlignment(Pos.CENTER);
-        VBox vBox = new VBox(30, infoLbl, spinner);
+        VBox vBox = new VBox(10, infoLbl, spinner);
+        vBox.setMaxWidth(Double.MAX_VALUE);
+        vBox.setMaxHeight(Double.MAX_VALUE);
+        vBox.setAlignment(Pos.CENTER);
         spinnerAnimation.playFromStart();
         viewerPane.setCenter(vBox);
 
@@ -745,24 +748,12 @@ public class DNPTUIController {
                             }
                             FileInfo fileInfo = entry.entry.getFileInfo();
                             PakFile pakFile = entry.parent;
+                            updateMessage("Loading PAK");
                             pakFile.openIfNotOpen();
-                            String pakName = pakFile.getPath().getFileName().toString();
-                            int dotIndex = pakName.indexOf(".");
-                            if (dotIndex != -1) {
-                                pakName = pakName.substring(0, dotIndex);
-                            }
                             if (isCancelled()) {
                                 return null;
                             }
-                            Path temp = TEMP_DIR.resolve(pakName).resolve(fileInfo.getDiskOffset() + "." +
-                                    fileInfo.getDecompressedSize() + fileInfo.getFileName());
-                            Files.createDirectories(temp.getParent());
-                            if (Files.notExists(temp)) {
-                                Files.createFile(temp);
-                            }
-                            if (isCancelled()) {
-                                return null;
-                            }
+                            updateMessage("Preparing for decompressing");
                             ByteArrayOutputStream bao = new ByteArrayOutputStream((int) fileInfo.getDecompressedSize());
                             OutputStream out = new InflaterOutputStream(bao);
                             WritableByteChannel writableByteChannel = Channels.newChannel(out);
@@ -772,6 +763,7 @@ public class DNPTUIController {
                                 }
                                 synchronized (loadLock) {
                                     try {
+                                        updateMessage("Decompressing");
                                         entry.parent.openIfNotOpen();
                                         entry.parent.transferTo(entry.entry.getFileInfo(), writableByteChannel);
                                         break;
@@ -786,12 +778,14 @@ public class DNPTUIController {
                                 return null;
                             }
                             out.flush();
+                            updateMessage("Buffering");
                             ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
                             buffer.put(bao.toByteArray());
                             buffer.flip();
                             if (isCancelled()) {
                                 return null;
                             }
+                            updateMessage("Parsing data");
                             viewer.parse(buffer);
                         } catch (Exception e) {
                             System.err.println("exception while loading " + entry.entry.getFileInfo().getFullPath() + " in " + entry.parent.getPath().getFileName().toString());
