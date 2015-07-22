@@ -719,7 +719,10 @@ public class DNPTUIController {
         Label infoLbl = new Label("Loading");
         infoLbl.setTextAlignment(TextAlignment.CENTER);
         infoLbl.setAlignment(Pos.CENTER);
-        VBox vBox = new VBox(30, infoLbl, spinner);
+        VBox vBox = new VBox(10, infoLbl, spinner);
+        vBox.setMaxWidth(Double.MAX_VALUE);
+        vBox.setMaxHeight(Double.MAX_VALUE);
+        vBox.setAlignment(Pos.CENTER);
         spinnerAnimation.playFromStart();
         viewerPane.setCenter(vBox);
 
