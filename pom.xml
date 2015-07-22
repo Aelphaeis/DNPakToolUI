@@ -92,6 +92,8 @@
                     <archive>
                         <manifest>
                             <mainClass>co.phoenixlab.dn.dnptui.DNPTApplication</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -117,6 +119,8 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependency-jars/</classpathPrefix>
                             <mainClass>co.phoenixlab.dn.dnptui.DNPTApplication</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>
