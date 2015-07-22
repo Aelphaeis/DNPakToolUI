@@ -58,6 +58,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +105,10 @@ public class DNPTUIController {
      * Temporary directory
      */
     private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"), "dnptui");
+    /**
+     * Logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DNPTUIController.class);
     /**
      * Application instance
      */
@@ -254,7 +260,7 @@ public class DNPTUIController {
         try (InputStream navFolderIconInputStream = getClass().getResourceAsStream(NAV_FOLDER_ICON_PATH)) {
             navFolderIcon = new Image(navFolderIconInputStream);
         } catch (IOException e) {
-            //  TODO Exception handling
+            LOGGER.warn("Unable to load navigation pane folder icon", e);
         }
         //  Create the navigation pane's cell factory
         treeView.setCellFactory(param -> new TreeCell<PakTreeEntry>() {
@@ -321,6 +327,7 @@ public class DNPTUIController {
     @FXML
     private void showClosePrompt(ActionEvent event) {
         try {
+            LOGGER.debug("Application quit requested, confirming");
             //  Create popup window
             Stage promptStage = new Stage(StageStyle.TRANSPARENT);
             promptStage.initOwner(stage);
@@ -342,6 +349,7 @@ public class DNPTUIController {
                     play();
         } catch (IOException e) {
             //  If an error occurs showing the exit dialog, just quit
+            LOGGER.warn("Error showing exit dialog, defaulting to force-exit", e);
             quit();
         }
     }
@@ -350,6 +358,7 @@ public class DNPTUIController {
      * Quits the application
      */
     private void quit() {
+        LOGGER.debug("Application quit confirmed, quitting");
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
         scaleTransition.setFromX(1D);
         scaleTransition.setFromY(1D);
@@ -369,6 +378,7 @@ public class DNPTUIController {
      */
     @FXML
     private void iconify(ActionEvent event) {
+        LOGGER.debug("Application iconification requested");
         stage.setIconified(true);
     }
 
@@ -382,6 +392,7 @@ public class DNPTUIController {
         boolean wasMaximized = stage.isMaximized();
         stage.setMaximized(!wasMaximized);
         root.requestLayout();
+        LOGGER.debug("Application {}", wasMaximized ? "restored" : "maximized");
     }
 
     /**
@@ -406,6 +417,7 @@ public class DNPTUIController {
      * @param pakPath The path to the pak file to load
      */
     private void loadPak(Path pakPath) {
+        LOGGER.info("Attempting to load pak from {}", pakPath);
         lastOpenedDir = pakPath.getParent();
         openedFilePathProperty.set(pakPath.toString());
         resetProperties();
@@ -435,6 +447,7 @@ public class DNPTUIController {
      * @param virtualPakDirPath The path to the directory containing the paks to load
      */
     private void loadVirtualPak(Path virtualPakDirPath) {
+        LOGGER.info("Attempting to load virtual pak from directory {}", virtualPakDirPath);
         lastOpenedDir = virtualPakDirPath;
         openedFilePathProperty.set(virtualPakDirPath.toString() + " (Virtual)");
         resetProperties();
@@ -446,10 +459,11 @@ public class DNPTUIController {
         try (Stream<Path> matches = Files.find(virtualPakDirPath, 1, pakFilter)) {
             acceptedPakPaths = matches.collect(Collectors.toList());
         } catch (IOException e) {
-            //  TODO Error handling
-            e.printStackTrace();
+            LOGGER.warn("Error while finding pak files in directory", e);
+            //  TODO Error popup
             return;
         }
+        LOGGER.info("Found {} pak files to load", acceptedPakPaths.size());
         //  Create task
         PakLoadTask virtualPakLoadTask = new PakLoadTask(acceptedPakPaths, this::onLoadFinished);
         connectTaskToUI(virtualPakLoadTask);
@@ -469,12 +483,11 @@ public class DNPTUIController {
         loadingRoot.getStyleClass().add("dialog");
         loadingStage.setScene(loadingScene);
         //  Create the throbber/spinner
-        Image spinnerImage;
+        Image spinnerImage = null;
         try (InputStream spinnerInputStream = getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
             spinnerImage = new Image(spinnerInputStream);
         } catch (IOException e) {
-            //  TODO Exception handling
-            throw new RuntimeException(e);
+            LOGGER.warn("Unable to load spinner animation sprites", e);
         }
         ImageView spinner = new ImageView(spinnerImage);
         spinner.setFitHeight(32);
@@ -562,6 +575,7 @@ public class DNPTUIController {
             noPakLoadedProperty.set(false);
             treeRoot.setExpanded(true);
         });
+        LOGGER.info("Finished loading pak(s)");
     }
 
     /**
@@ -585,6 +599,9 @@ public class DNPTUIController {
         //  revalidate in case something went wrong or some idiot called this method manually.
         if (selectionTypeProperty.get() == SelectionType.FILE) {
             exportFile(selectedProperty.get());
+        } else {
+            LOGGER.warn("exportFile() called on an invalid selection (SelectionType = {})",
+                    selectionTypeProperty.get());
         }
     }
 
@@ -601,8 +618,10 @@ public class DNPTUIController {
         PakTreeEntry selectedPakTreeEntry = entry.getValue();
         //  Not a valid entry or is a directory
         if (selectedPakTreeEntry == null || selectedPakTreeEntry.isDirectory()) {
+            LOGGER.warn("Attempted to export invalid entry {}", selectedPakTreeEntry);
             return;
         }
+        LOGGER.info("Requesting export for {}", selectedPakTreeEntry.path);
         //  Show file chooser
         FileChooser exportFilePathChooser = new FileChooser();
         exportFilePathChooser.setTitle("Export as...");
@@ -611,6 +630,7 @@ public class DNPTUIController {
         File exportFile = exportFilePathChooser.showSaveDialog(stage);
         //  User hit cancel
         if (exportFile == null) {
+            LOGGER.debug("Export cancelled by user");
             return;
         }
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportFile.toPath(), false);
@@ -629,6 +649,9 @@ public class DNPTUIController {
         //  revalidate in case something went wrong or some idiot called this method manually.
         if (selectionTypeProperty.get() == SelectionType.FOLDER) {
             exportFolder(selectedProperty.get());
+        } else {
+            LOGGER.warn("exportFile() called on an invalid selection (SelectionType = {})",
+                    selectionTypeProperty.get());
         }
     }
 
@@ -645,8 +668,10 @@ public class DNPTUIController {
         PakTreeEntry selectedDirPakTreeEntry = entry.getValue();
         //  Not a valid entry or is a file
         if (selectedDirPakTreeEntry == null || !selectedDirPakTreeEntry.isDirectory()) {
+            LOGGER.warn("Attempted to directory export invalid entry {}", selectedDirPakTreeEntry);
             return;
         }
+        LOGGER.info("Requesting directory export for {}", selectedDirPakTreeEntry.path);
         //  Show directory chooser
         DirectoryChooser exportDirPathChooser = new DirectoryChooser();
         exportDirPathChooser.setTitle("Export into...");
@@ -654,6 +679,7 @@ public class DNPTUIController {
         File exportDir = exportDirPathChooser.showDialog(stage);
         //  User hit cancel
         if (exportDir == null) {
+            LOGGER.debug("Directory export cancelled by user");
             return;
         }
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportDir.toPath(), true);
@@ -676,6 +702,7 @@ public class DNPTUIController {
      * Closes the open pak/virtual pak
      */
     public void closePak() {
+        LOGGER.info("Closing currently loaded pak(s)");
         resetProperties();
         openedFilePathProperty.setValue("No File");
         treeView.setRoot(null);
@@ -702,12 +729,11 @@ public class DNPTUIController {
             return;
         }
         //  Create the throbber/spinner
-        Image spinnerImage;
+        Image spinnerImage = null;
         try (InputStream spinnerInputStream = getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
             spinnerImage = new Image(spinnerInputStream);
         } catch (IOException e) {
-            //  TODO Exception handling
-            throw new RuntimeException(e);
+            LOGGER.warn("Unable to load spinner animation sprites", e);
         }
         ImageView spinner = new ImageView(spinnerImage);
         spinner.setFitHeight(32);
@@ -733,6 +759,7 @@ public class DNPTUIController {
         if (newValue != null) {
             PakTreeEntry entry = newValue.getValue();
             if (entry != null && !entry.isDirectory()) {
+                LOGGER.debug("Selection changed to {}", entry.path);
                 Task<Void> task = new SubfileLoadTask(entry, viewer::parse, loadLock, TEMP_DIR);
                 task.setOnSucceeded(e -> {
                     viewerPane.setCenter(viewer.getDisplayNode());
