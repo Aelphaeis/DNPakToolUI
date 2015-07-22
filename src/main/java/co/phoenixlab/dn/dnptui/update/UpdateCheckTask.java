@@ -27,9 +27,16 @@ package co.phoenixlab.dn.dnptui.update;
 import javafx.concurrent.Task;
 
 public class UpdateCheckTask extends Task<Void> {
+
+    private final String currentVersion;
+
+    public UpdateCheckTask(String currentVersion) {
+        this.currentVersion = currentVersion;
+    }
+
     @Override
     protected Void call() throws Exception {
-        String currentVersion = getClass().getPackage().getImplementationVersion();
+
         //  TODO
 
         return null;

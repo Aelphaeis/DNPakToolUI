@@ -33,7 +33,10 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,6 +44,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class DNPTApplication extends Application {
 
     public static final ScheduledExecutorService EXECUTOR_SERVICE;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DNPTApplication.class);
 
     static {
         EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2);
@@ -53,11 +57,14 @@ public class DNPTApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
+            String currentVersion = getClass().getPackage().getImplementationVersion();
+            LOGGER.info("Starting DNPakToolUI v{}", currentVersion);
             //  Dispatch update checker
-            EXECUTOR_SERVICE.submit(new UpdateCheckTask());
+            EXECUTOR_SERVICE.submit(new UpdateCheckTask(currentVersion));
             //  Load the primary scene FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
             Parent root = loader.load();
+            LOGGER.debug("Loaded scene from FXML");
             Scene scene = new Scene(root, 1000, 700);
             scene.setFill(Color.TRANSPARENT);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
@@ -70,22 +77,26 @@ public class DNPTApplication extends Application {
                              getClass().getResourceAsStream("/co/phoenixlab/dn/dnptui/assets/window/icon_" + i +
                                      ".png")) {
                     primaryStage.getIcons().add(new Image(stream));
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to load " + i + "px icon", e);
                 }
             }
+            LOGGER.debug("Loaded {} icons", primaryStage.getIcons().size());
             //  Set up controller
             DNPTUIController controller = loader.getController();
             controller.setStageSceneApp(primaryStage, scene, this);
+            LOGGER.debug("Displaying scene");
             primaryStage.show();
             controller.init();
+            LOGGER.info("Startup complete");
         } catch (Exception e) {
-            //  TODO Better error handling
-            e.printStackTrace();
-            throw e;
+            LOGGER.error("Unexpected error during startup", e);
         }
     }
 
     @Override
     public void stop() {
+        LOGGER.info("Stopping DNPakToolUI");
         //  Nothing much to do here cleanup wise
         //  Stop application
         System.exit(0);
