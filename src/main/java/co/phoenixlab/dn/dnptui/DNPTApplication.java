@@ -24,6 +24,7 @@
 
 package co.phoenixlab.dn.dnptui;
 
+import co.phoenixlab.dn.dnptui.update.UpdateCheckTask;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -52,6 +53,8 @@ public class DNPTApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
+            //  Dispatch update checker
+            EXECUTOR_SERVICE.submit(new UpdateCheckTask());
             //  Load the primary scene FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/phoenixlab/dn/dnptui/assets/scene.fxml"));
             Parent root = loader.load();
