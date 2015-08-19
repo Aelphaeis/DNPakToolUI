@@ -123,8 +123,9 @@ public class PakHandler {
      */
     private void insert(PakTreeEntry entry, Map<String, TreeItem<PakTreeEntry>> dirCache) {
         Path entryPath = entry.path.getParent();
+        TreeItem<PakTreeEntry> entryTreeItem = new TreeItem<>(entry);
         if (entryPath == null) {
-            insert(entry, root);
+            root.getChildren().add(entryTreeItem);
         } else {
             TreeItem<PakTreeEntry> parent = dirCache.get(entryPath.toString());
             if (parent == null) {
@@ -133,20 +134,8 @@ public class PakHandler {
                     parent = createDir(path.toString(), parent, dirCache);
                 }
             }
-            insert(entry, parent);
+            parent.getChildren().add(entryTreeItem);
         }
-    }
-
-    /**
-     * Inserts an entry into its parent.
-     *
-     * @param entry  The entry to insert
-     * @param parent The parent for the given entry
-     */
-    //  TODO This should be inlined
-    private void insert(PakTreeEntry entry, TreeItem<PakTreeEntry> parent) {
-        TreeItem<PakTreeEntry> entryTreeItem = new TreeItem<>(entry);
-        parent.getChildren().add(entryTreeItem);
     }
 
     /**
