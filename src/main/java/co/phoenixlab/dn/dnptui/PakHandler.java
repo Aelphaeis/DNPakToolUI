@@ -27,6 +27,8 @@ package co.phoenixlab.dn.dnptui;
 import co.phoenixlab.dn.pak.FileEntry;
 import co.phoenixlab.dn.pak.PakFile;
 import javafx.scene.control.TreeItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.channels.Channels;
@@ -40,6 +42,11 @@ import java.util.*;
 import java.util.zip.InflaterOutputStream;
 
 public class PakHandler {
+
+    /**
+     * Logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PakHandler.class);
 
     /**
      * Compares two TreeItems by their values. Alphabetically sorts folders first and files second
@@ -229,6 +236,7 @@ public class PakHandler {
                 }
             } while (true);
             outputStream.flush();
+            LOGGER.info("Subfile {} exported to {}", entry.path, exportPath);
         }
     }
 
@@ -251,6 +259,7 @@ public class PakHandler {
                 exportFile(entry, path);
             }
         }
+        LOGGER.info("Subdirectory {} exported to {}", treeItem.getValue().path, exportPath);
     }
 
     /**
@@ -259,6 +268,7 @@ public class PakHandler {
     public void unload() {
         paks.forEach(this::tryClosePak);
         paks.clear();
+        LOGGER.info("Paks unloaded");
     }
 
     /**
@@ -270,7 +280,7 @@ public class PakHandler {
         try {
             pakFile.close();
         } catch (IOException e) {
-            //  Don't care
+            LOGGER.warn("Unable to close pak " + pakFile.getPath().toString(), e);
         }
     }
 
