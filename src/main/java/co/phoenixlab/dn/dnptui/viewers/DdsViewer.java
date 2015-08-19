@@ -28,13 +28,21 @@ import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
 import co.phoenixlab.dds.InvalidDdsException;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
 
 import java.io.ByteArrayInputStream;
@@ -49,8 +57,41 @@ public class DdsViewer implements Viewer {
     private Image image;
     private final DdsImageDecoder decoder;
 
+    private ImageView imageView;
+    private ScrollPane scrollPane;
+    private Spinner<Integer> zoomSpinner;
+    private IntegerSpinnerValueFactory zoomValueFactory;
+
+    private final DoubleProperty zoomProperty;
+    private final IntegerProperty imageWidthProperty;
+    private byte[] pngData;
+
     public DdsViewer() {
         decoder = new DdsImageDecoder();
+        zoomProperty = new SimpleDoubleProperty(this, "zoom", 1D);
+        imageWidthProperty = new SimpleIntegerProperty(this, "imageWidth");
+        preLayout();
+    }
+
+    private void preLayout() {
+        imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+        scrollPane = new ScrollPane(imageView);
+        zoomValueFactory = new IntegerSpinnerValueFactory(25, 400, 100);
+        zoomValueFactory.setValue(100);
+        zoomValueFactory.setAmountToStepBy(25);
+        zoomSpinner = new Spinner<>(zoomValueFactory);
+        zoomSpinner.setEditable(false);
+
+        BorderPane borderPane = new BorderPane(scrollPane, zoomSpinner, null, null, null);
+
+        //  Bindings
+        zoomValueFactory.valueProperty().addListener((observable, oldValue, newValue) -> {
+            zoomProperty.set(newValue.doubleValue() / 100D);
+        });
+        imageView.fitWidthProperty().bind(Bindings.multiply(imageWidthProperty, zoomProperty));
+
+        displayNode = borderPane;
     }
 
     @Override
@@ -64,8 +105,9 @@ public class DdsViewer implements Viewer {
         try {
             byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
             currentDds.read(byteBuffer);
-            byte[] png = decoder.convertToPNG(currentDds);
-            image = new Image(new ByteArrayInputStream(png));
+            pngData = decoder.convertToPNG(currentDds);
+            image = new Image(new ByteArrayInputStream(pngData));
+            imageWidthProperty.bind(image.widthProperty());
         } catch (InvalidDdsException e) {
             Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
             label.setAlignment(Pos.CENTER);
@@ -74,10 +116,14 @@ public class DdsViewer implements Viewer {
             displayNode = label;
             return;
         }
-        //  TODO real pane thingy
-        ImageView imageView = new ImageView(image);
-        displayNode = new ScrollPane(imageView);
+        layout();
     }
+
+    private void layout() {
+        imageView.setImage(image);
+    }
+
+
 
     @Override
     public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
@@ -88,6 +134,7 @@ public class DdsViewer implements Viewer {
     public void reset() {
         currentDds = null;
         image.cancel();
+        imageWidthProperty.unbind();
         image = null;
         displayNode = null;
     }
