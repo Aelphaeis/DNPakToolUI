@@ -26,7 +26,6 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
-import co.phoenixlab.dds.InvalidDdsException;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -65,6 +64,7 @@ public class DdsViewer implements Viewer {
     private final DoubleProperty zoomProperty;
     private final IntegerProperty imageWidthProperty;
     private byte[] pngData;
+    private BorderPane displayPane;
 
     public DdsViewer() {
         decoder = new DdsImageDecoder();
@@ -83,7 +83,7 @@ public class DdsViewer implements Viewer {
         zoomSpinner = new Spinner<>(zoomValueFactory);
         zoomSpinner.setEditable(false);
 
-        BorderPane borderPane = new BorderPane(scrollPane, zoomSpinner, null, null, null);
+        displayPane = new BorderPane(scrollPane, zoomSpinner, null, null, null);
 
         //  Bindings
         zoomValueFactory.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -91,7 +91,7 @@ public class DdsViewer implements Viewer {
         });
         imageView.fitWidthProperty().bind(Bindings.multiply(imageWidthProperty, zoomProperty));
 
-        displayNode = borderPane;
+        displayNode = displayPane;
     }
 
     @Override
@@ -108,12 +108,13 @@ public class DdsViewer implements Viewer {
             pngData = decoder.convertToPNG(currentDds);
             image = new Image(new ByteArrayInputStream(pngData));
             imageWidthProperty.bind(image.widthProperty());
-        } catch (InvalidDdsException e) {
+            displayPane.setCenter(scrollPane);
+        } catch (Exception e) {
             Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
             label.setAlignment(Pos.CENTER);
             label.setTextAlignment(TextAlignment.CENTER);
             label.setPrefWidth(Double.MAX_VALUE);
-            displayNode = label;
+            displayPane.setCenter(label);
             return;
         }
         layout();
