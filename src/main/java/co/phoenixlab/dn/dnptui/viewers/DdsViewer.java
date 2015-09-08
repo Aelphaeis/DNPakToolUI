@@ -35,21 +35,23 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.util.converter.FormatStringConverter;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
 
 public class DdsViewer implements Viewer {
@@ -71,6 +73,8 @@ public class DdsViewer implements Viewer {
     private BorderPane displayPane;
     private Label sizeLbl;
 
+    private String fileName;
+
     public DdsViewer() {
         decoder = new DdsImageDecoder();
         zoomProperty = new SimpleDoubleProperty(this, "zoom", 1D);
@@ -90,11 +94,13 @@ public class DdsViewer implements Viewer {
         zoomSpinner.setEditable(false);
         Label zoomLbl = new Label("Zoom:");
         sizeLbl = new Label();
+        Button exportBtn = new Button("Export as PNG");
+        exportBtn.setOnAction(this::exportImage);
 
         HBox toolbar = new HBox(10);
         toolbar.setAlignment(Pos.CENTER_LEFT);
         toolbar.setPadding(new Insets(0, 0, 0, 10));
-        toolbar.getChildren().addAll(zoomLbl, zoomSpinner, sizeLbl);
+        toolbar.getChildren().addAll(zoomLbl, zoomSpinner, sizeLbl, exportBtn);
 
         displayPane = new BorderPane(scrollPane, toolbar, null, null, null);
 
@@ -105,6 +111,22 @@ public class DdsViewer implements Viewer {
         imageView.fitWidthProperty().bind(Bindings.multiply(imageWidthProperty, zoomProperty));
 
         displayNode = displayPane;
+    }
+
+    private void exportImage(Object ignored) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(fileName.replace(".dds", ".png"));
+        fileChooser.setTitle("Export as...");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
+        File file = fileChooser.showSaveDialog(displayNode.getScene().getWindow());
+        if (file != null) {
+            //  TODO Do this async
+            try {
+                Files.write(file.toPath(), pngData, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -141,7 +163,7 @@ public class DdsViewer implements Viewer {
 
     @Override
     public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
-
+        fileName = pakTreeEntry.getValue().name;
     }
 
     @Override
