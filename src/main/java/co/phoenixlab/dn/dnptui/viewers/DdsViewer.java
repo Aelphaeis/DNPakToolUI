@@ -32,6 +32,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -42,11 +43,14 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
+import javafx.util.converter.FormatStringConverter;
 
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DecimalFormat;
 
 public class DdsViewer implements Viewer {
 
@@ -65,6 +69,7 @@ public class DdsViewer implements Viewer {
     private final IntegerProperty imageWidthProperty;
     private byte[] pngData;
     private BorderPane displayPane;
+    private Label sizeLbl;
 
     public DdsViewer() {
         decoder = new DdsImageDecoder();
@@ -78,12 +83,20 @@ public class DdsViewer implements Viewer {
         imageView.setPreserveRatio(true);
         scrollPane = new ScrollPane(imageView);
         zoomValueFactory = new IntegerSpinnerValueFactory(25, 400, 100);
+        zoomValueFactory.setConverter(new FormatStringConverter<>(new DecimalFormat("#'%'")));
         zoomValueFactory.setValue(100);
         zoomValueFactory.setAmountToStepBy(25);
         zoomSpinner = new Spinner<>(zoomValueFactory);
         zoomSpinner.setEditable(false);
+        Label zoomLbl = new Label("Zoom:");
+        sizeLbl = new Label();
 
-        displayPane = new BorderPane(scrollPane, zoomSpinner, null, null, null);
+        HBox toolbar = new HBox(10);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        toolbar.setPadding(new Insets(0, 0, 0, 10));
+        toolbar.getChildren().addAll(zoomLbl, zoomSpinner, sizeLbl);
+
+        displayPane = new BorderPane(scrollPane, toolbar, null, null, null);
 
         //  Bindings
         zoomValueFactory.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -109,6 +122,7 @@ public class DdsViewer implements Viewer {
             image = new Image(new ByteArrayInputStream(pngData));
             imageWidthProperty.bind(image.widthProperty());
             displayPane.setCenter(scrollPane);
+            sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight()));
         } catch (Exception e) {
             Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
             label.setAlignment(Pos.CENTER);
@@ -123,7 +137,6 @@ public class DdsViewer implements Viewer {
     private void layout() {
         imageView.setImage(image);
     }
-
 
 
     @Override
