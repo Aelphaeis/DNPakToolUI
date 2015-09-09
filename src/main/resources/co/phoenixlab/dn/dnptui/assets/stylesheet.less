@@ -301,5 +301,38 @@
         -fx-border-color: @color-toolbar-button-bar-hover;
       }
     }
+    #size-lbl {
+      -fx-padding: 0 4px;
+      -fx-min-width: 100px;
+      -fx-text-alignment: center;
+      -fx-alignment: center;
+    }
+    .spinner {
+      -fx-border-insets: 0;
+      -fx-background-color: transparent;
+      -fx-border-color: transparent;
+      -fx-border-width: 0;
+      .text-field {
+        -fx-cursor: default;
+        -fx-highlight-fill: transparent;
+        -fx-highlight-text-fill: @color-text-light;
+        -fx-text-fill: @color-text-light;
+        -fx-background-color: transparent;
+      }
+      .increment-arrow-button,
+      .decrement-arrow-button {
+        -fx-border-width: 0;
+        -fx-border-radius: 0;
+        -fx-background-color: @color-toolbar-button;
+        -fx-background-radius: 0;
+        &:hover {
+          -fx-background-color: @color-toolbar-button-hover;
+        }
+        .increment-arrow,
+        .decrement-arrow {
+          -fx-background-color: @color-text-light;
+        }
+      }
+    }
   }
 }

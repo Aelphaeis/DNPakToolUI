@@ -33,8 +33,8 @@
     <top>
         <HBox spacing="10" styleClass="dds-toolbar" alignment="CENTER_LEFT">
             <Label fx:id="zoomLbl"/>
-            <Spinner fx:id="zoomSpinner" editable="false" prefWidth="70"/>
-            <Label fx:id="sizeLbl"/>
+            <Spinner fx:id="zoomSpinner" editable="false" prefWidth="66"/>
+            <Label fx:id="sizeLbl" id="size-lbl"/>
             <Button fx:id="exportBtn" onAction="#exportImage"/>
         </HBox>
     </top>
