@@ -24,9 +24,12 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
+import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -40,7 +43,20 @@ public class Viewers {
 
     static {
         //  Register Viewers here
-        fileExtensionViewers.put(".dds", new DdsViewer());
+        registerFXMLViewer(".dds", "/co/phoenixlab/dn/dnptui/assets/viewers/dds.fxml");
+    }
+
+    public static void registerFXMLViewer(String extension, String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(DNPTUIController.class.getResource(fxmlPath));
+            loader.load();
+            Viewer viewer = loader.getController();
+            viewer.init();
+            fileExtensionViewers.put(extension, viewer);
+        } catch (IOException e) {
+            //  TODO
+            e.printStackTrace();
+        }
     }
 
     private Viewers() {}

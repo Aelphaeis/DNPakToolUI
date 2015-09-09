@@ -33,6 +33,13 @@ import java.nio.ByteBuffer;
 public interface Viewer {
 
     /**
+     * Called immediately after the Viewer is created. This method is called only once per
+     * initialization
+     */
+    default void init() {
+    }
+
+    /**
      * Called from the UI thread once {@link #parse(ByteBuffer)} finishes parsing the file data
      * @return The node to display in the view pane
      */

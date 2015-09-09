@@ -283,3 +283,23 @@
   }
 }
 
+.dds {
+  .dds-toolbar {
+    -fx-padding: 0 10px;
+    .button {
+      -fx-background-color: @color-toolbar-button;
+      -fx-background-insets: 0;
+      -fx-border-color: @color-toolbar-button-bar;
+      -fx-border-width: 0 0 2px 0;
+      -fx-border-insets: 0 0 2px 0;
+      -fx-font-size: 12px;
+      -fx-text-fill: @color-text-light;
+      -fx-padding: 4px 8px;
+      -fx-alignment: CENTER;
+      &:hover {
+        -fx-background-color: @color-toolbar-button-hover;
+        -fx-border-color: @color-toolbar-button-bar-hover;
+      }
+    }
+  }
+}

@@ -32,7 +32,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -40,7 +40,6 @@ import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.util.converter.FormatStringConverter;
@@ -61,48 +60,45 @@ public class DdsViewer implements Viewer {
     private Dds currentDds;
     private Image image;
     private final DdsImageDecoder decoder;
-
+    @FXML
     private ImageView imageView;
+    @FXML
     private ScrollPane scrollPane;
+    @FXML
     private Spinner<Integer> zoomSpinner;
+    @FXML
     private IntegerSpinnerValueFactory zoomValueFactory;
 
     private final DoubleProperty zoomProperty;
     private final IntegerProperty imageWidthProperty;
     private byte[] pngData;
+    @FXML
     private BorderPane displayPane;
+    @FXML
     private Label sizeLbl;
 
     private String fileName;
+    @FXML
+    private Button exportBtn;
+    @FXML
+    private Label zoomLbl;
 
     public DdsViewer() {
         decoder = new DdsImageDecoder();
         zoomProperty = new SimpleDoubleProperty(this, "zoom", 1D);
         imageWidthProperty = new SimpleIntegerProperty(this, "imageWidth");
-        preLayout();
     }
 
-    private void preLayout() {
-        imageView = new ImageView();
-        imageView.setPreserveRatio(true);
-        scrollPane = new ScrollPane(imageView);
+    @Override
+    public void init() {
         zoomValueFactory = new IntegerSpinnerValueFactory(25, 400, 100);
         zoomValueFactory.setConverter(new FormatStringConverter<>(new DecimalFormat("#'%'")));
         zoomValueFactory.setValue(100);
         zoomValueFactory.setAmountToStepBy(25);
-        zoomSpinner = new Spinner<>(zoomValueFactory);
-        zoomSpinner.setEditable(false);
-        Label zoomLbl = new Label("Zoom:");
-        sizeLbl = new Label();
-        Button exportBtn = new Button("Export as PNG");
-        exportBtn.setOnAction(this::exportImage);
-
-        HBox toolbar = new HBox(10);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-        toolbar.setPadding(new Insets(0, 0, 0, 10));
-        toolbar.getChildren().addAll(zoomLbl, zoomSpinner, sizeLbl, exportBtn);
-
-        displayPane = new BorderPane(scrollPane, toolbar, null, null, null);
+        zoomSpinner.setValueFactory(zoomValueFactory);
+        //  Text
+        zoomLbl.setText("Zoom:");
+        exportBtn.setText("Export as PNG");
 
         //  Bindings
         zoomValueFactory.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -113,7 +109,8 @@ public class DdsViewer implements Viewer {
         displayNode = displayPane;
     }
 
-    private void exportImage(Object ignored) {
+    @FXML
+    private void exportImage() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialFileName(fileName.replace(".dds", ".png"));
         fileChooser.setTitle("Export as...");
