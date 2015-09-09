@@ -40,6 +40,7 @@ import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.util.converter.FormatStringConverter;
@@ -82,6 +83,9 @@ public class DdsViewer implements Viewer {
     private Button exportBtn;
     @FXML
     private Label zoomLbl;
+    @FXML
+    private HBox toolbar;
+
 
     public DdsViewer() {
         decoder = new DdsImageDecoder();
@@ -142,12 +146,15 @@ public class DdsViewer implements Viewer {
             imageWidthProperty.bind(image.widthProperty());
             displayPane.setCenter(scrollPane);
             sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight()));
+            toolbar.setDisable(false);
         } catch (Exception e) {
             Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
             label.setAlignment(Pos.CENTER);
             label.setTextAlignment(TextAlignment.CENTER);
             label.setPrefWidth(Double.MAX_VALUE);
+
             displayPane.setCenter(label);
+            toolbar.setDisable(true);
             return;
         }
         layout();

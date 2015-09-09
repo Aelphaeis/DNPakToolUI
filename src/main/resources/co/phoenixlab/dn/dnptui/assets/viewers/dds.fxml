@@ -31,7 +31,7 @@
 <BorderPane fx:id="displayPane" styleClass="dds" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="co.phoenixlab.dn.dnptui.viewers.DdsViewer">
     <top>
-        <HBox spacing="10" styleClass="dds-toolbar" alignment="CENTER_LEFT">
+        <HBox spacing="10" fx:id="toolbar" styleClass="dds-toolbar" alignment="CENTER_LEFT">
             <Label fx:id="zoomLbl"/>
             <Spinner fx:id="zoomSpinner" editable="false" prefWidth="66"/>
             <Label fx:id="sizeLbl" id="size-lbl"/>
