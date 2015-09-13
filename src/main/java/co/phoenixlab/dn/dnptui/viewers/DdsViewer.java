@@ -150,7 +150,11 @@ public class DdsViewer implements Viewer {
             Platform.runLater(() ->
                     sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight())));
         } catch (Exception e) {
-            Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
+            String exceptionMsg = e.getMessage();
+            if (exceptionMsg == null) {
+                exceptionMsg = e.getClass().getSimpleName();
+            }
+            Label label = new Label("Error decoding DDS file:\n" + exceptionMsg);
             label.setAlignment(Pos.CENTER);
             label.setTextAlignment(TextAlignment.CENTER);
             label.setPrefWidth(Double.MAX_VALUE);
