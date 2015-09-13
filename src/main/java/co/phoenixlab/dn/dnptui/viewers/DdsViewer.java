@@ -27,6 +27,7 @@ package co.phoenixlab.dn.dnptui.viewers;
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -145,8 +146,9 @@ public class DdsViewer implements Viewer {
             image = new Image(new ByteArrayInputStream(pngData));
             imageWidthProperty.bind(image.widthProperty());
             displayPane.setCenter(scrollPane);
-            sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight()));
             toolbar.setDisable(false);
+            Platform.runLater(() ->
+                    sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight())));
         } catch (Exception e) {
             Label label = new Label("Error decoding DDS file:\n" + e.getMessage());
             label.setAlignment(Pos.CENTER);
