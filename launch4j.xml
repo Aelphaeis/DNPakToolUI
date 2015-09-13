@@ -18,7 +18,7 @@
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.8.0_31</minVersion>
+    <minVersion>1.8.0_40</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
@@ -37,7 +37,7 @@
     <productVersion>1.0.0.0</productVersion>
     <txtProductVersion>1.0.0 Beta</txtProductVersion>
     <productName>DNPakToolUI</productName>
-    <companyName></companyName>
+    <companyName>PhoenixLAB</companyName>
     <internalName>DNPakToolUI</internalName>
     <originalFilename>DNPakToolUI.exe</originalFilename>
   </versionInfo>
