@@ -36,6 +36,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>phoenixlab-maven</id>
+            <name>PhoenixLAB Maven Repo</name>
+            <url>http://maven.phoenixlab.co/maven2</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
