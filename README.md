@@ -34,7 +34,7 @@ mvn install:install-file -Dfile=DNPakTool-1.0.1.jar -DgroupId=co.phoenixlab.dn -
 
 ##Dependencies
 - [DNPakTool](https://github.com/vincentzhang96/DNPakTool)
-- Java 8u31
+- Java 8u40
 
 ##Contributing
 Simply submit a pull request and I'll review it for inclusion.
