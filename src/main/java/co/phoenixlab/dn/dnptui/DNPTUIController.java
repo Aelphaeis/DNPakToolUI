@@ -422,7 +422,7 @@ public class DNPTUIController {
         openedFilePathProperty.set(pakPath.toString());
         resetProperties();
         PakLoadTask pakLoadTask = new PakLoadTask(pakPath, this::onLoadFinished);
-        connectTaskToUI(pakLoadTask);
+        showLoadingPopup(pakLoadTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(pakLoadTask);
     }
 
@@ -466,11 +466,11 @@ public class DNPTUIController {
         LOGGER.info("Found {} pak files to load", acceptedPakPaths.size());
         //  Create task
         PakLoadTask virtualPakLoadTask = new PakLoadTask(acceptedPakPaths, this::onLoadFinished);
-        connectTaskToUI(virtualPakLoadTask);
+        showLoadingPopup(virtualPakLoadTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(virtualPakLoadTask);
     }
 
-    private void connectTaskToUI(Task task) {
+    private void showLoadingPopup(Task task) {
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
         loadingStage.initOwner(stage);
@@ -634,7 +634,7 @@ public class DNPTUIController {
             return;
         }
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportFile.toPath(), false);
-        connectTaskToUI(exportTask);
+        showLoadingPopup(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
 
@@ -683,7 +683,7 @@ public class DNPTUIController {
             return;
         }
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportDir.toPath(), true);
-        connectTaskToUI(exportTask);
+        showLoadingPopup(exportTask);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
 
