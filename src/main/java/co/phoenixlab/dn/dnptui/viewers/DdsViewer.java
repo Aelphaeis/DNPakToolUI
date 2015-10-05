@@ -45,6 +45,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.util.converter.FormatStringConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -56,6 +58,8 @@ import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
 
 public class DdsViewer implements Viewer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DdsViewer.class);
 
     private Node displayNode;
 
@@ -150,6 +154,7 @@ public class DdsViewer implements Viewer {
             Platform.runLater(() ->
                     sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight())));
         } catch (Exception e) {
+            LOGGER.warn("Error decoding DDS file \"" + fileName + "\"", e);
             String exceptionMsg = e.getMessage();
             if (exceptionMsg == null) {
                 exceptionMsg = e.getClass().getSimpleName();
