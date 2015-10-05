@@ -61,15 +61,18 @@ public class PakLoadTask extends Task<PakLoadTask.Tuple> {
             PakFileReader reader = new PakFileReader();
             List<PakFile> paks = new ArrayList<>(numPaths);
             Path path;
+            long files = 0;
             for (int i = 0; i < numPaths;) {
                 path = paths.get(i);
                 ++i;
                 LOGGER.info("Loading {} ({}/{})", path, i, numPaths);
                 updateMessage("Loading " + path.getFileName().toString());
                 PakFile pakFile = reader.load(path);
+                files += pakFile.getNumFiles();
                 paks.add(pakFile);
                 updateProgress(i, numPaths);
             }
+            LOGGER.info("Loaded {} files", files);
             PakHandler handler = new PakHandler(paks);
             updateMessage("Building file tree");
             LOGGER.info("Building file tree");
