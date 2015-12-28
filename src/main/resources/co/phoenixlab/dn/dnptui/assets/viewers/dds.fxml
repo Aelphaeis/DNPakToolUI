@@ -28,19 +28,22 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<BorderPane fx:id="displayPane" styleClass="dds" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="co.phoenixlab.dn.dnptui.viewers.DdsViewer">
+<BorderPane fx:id="displayPane" styleClass="dds" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.phoenixlab.dn.dnptui.viewers.DdsViewer">
     <top>
-        <HBox spacing="10" fx:id="toolbar" styleClass="dds-toolbar" alignment="CENTER_LEFT">
-            <Label fx:id="zoomLbl"/>
-            <Spinner fx:id="zoomSpinner" editable="false" prefWidth="66"/>
-            <Label fx:id="sizeLbl" id="size-lbl"/>
-            <Button fx:id="exportBtn" onAction="#exportImage"/>
+        <HBox fx:id="toolbar" alignment="CENTER_LEFT" spacing="10" styleClass="dds-toolbar">
+           <children>
+               <Label fx:id="zoomLbl" />
+               <Spinner fx:id="zoomSpinner" editable="false" prefWidth="66" />
+               <Label id="size-lbl" fx:id="sizeLbl" />
+               <Button fx:id="exportBtn" onAction="#exportImage" />
+           </children>
         </HBox>
     </top>
     <center>
-        <ScrollPane fx:id="scrollPane">
-            <ImageView fx:id="imageView" preserveRatio="true"/>
+        <ScrollPane fx:id="scrollPane" pannable="true">
+           <content>
+               <ImageView fx:id="imageView" preserveRatio="true" />
+           </content>
         </ScrollPane>
     </center>
 </BorderPane>
