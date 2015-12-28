@@ -29,6 +29,7 @@ import co.phoenixlab.dn.dnptui.fx.SpriteAnimation;
 import co.phoenixlab.dn.dnptui.viewers.Viewer;
 import co.phoenixlab.dn.dnptui.viewers.Viewers;
 import co.phoenixlab.dn.pak.DNPakTool;
+import co.phoenixlab.dn.pak.FileInfo;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -149,6 +150,7 @@ public class DNPTUIController {
     @FXML private ScrollPane navScrollPane;
     @FXML private BorderPane viewerPane;
     @FXML private TreeView<PakTreeEntry> treeView;
+    @FXML private Label fileInfoLbl;
     /**
      * The folder icon used in the navigation pane. Shared instance
      */
@@ -762,9 +764,15 @@ public class DNPTUIController {
 
         currentLoadTask.ifPresent(Task::cancel);
         currentViewer.ifPresent(Viewer::reset);
+        fileInfoLbl.setText("");
         if (newValue != null) {
             PakTreeEntry entry = newValue.getValue();
             if (entry != null && !entry.isDirectory()) {
+                FileInfo fileInfo = entry.entry.getFileInfo();
+                fileInfoLbl.setText(String.format("Disk Size: %,.1f KB | Decompressed Size: %,.1f KB | Offset: 0x%08X",
+                        fileInfo.getDiskSize() / 1024D,
+                        fileInfo.getDecompressedSize() / 1024D,
+                        fileInfo.getDiskOffset()));
                 Viewer viewer = Viewers.getViewer(newValue);
                 currentViewer = Optional.of(viewer);
                 viewer.setMainUiController(this);
@@ -777,7 +785,7 @@ public class DNPTUIController {
                     subfileLoadingLabel.textProperty().unbind();
                     viewerPane.setCenter(viewer.getDisplayNode());
                 });
-                task.setOnCancelled(e ->  {
+                task.setOnCancelled(e -> {
                     spinnerAnimation.stop();
                     subfileLoadingLabel.textProperty().unbind();
                 });

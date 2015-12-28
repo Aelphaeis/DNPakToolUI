@@ -21,7 +21,13 @@
                   </ScrollPane>
                </children>
             </VBox>
-            <BorderPane fx:id="viewerPane" prefHeight="200.0" prefWidth="200.0" />
+            <BorderPane fx:id="viewerPane" prefHeight="200.0" prefWidth="200.0">
+               <bottom>
+                  <HBox id="fileInfoBar" alignment="CENTER_LEFT" minHeight="20.0" prefHeight="20.0" styleClass="file-info-bar" BorderPane.alignment="CENTER_LEFT">
+                     <children>
+                        <Label fx:id="fileInfoLbl" />
+                     </children></HBox>
+               </bottom></BorderPane>
          </items>
       </SplitPane>
    </center>
