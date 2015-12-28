@@ -20,7 +20,7 @@ You may download the latest stable release [here](https://github.com/vincentzhan
 - [x] Add a throbber when exporting file(s)
 - [ ] Implement Search
 - [ ] Infrastructure for caching decompressed files to a temp directory
-- [ ] Infrastructure for in-tool viewing of files
+- [x] Infrastructure for in-tool viewing of files
 - [ ] Thumbnail view for directories when selected?
 - [ ] Internationalize
 
