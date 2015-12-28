@@ -47,10 +47,16 @@ public class SubfileExportTask extends Task<Void> {
     @Override
     protected Void call() throws Exception {
         updateMessage("Exporting...");
+        long startTime = System.currentTimeMillis();
         if (exportAsFolder) {
             handler.exportDirectory(treeItem, exportPath);
         } else {
             handler.exportFile(treeItem.getValue(), exportPath);
+        }
+        //  Add a sleep if we took less than 1s because people dont notice it completed
+        long delta = System.currentTimeMillis() - startTime;
+        if (delta < 1000) {
+            Thread.sleep(1000 - delta);
         }
         updateMessage("Done");
         return null;
