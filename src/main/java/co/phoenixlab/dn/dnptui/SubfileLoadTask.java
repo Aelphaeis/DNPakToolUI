@@ -63,7 +63,9 @@ public class SubfileLoadTask extends Task<Void> {
                 return null;
             }
             updateMessage("Extracting subfile");
-            ByteArrayOutputStream bao = new ByteArrayOutputStream((int) fileInfo.getDecompressedSize());
+            ByteArrayOutputStream bao = new ByteArrayOutputStream((int) Math.max(
+                    fileInfo.getDecompressedSize(),
+                    fileInfo.getCompressedSize()));
             OutputStream out = new InflaterOutputStream(bao);
             WritableByteChannel writableByteChannel = Channels.newChannel(out);
             do {
@@ -89,8 +91,9 @@ public class SubfileLoadTask extends Task<Void> {
             }
             out.flush();
             updateMessage("Processing subfile");
-            ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
-            buffer.put(bao.toByteArray());
+            byte[] decompressedBytes = bao.toByteArray();
+            ByteBuffer buffer = ByteBuffer.allocate(decompressedBytes.length);
+            buffer.put(decompressedBytes);
             buffer.flip();
             if (isCancelled()) {
                 return null;
@@ -99,7 +102,8 @@ public class SubfileLoadTask extends Task<Void> {
             consumer.accept(buffer);
             updateMessage("Done");
         } catch (Exception e) {
-            System.err.println("exception while loading " + entry.entry.getFileInfo().getFullPath() + " in " + entry.parent.getPath().getFileName().toString());
+            System.err.println("exception while loading " + entry.entry.getFileInfo().getFullPath() + " in " +
+                    entry.parent.getPath().getFileName().toString());
             e.printStackTrace();
         }
         return null;
