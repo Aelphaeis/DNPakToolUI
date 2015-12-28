@@ -25,7 +25,6 @@
 package co.phoenixlab.dn.dnptui;
 
 import co.phoenixlab.dn.pak.FileInfo;
-import co.phoenixlab.dn.pak.PakFile;
 import javafx.concurrent.Task;
 
 import java.io.ByteArrayOutputStream;
@@ -35,7 +34,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.zip.InflaterOutputStream;
@@ -61,25 +59,10 @@ public class SubfileLoadTask extends Task<Void> {
                 return null;
             }
             FileInfo fileInfo = entry.entry.getFileInfo();
-            PakFile pakFile = entry.parent;
-            pakFile.openIfNotOpen();
-            String pakName = pakFile.getPath().getFileName().toString();
-            int dotIndex = pakName.indexOf(".");
-            if (dotIndex != -1) {
-                pakName = pakName.substring(0, dotIndex);
-            }
             if (isCancelled()) {
                 return null;
             }
-            Path temp = tempDir.resolve(pakName).resolve(fileInfo.getDiskOffset() + "." +
-                    fileInfo.getDecompressedSize() + fileInfo.getFileName());
-            Files.createDirectories(temp.getParent());
-            if (Files.notExists(temp)) {
-                Files.createFile(temp);
-            }
-            if (isCancelled()) {
-                return null;
-            }
+            updateMessage("Extracting subfile");
             ByteArrayOutputStream bao = new ByteArrayOutputStream((int) fileInfo.getDecompressedSize());
             OutputStream out = new InflaterOutputStream(bao);
             WritableByteChannel writableByteChannel = Channels.newChannel(out);
@@ -93,7 +76,9 @@ public class SubfileLoadTask extends Task<Void> {
                         entry.parent.transferTo(entry.entry.getFileInfo(), writableByteChannel);
                         break;
                     } catch (ClosedByInterruptException cbie) {
-                        return null;
+                        if (isCancelled()) {
+                            return null;
+                        }
                     } catch (ClosedChannelException ex) {
                         entry.parent.reopen();
                     }
@@ -103,13 +88,16 @@ public class SubfileLoadTask extends Task<Void> {
                 return null;
             }
             out.flush();
+            updateMessage("Processing subfile");
             ByteBuffer buffer = ByteBuffer.allocate((int) fileInfo.getDecompressedSize());
             buffer.put(bao.toByteArray());
             buffer.flip();
             if (isCancelled()) {
                 return null;
             }
+            updateMessage("Parsing subfile");
             consumer.accept(buffer);
+            updateMessage("Done");
         } catch (Exception e) {
             System.err.println("exception while loading " + entry.entry.getFileInfo().getFullPath() + " in " + entry.parent.getPath().getFileName().toString());
             e.printStackTrace();

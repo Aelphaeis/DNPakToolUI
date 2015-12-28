@@ -187,6 +187,5 @@ public class DdsViewer implements Viewer {
         image.cancel();
         imageWidthProperty.unbind();
         image = null;
-        displayNode = null;
     }
 }

@@ -121,6 +121,7 @@ public class DNPTUIController {
      * Primary scene
      */
     private Scene scene;
+    private Label subfileLoadingLabel;
 
 
     /**
@@ -193,6 +194,8 @@ public class DNPTUIController {
      */
     private Optional<Task<Void>> currentLoadTask;
 
+    private Optional<Viewer> currentViewer;
+
     private final Object loadLock;
 
     public DNPTUIController() {
@@ -203,6 +206,7 @@ public class DNPTUIController {
         maximizedProperty = new SimpleBooleanProperty(this, "maximized", false);
         lastOpenedDir = Paths.get(System.getProperty("user.dir"));
         currentLoadTask = Optional.empty();
+        currentViewer = Optional.empty();
         loadLock = new Object();
     }
 
@@ -305,6 +309,11 @@ public class DNPTUIController {
         Platform.runLater(() ->
                 navScrollPane.prefViewportHeightProperty().
                         bind(root.heightProperty().subtract(126)));
+
+        //  Loading label for subfiles
+        subfileLoadingLabel = new Label("Loading");
+        subfileLoadingLabel.setTextAlignment(TextAlignment.CENTER);
+        subfileLoadingLabel.setAlignment(Pos.CENTER);
 
         //  Fade the window in
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
@@ -742,36 +751,45 @@ public class DNPTUIController {
         SpriteAnimation spinnerAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
         spinnerAnimation.setCycleCount(Animation.INDEFINITE);
         //  Task information (e.g. loading Resource00.pak, building file tree)
-        Label infoLbl = new Label("Loading");
-        infoLbl.setTextAlignment(TextAlignment.CENTER);
-        infoLbl.setAlignment(Pos.CENTER);
-        VBox vBox = new VBox(10, infoLbl, spinner);
+        subfileLoadingLabel.setText("Loading");
+        VBox vBox = new VBox(10, subfileLoadingLabel, spinner);
         vBox.setMaxWidth(Double.MAX_VALUE);
         vBox.setMaxHeight(Double.MAX_VALUE);
         vBox.setAlignment(Pos.CENTER);
         spinnerAnimation.playFromStart();
         viewerPane.setCenter(vBox);
 
-
         currentLoadTask.ifPresent(Task::cancel);
-        Viewer viewer = Viewers.getViewer(newValue);
-        viewer.onLoadStart(newValue);
+        currentViewer.ifPresent(Viewer::reset);
         if (newValue != null) {
             PakTreeEntry entry = newValue.getValue();
             if (entry != null && !entry.isDirectory()) {
+                Viewer viewer = Viewers.getViewer(newValue);
+                currentViewer = Optional.of(viewer);
+                viewer.onLoadStart(newValue);
                 LOGGER.debug("Selection changed to {}", entry.path);
                 Task<Void> task = new SubfileLoadTask(entry, viewer::parse, loadLock, TEMP_DIR);
+                task.setOnRunning(e -> subfileLoadingLabel.textProperty().bind(task.messageProperty()));
                 task.setOnSucceeded(e -> {
-                    viewerPane.setCenter(viewer.getDisplayNode());
                     spinnerAnimation.stop();
+                    subfileLoadingLabel.textProperty().unbind();
+                    viewerPane.setCenter(viewer.getDisplayNode());
+                });
+                task.setOnCancelled(e ->  {
+                    spinnerAnimation.stop();
+                    subfileLoadingLabel.textProperty().unbind();
+                });
+                task.setOnFailed(e -> {
+                    spinnerAnimation.stop();
+                    subfileLoadingLabel.textProperty().unbind();
                 });
                 currentLoadTask = Optional.of(task);
                 DNPTApplication.EXECUTOR_SERVICE.submit(task);
                 return;
             }
         }
-        viewerPane.setCenter(viewer.getDisplayNode());
         spinnerAnimation.stop();
+        viewerPane.setCenter(null);
     }
 
     /**
