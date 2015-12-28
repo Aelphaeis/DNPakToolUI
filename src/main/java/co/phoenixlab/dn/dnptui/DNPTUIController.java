@@ -751,6 +751,7 @@ public class DNPTUIController {
         SpriteAnimation spinnerAnimation = new SpriteAnimation(spinner, Duration.seconds(1), 18, 18, 0, 0, 64, 64, 18);
         spinnerAnimation.setCycleCount(Animation.INDEFINITE);
         //  Task information (e.g. loading Resource00.pak, building file tree)
+        subfileLoadingLabel.textProperty().unbind();
         subfileLoadingLabel.setText("Loading");
         VBox vBox = new VBox(10, subfileLoadingLabel, spinner);
         vBox.setMaxWidth(Double.MAX_VALUE);
