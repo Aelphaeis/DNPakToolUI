@@ -769,10 +769,14 @@ public class DNPTUIController {
             PakTreeEntry entry = newValue.getValue();
             if (entry != null && !entry.isDirectory()) {
                 FileInfo fileInfo = entry.entry.getFileInfo();
-                fileInfoLbl.setText(String.format("Disk Size: %,.1f KB | Decompressed Size: %,.1f KB | Offset: 0x%08X",
-                        fileInfo.getDiskSize() / 1024D,
-                        fileInfo.getDecompressedSize() / 1024D,
-                        fileInfo.getDiskOffset()));
+                fileInfoLbl.setText(String.format("CmpSz 0x%08X | DskSz 0x%08X | " +
+                        "DcmSz 0x%08X | Off 0x%08X | Parent %s",
+                        fileInfo.getCompressedSize(),
+                        fileInfo.getDiskSize(),
+                        fileInfo.getDecompressedSize(),
+                        fileInfo.getDiskOffset(),
+                        entry.parent.getPath().getFileName().toString()));
+
                 Viewer viewer = Viewers.getViewer(newValue);
                 currentViewer = Optional.of(viewer);
                 viewer.setMainUiController(this);
