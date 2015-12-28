@@ -165,8 +165,11 @@ public class DdsViewer implements Viewer {
             imageWidthProperty.bind(image.widthProperty());
             displayPane.setCenter(scrollPane);
             toolbar.setDisable(false);
-            Platform.runLater(() ->
-                    sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight())));
+            Platform.runLater(() -> {
+                if (sizeLbl != null && image != null) {
+                    sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight()));
+                }
+            });
         } catch (Exception e) {
             LOGGER.warn("Error decoding DDS file \"" + fileName + "\"", e);
             String exceptionMsg = e.getMessage();
