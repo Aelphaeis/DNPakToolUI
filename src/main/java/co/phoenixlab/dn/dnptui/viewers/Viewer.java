@@ -24,6 +24,7 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
+import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
@@ -65,4 +66,8 @@ public interface Viewer {
      * Resets/clears this viewer for later reuse
      */
     void reset();
+
+    default void setMainUiController(DNPTUIController uiController) {
+        //  Do nothing
+    }
 }

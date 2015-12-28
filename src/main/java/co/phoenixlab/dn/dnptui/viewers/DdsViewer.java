@@ -26,6 +26,8 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
+import co.phoenixlab.dn.dnptui.DNPTApplication;
+import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -33,6 +35,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -50,12 +53,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 public class DdsViewer implements Viewer {
 
@@ -90,6 +95,7 @@ public class DdsViewer implements Viewer {
     private Label zoomLbl;
     @FXML
     private HBox toolbar;
+    private DNPTUIController mainUiController;
 
 
     public DdsViewer() {
@@ -124,14 +130,22 @@ public class DdsViewer implements Viewer {
         fileChooser.setInitialFileName(fileName.replace(".dds", ".png"));
         fileChooser.setTitle("Export as...");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
-        File file = fileChooser.showSaveDialog(displayNode.getScene().getWindow());
+        final File file = fileChooser.showSaveDialog(displayNode.getScene().getWindow());
         if (file != null) {
-            //  TODO Do this async
-            try {
-                Files.write(file.toPath(), pngData, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Task<Void> task = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    updateMessage("Exporting image");
+                    Files.write(file.toPath(), pngData, CREATE, TRUNCATE_EXISTING);
+                    //  Sleep for a second because people aren't noticing that its doing anything even with
+                    //  the fade out "Done" at the end >.>
+                    TimeUnit.SECONDS.sleep(1);
+                    updateMessage("Done");
+                    return null;
+                }
+            };
+            mainUiController.showLoadingPopup(task);
+            DNPTApplication.EXECUTOR_SERVICE.submit(task);
         }
     }
 
@@ -184,8 +198,15 @@ public class DdsViewer implements Viewer {
     @Override
     public void reset() {
         currentDds = null;
-        image.cancel();
+        if (image != null) {
+            image.cancel();
+            image = null;
+        }
         imageWidthProperty.unbind();
-        image = null;
+    }
+
+    @Override
+    public void setMainUiController(DNPTUIController uiController) {
+        mainUiController = uiController;
     }
 }

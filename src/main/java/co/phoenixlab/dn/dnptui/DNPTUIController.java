@@ -479,7 +479,7 @@ public class DNPTUIController {
         DNPTApplication.EXECUTOR_SERVICE.submit(virtualPakLoadTask);
     }
 
-    private void showLoadingPopup(Task task) {
+    public void showLoadingPopup(Task task) {
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
         loadingStage.initOwner(stage);
@@ -766,6 +766,7 @@ public class DNPTUIController {
             if (entry != null && !entry.isDirectory()) {
                 Viewer viewer = Viewers.getViewer(newValue);
                 currentViewer = Optional.of(viewer);
+                viewer.setMainUiController(this);
                 viewer.onLoadStart(newValue);
                 LOGGER.debug("Selection changed to {}", entry.path);
                 Task<Void> task = new SubfileLoadTask(entry, viewer::parse, loadLock, TEMP_DIR);
