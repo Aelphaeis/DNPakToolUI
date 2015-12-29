@@ -109,7 +109,7 @@ public class DNPTUIController {
     /**
      * Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DNPTUIController.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(DNPTUIController.class);
     /**
      * Application instance
      */
