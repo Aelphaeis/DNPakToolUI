@@ -45,6 +45,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -122,7 +123,6 @@ public class DNPTUIController {
      * Primary scene
      */
     private Scene scene;
-    private Label subfileLoadingLabel;
 
 
     /**
@@ -136,7 +136,6 @@ public class DNPTUIController {
 
     //  FXML elements
     @FXML private BorderPane root;
-
     @FXML private AnchorPane topBar;
     @FXML private VBox bottomDrag;
     @FXML private HBox rightDrag;
@@ -195,11 +194,22 @@ public class DNPTUIController {
      * The current/last active file view load task
      */
     private Optional<Task<Void>> currentLoadTask;
-
+    /**
+     * The current viewer being shown
+     */
     private Optional<Viewer> currentViewer;
-
+    /**
+     * Label shown during loading of subfiles. It is bound to the loading task and reused
+     */
+    private Label subfileLoadingLabel;
+    /**
+     * The synchronization object for loading subfiles to prevent loading multiple at the same time
+     */
     private final Object loadLock;
 
+    /**
+     * Constructs a new controller for the main interface. Invoked by the FXML loader
+     */
     public DNPTUIController() {
         noPakLoadedProperty = new SimpleBooleanProperty(this, "noPakLoaded", true);
         selectionTypeProperty = new SimpleObjectProperty<>(this, "selectionType", SelectionType.NONE);
@@ -223,6 +233,8 @@ public class DNPTUIController {
         this.stage = stage;
         this.scene = scene;
         this.application = application;
+
+        //  Make the scene transparent so we can fade in on show
         scene.getRoot().setOpacity(0D);
     }
 
@@ -230,87 +242,74 @@ public class DNPTUIController {
      * Initializes the controller after the stage has been shown.
      */
     public void init() {
-        //  Property bindings
+        ////////////////////////
+        //  Property bindings //
+        ////////////////////////
         //  Disable the find button when no pak is loaded
         findBtn.disableProperty().bind(noPakLoadedProperty);
+
         //  Disable the export file button when no pak is loaded or the selection is not a file
         exportBtn.disableProperty().bind(noPakLoadedProperty.
                 or(selectionTypeProperty.isNotEqualTo(SelectionType.FILE)));
+
         //  Disable the export folder button when no pak is loaded or the selection is not a directory
         exportFolderBtn.disableProperty().bind(noPakLoadedProperty.
                 or(selectionTypeProperty.isNotEqualTo(SelectionType.FOLDER)));
+
         //  Disable the close pak button when no pak is loaded
         closePakBtn.disableProperty().bind(noPakLoadedProperty);
+
         //  Bind the window title to display the currently loaded pak/virtual pak
         titleLbl.textProperty().bind(Bindings.concat("DN Pak Tool - ").concat(openedFilePathProperty));
+
         //  Bind the maximized property to the stage's maximized property
         maximizedProperty.bind(stage.maximizedProperty());
+
         //  Toggle the max/restore button icon and enable/disable the window resize handles on maximize change
-        maximizedProperty.addListener((observable, oldValue, newValue) -> {
-            maxRestoreBtn.setId(newValue ? "window-restore-button" : null);
-            if (newValue) {
-                leftDrag.setId(null);
-                rightDrag.setId(null);
-                bottomDrag.setId(null);
-                topBar.setId(null);
-            } else {
-                leftDrag.setId("side-drag");
-                rightDrag.setId("side-drag");
-                bottomDrag.setId("bottom-drag");
-                topBar.setId("top-drag");
-            }
-        });
+        maximizedProperty.addListener(this::onWindowMaximizeChanged);
+
         //  Change the displayed viewer when the selected item changes
         selectedProperty.addListener(this::onSelectionChanged);
+
         //  Load the shared folder icon
         try (InputStream navFolderIconInputStream = getClass().getResourceAsStream(NAV_FOLDER_ICON_PATH)) {
             navFolderIcon = new Image(navFolderIconInputStream);
         } catch (IOException e) {
             LOGGER.warn("Unable to load navigation pane folder icon", e);
         }
-        //  Create the navigation pane's cell factory
+
+
+        ///////////////////////////
+        //  Navigation Tree View //
+        ///////////////////////////
+        //  Configure the TreeView and its cells
         treeView.setCellFactory(param -> new TreeCell<PakTreeEntry>() {
             @Override
             protected void updateItem(PakTreeEntry item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    //  Item is empty - clear children
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    //  Nodes
-                    if (item.isDirectory()) {
-                        //  Directory nodes
-                        setText(item.name);
-                        //  ImageView instances cannot be shared between cells
-                        setGraphic(new ImageView(navFolderIcon));
-                    } else {
-                        //  File/leaf nodes
-                        setText(item.name);
-                        //  TODO Icon
-                        setGraphic(null);
-                    }
-                }
+                updateTreeCellContent(item, empty, this);
             }
 
             @Override
             public void updateSelected(boolean selected) {
                 super.updateSelected(selected);
                 if (selected) {
-                    //  Update the selection type and selection properties
-                    selectionTypeProperty.set(getItem().isDirectory() ? SelectionType.FOLDER : SelectionType.FILE);
-                    selectedProperty.set(getTreeItem());
+                    updateSelection(this);
                 }
             }
         });
         treeView.setShowRoot(false);
+
+        ////////////////////
+        //  Miscellaneous //
+        ////////////////////
         //  Enforce minimum window dimensions
         stage.setMinWidth(MIN_WIDTH);
         stage.setMinHeight(MIN_HEIGHT);
+
         //  Ensure our navpane scrollpane is the right size always
-        Platform.runLater(() ->
-                navScrollPane.prefViewportHeightProperty().
-                        bind(root.heightProperty().subtract(126)));
+        Platform.runLater(() -> navScrollPane.prefViewportHeightProperty().
+                bind(root.heightProperty().subtract(126)));
 
         //  Loading label for subfiles
         subfileLoadingLabel = new Label("Loading");
@@ -331,6 +330,74 @@ public class DNPTUIController {
     }
 
     /**
+     * Event listener for updating various window-handle related states upon maximize/restore
+     *
+     * @param o      The ObservableValue that changed
+     * @param wasMax The old value
+     * @param isMax  The new value
+     */
+    private void onWindowMaximizeChanged(ObservableValue<? extends Boolean> o, boolean wasMax, boolean isMax) {
+        if (isMax) {
+            //  Maximized window should show the restore button and disable edge resize
+            maxRestoreBtn.setId("window-restore-button");
+            leftDrag.setId(null);
+            rightDrag.setId(null);
+            bottomDrag.setId(null);
+            topBar.setId(null);
+        } else {
+            //  Restored window should show the maximize (default) button and enable edge resize
+            maxRestoreBtn.setId(null);
+            leftDrag.setId("side-drag");
+            rightDrag.setId("side-drag");
+            bottomDrag.setId("bottom-drag");
+            topBar.setId("top-drag");
+        }
+    }
+
+    /**
+     * Event listener for updating the content of the navigation tree cells
+     *
+     * @param item  The PakTreeEntry that this cell will represent
+     * @param empty Whether or not the cell should be empty
+     * @param cell  The cell to update
+     */
+    private void updateTreeCellContent(PakTreeEntry item, boolean empty, TreeCell<PakTreeEntry> cell) {
+        String text;
+        Node graphic;
+        if (empty || item == null) {
+            //  Item is empty - clear children
+            text = null;
+            graphic = null;
+        } else {
+            //  Nodes
+            text = item.name;
+            if (item.isDirectory()) {
+                //  Directory nodes
+                //  ImageView instances cannot be shared between cells
+                graphic = new ImageView(navFolderIcon);
+            } else {
+                //  File/leaf nodes
+                //  TODO Icon
+                graphic = null;
+            }
+        }
+        cell.setText(text);
+        cell.setGraphic(graphic);
+    }
+
+    /**
+     * Event listener for change in currently selected navigation tree cell
+     *
+     * @param cell The cell that is selected
+     */
+    private void updateSelection(TreeCell<PakTreeEntry> cell) {
+        //  Update the selection type and selection properties
+        selectionTypeProperty.set(cell.getItem().isDirectory() ? SelectionType.FOLDER : SelectionType.FILE);
+        selectedProperty.set(cell.getTreeItem());
+    }
+
+
+    /**
      * EventHandler for the close button. Shows a close prompt.
      *
      * @param event The button click event
@@ -347,36 +414,48 @@ public class DNPTUIController {
             FXMLLoader promptFxmlLoader = new FXMLLoader(getClass().getResource(EXIT_DIALOG_FXML_PATH));
             VBox promptRoot = promptFxmlLoader.load();
             ExitDialogController promptController = promptFxmlLoader.getController();
-            promptController.setQuitAction(this::quit);
+            promptController.setQuitAction(this::doQuit);
             promptController.setStage(promptStage);
             Scene promptScene = new Scene(promptRoot, 200, 100, Color.TRANSPARENT);
             promptScene.getStylesheets().add(STYLESHEET);
             promptStage.setScene(promptScene);
             promptScene.getRoot().setOpacity(0D);
+
+            //  Show window
             promptStage.show();
+
+            //  Center to main application stage
             promptStage.setX(stage.getX() + stage.getWidth() / 2 - promptStage.getWidth() / 2);
             promptStage.setY(stage.getY() + stage.getHeight() / 2 - promptStage.getHeight() / 2);
+
+            //  Fade in
             FadeTransitionUtil.fadeTransitionIn(Duration.seconds(0.25D), promptScene.getRoot()).
                     play();
         } catch (IOException e) {
             //  If an error occurs showing the exit dialog, just quit
             LOGGER.warn("Error showing exit dialog, defaulting to force-exit", e);
-            quit();
+            doQuit();
         }
     }
 
     /**
      * Quits the application
      */
-    private void quit() {
+    private void doQuit() {
         LOGGER.debug("Application quit confirmed, quitting");
+
+        //  Zoom out transition
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.15D));
         scaleTransition.setFromX(1D);
         scaleTransition.setFromY(1D);
         scaleTransition.setToX(0.875D);
         scaleTransition.setToY(0.875D);
         scaleTransition.setInterpolator(Interpolator.EASE_IN);
+
+        //  Fade out transition
         FadeTransition fadeTransition = FadeTransitionUtil.fadeTransitionOut(Duration.seconds(0.15D), null);
+
+        //  Play both at the same time
         ParallelTransition closeTransition = new ParallelTransition(scene.getRoot(), scaleTransition, fadeTransition);
         closeTransition.setOnFinished(ae -> application.stop());
         closeTransition.playFromStart();
@@ -413,10 +492,15 @@ public class DNPTUIController {
      */
     @FXML
     private void openPak(ActionEvent event) {
+        //  Set up file chooser
         FileChooser pakFileChooser = new FileChooser();
         pakFileChooser.setInitialDirectory(lastOpenedDir.toFile());
         pakFileChooser.setTitle("Choose a Pak file");
+
+        //  Limit to just .pak files
         pakFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Dragon Nest Package File", "*.pak"));
+
+        //  Show chooser, and if the user selected a file, load it
         Optional.ofNullable(pakFileChooser.showOpenDialog(stage)).
                 map(File::toPath).
                 ifPresent(this::loadPak);
@@ -733,12 +817,22 @@ public class DNPTUIController {
         selectedProperty.set(null);
     }
 
+    /**
+     * EventHandler for when the currently selected navigation tree item has changed
+     * @param observable The Observable that changed
+     * @param oldValue The previously selected Item
+     * @param newValue The currently selected Item
+     */
     private void onSelectionChanged(ObservableValue<? extends TreeItem<PakTreeEntry>> observable,
                                     TreeItem<PakTreeEntry> oldValue,
                                     TreeItem<PakTreeEntry> newValue) {
         if (newValue == oldValue) {
+            //  No change, nothing need be done
             return;
         }
+
+        //  Prepare to load the subfile
+
         //  Create the throbber/spinner
         Image spinnerImage = null;
         try (InputStream spinnerInputStream = getClass().getResourceAsStream(LOADING_SPINNER_PATH)) {
@@ -755,6 +849,7 @@ public class DNPTUIController {
         //  Task information (e.g. loading Resource00.pak, building file tree)
         subfileLoadingLabel.textProperty().unbind();
         subfileLoadingLabel.setText("Loading");
+        //  Display node
         VBox vBox = new VBox(10, subfileLoadingLabel, spinner);
         vBox.setMaxWidth(Double.MAX_VALUE);
         vBox.setMaxHeight(Double.MAX_VALUE);
@@ -762,46 +857,68 @@ public class DNPTUIController {
         spinnerAnimation.playFromStart();
         viewerPane.setCenter(vBox);
 
+        //  Cancel any previous loading tasks and reset the viewer
         currentLoadTask.ifPresent(Task::cancel);
         currentViewer.ifPresent(Viewer::reset);
         fileInfoLbl.setText("");
         if (newValue != null) {
+            //  Selection is an actual entry (as in, not an unselection event)
             PakTreeEntry entry = newValue.getValue();
             if (entry != null && !entry.isDirectory()) {
+                //  Entry is not an empty entry and is not a directory
+
+                //  Set up file information bar
                 FileInfo fileInfo = entry.entry.getFileInfo();
                 fileInfoLbl.setText(String.format("CmpSz 0x%08X | DskSz 0x%08X | " +
-                        "DcmSz 0x%08X | Off 0x%08X | Parent %s",
+                                "DcmSz 0x%08X | Off 0x%08X | Parent %s",
                         fileInfo.getCompressedSize(),
                         fileInfo.getDiskSize(),
                         fileInfo.getDecompressedSize(),
                         fileInfo.getDiskOffset(),
                         entry.parent.getPath().getFileName().toString()));
 
+                //  Prepare the viewer to use
                 Viewer viewer = Viewers.getViewer(newValue);
                 currentViewer = Optional.of(viewer);
                 viewer.setMainUiController(this);
+
+                //  Notify viewer that we are about to start loading data
                 viewer.onLoadStart(newValue);
                 LOGGER.debug("Selection changed to {}", entry.path);
+
+                //  Set up loading task
                 Task<Void> task = new SubfileLoadTask(entry, viewer::parse, loadLock, TEMP_DIR);
+                //  Wire up event handlers for display updates
                 task.setOnRunning(e -> subfileLoadingLabel.textProperty().bind(task.messageProperty()));
                 task.setOnSucceeded(e -> {
+                    //  Clean up the loading page and show the viewer
                     spinnerAnimation.stop();
                     subfileLoadingLabel.textProperty().unbind();
                     viewerPane.setCenter(viewer.getDisplayNode());
                 });
                 task.setOnCancelled(e -> {
+                    //  Clean up the loading page and show nothing
                     spinnerAnimation.stop();
                     subfileLoadingLabel.textProperty().unbind();
+                    viewerPane.setCenter(null);
                 });
                 task.setOnFailed(e -> {
+                    //  Clean up the loading page and display an error
                     spinnerAnimation.stop();
                     subfileLoadingLabel.textProperty().unbind();
+                    viewerPane.setCenter(null);
+
+                    //  Display the error
+                    subfileLoadingLabel.setText(e.getSource().getException().toString());
+                    viewerPane.setCenter(subfileLoadingLabel);
                 });
+                //  Update the current task and submit for execution
                 currentLoadTask = Optional.of(task);
                 DNPTApplication.EXECUTOR_SERVICE.submit(task);
                 return;
             }
         }
+        //  We either deselected, selected an empty entry, or selected a directory, so show nothing
         spinnerAnimation.stop();
         viewerPane.setCenter(null);
     }
