@@ -26,6 +26,8 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniGridInfoViewer;
+import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniSectorSizeViewer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 
@@ -47,22 +49,60 @@ public class Viewers {
         registerFXMLViewer(".lua", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".cfg", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".txt", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerMatcherViewer("sectorsize\\.ini", new StageIniSectorSizeViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerMatcherViewer("gridinfo\\.ini", new StageIniGridInfoViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
+        Viewer viewer = loadFXMLViewer(fxmlPath);
+        viewer.init();
+        fileExtensionViewers.put(extension, viewer);
+    }
+
+    public static Viewer loadFXMLViewer(String fxmlPath) {
+        return loadFXMLViewer(fxmlPath, null);
+    }
+
+    public static Viewer loadFXMLViewer(String fxmlPath, Viewer viewer) {
         try {
             FXMLLoader loader = new FXMLLoader(DNPTUIController.class.getResource(fxmlPath));
+            if (viewer != null) {
+                loader.setController(viewer);
+            }
             loader.load();
-            Viewer viewer = loader.getController();
-            viewer.init();
-            fileExtensionViewers.put(extension, viewer);
+            return loader.getController();
         } catch (IOException e) {
             //  TODO
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private Viewers() {}
+    public static void registerMatcherViewer(String matchPattern, Viewer viewer, String fxmlPath) {
+        loadFXMLViewer(fxmlPath, viewer);
+        viewer.init();
+        matcherViewers.add(new Pair<>(t -> matches(t, matchPattern), viewer));
+    }
+
+    public static void registerMatcherViewer(String matchPattern, Viewer viewer) {
+        viewer.init();
+        matcherViewers.add(new Pair<>(t -> matches(t, matchPattern), viewer));
+    }
+
+    private static boolean matches(TreeItem<PakTreeEntry> entry, String matchPattern) {
+        return entry != null && entry.getValue() != null &&
+                entry.getValue().name.matches(matchPattern);
+    }
+
+    public static void registerMatcherViewer(Predicate<TreeItem<PakTreeEntry>> matcher, Viewer viewer) {
+        viewer.init();
+        matcherViewers.add(new Pair<>(matcher, viewer));
+    }
+
+    private Viewers() {
+    }
 
     public static Viewer getViewer(TreeItem<PakTreeEntry> pakTreeItem) {
         if (pakTreeItem == null || pakTreeItem.getValue() == null) {
