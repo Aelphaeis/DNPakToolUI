@@ -35,6 +35,15 @@ public class StageIniGridInfoViewer extends TextViewer {
 
     @Override
     public void parse(ByteBuffer byteBuffer) {
+        /*
+        Basic Structure
+        CHAR[64]        Parent world name (?)
+        INT32           UnknownA (seems to always be 1)
+        INT32           UnknownB (seems to always be 1)
+        INT32           StageLength (varies, usually multiple of 50)
+        INT32           StageWidth (usually same value as UnknownC)
+        INT32           UnknownE (seems to always be 50)
+         */
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byte[] parentWorld = new byte[64];
         byteBuffer.get(parentWorld);
@@ -47,8 +56,8 @@ public class StageIniGridInfoViewer extends TextViewer {
         final String content = String.format("ParentWorld: \"%s\"\n" +
                 "unknownA: %d\n" +
                 "unknownB: %d\n" +
-                "unknownC: %d\n" +
-                "unknownD: %d\n" +
+                "StageLength: %d\n" +
+                "StageWidth: %d\n" +
                 "unknownE: %d",
                 parentWorldStr,  unknownA, unknownB, unknownC, unknownD, unknownE);
         Platform.runLater(() -> {
