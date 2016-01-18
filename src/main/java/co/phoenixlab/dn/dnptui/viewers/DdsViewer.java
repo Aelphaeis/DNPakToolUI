@@ -27,14 +27,10 @@ package co.phoenixlab.dn.dnptui.viewers;
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
 import javafx.stage.FileChooser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 
 public class DdsViewer extends ImageViewer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DdsViewer.class);
 
     private Dds currentDds;
     private final DdsImageDecoder decoder;
