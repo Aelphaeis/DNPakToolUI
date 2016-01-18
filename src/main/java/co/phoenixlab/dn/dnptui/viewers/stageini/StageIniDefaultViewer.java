@@ -36,11 +36,11 @@ public class StageIniDefaultViewer extends TextViewer {
     @Override
     public void parse(ByteBuffer byteBuffer) {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        int strLen = byteBuffer.getInt() - 1;
+        int strLen = byteBuffer.getInt();
         byte[] strBuf = new byte[strLen];
         byteBuffer.get(strBuf);
         final String content = String.format("ZoneName: \"%s\" (%d chars)",
-                new String(strBuf, StandardCharsets.UTF_8).trim(), strLen);
+                new String(strBuf, 0, strLen - 1, StandardCharsets.UTF_8), strLen - 1);
         Platform.runLater(() -> {
             textArea.setText(content);
         });
