@@ -47,10 +47,6 @@ public class DdsViewer extends ImageViewer {
         exportBtn.setText("Export as PNG");
     }
 
-    protected byte[] getImageData() {
-        return imageData;
-    }
-
     protected FileChooser.ExtensionFilter getExtensionFilter() {
         return new FileChooser.ExtensionFilter("PNG Image", "*.png");
     }
