@@ -46,13 +46,13 @@ public class TextViewer implements Viewer {
     private Node displayNode;
 
     @FXML
-    private BorderPane displayPane;
+    protected BorderPane displayPane;
 
     @FXML
-    private CheckBox lineWrapToggleChkBox;
+    protected CheckBox lineWrapToggleChkBox;
 
     @FXML
-    private TextArea textArea;
+    protected TextArea textArea;
 
     public TextViewer() {
     }
