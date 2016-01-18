@@ -26,190 +26,56 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
-import co.phoenixlab.dn.dnptui.DNPTApplication;
-import co.phoenixlab.dn.dnptui.DNPTUIController;
-import co.phoenixlab.dn.dnptui.PakTreeEntry;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.concurrent.Task;
-import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
-import javafx.util.converter.FormatStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.text.DecimalFormat;
-import java.util.concurrent.TimeUnit;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-
-public class DdsViewer implements Viewer {
+public class DdsViewer extends ImageViewer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DdsViewer.class);
 
-    private Node displayNode;
-
     private Dds currentDds;
-    private Image image;
     private final DdsImageDecoder decoder;
-    @FXML
-    private ImageView imageView;
-    @FXML
-    private ScrollPane scrollPane;
-    @FXML
-    private Spinner<Integer> zoomSpinner;
-    @FXML
-    private IntegerSpinnerValueFactory zoomValueFactory;
 
-    private final DoubleProperty zoomProperty;
-    private final IntegerProperty imageWidthProperty;
     private byte[] pngData;
-    @FXML
-    private BorderPane displayPane;
-    @FXML
-    private Label sizeLbl;
-
-    private String fileName;
-    @FXML
-    private Button exportBtn;
-    @FXML
-    private Label zoomLbl;
-    @FXML
-    private HBox toolbar;
-    private DNPTUIController mainUiController;
 
 
     public DdsViewer() {
+        super();
         decoder = new DdsImageDecoder();
-        zoomProperty = new SimpleDoubleProperty(this, "zoom", 1D);
-        imageWidthProperty = new SimpleIntegerProperty(this, "imageWidth");
     }
 
     @Override
     public void init() {
-        zoomValueFactory = new IntegerSpinnerValueFactory(25, 400, 100);
-        zoomValueFactory.setConverter(new FormatStringConverter<>(new DecimalFormat("#'%'")));
-        zoomValueFactory.setValue(100);
-        zoomValueFactory.setAmountToStepBy(25);
-        zoomSpinner.setValueFactory(zoomValueFactory);
-        //  Text
-        zoomLbl.setText("Zoom:");
+        super.init();
         exportBtn.setText("Export as PNG");
-
-        //  Bindings
-        zoomValueFactory.valueProperty().addListener((observable, oldValue, newValue) -> {
-            zoomProperty.set(newValue.doubleValue() / 100D);
-        });
-        imageView.fitWidthProperty().bind(Bindings.multiply(imageWidthProperty, zoomProperty));
-
-        displayNode = displayPane;
     }
 
-    @FXML
-    private void exportImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialFileName(fileName.replace(".dds", ".png"));
-        fileChooser.setTitle("Export as...");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
-        final File file = fileChooser.showSaveDialog(displayNode.getScene().getWindow());
-        if (file != null) {
-            Task<Void> task = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    updateMessage("Exporting image");
-                    Files.write(file.toPath(), pngData, CREATE, TRUNCATE_EXISTING);
-                    //  Sleep for a second because people aren't noticing that its doing anything even with
-                    //  the fade out "Done" at the end >.>
-                    TimeUnit.SECONDS.sleep(1);
-                    updateMessage("Done");
-                    return null;
-                }
-            };
-            mainUiController.showLoadingPopup(task);
-            DNPTApplication.EXECUTOR_SERVICE.submit(task);
-        }
+    protected byte[] getImageData() {
+        return pngData;
+    }
+
+    protected FileChooser.ExtensionFilter getExtensionFilter() {
+        return new FileChooser.ExtensionFilter("PNG Image", "*.png");
+    }
+
+    protected String getDefaultFileName() {
+        return fileName.replace(".dds", ".png");
     }
 
     @Override
-    public Node getDisplayNode() {
-        return displayNode;
-    }
-
-    @Override
-    public void parse(ByteBuffer byteBuffer) {
+    protected byte[] decodeImageData(ByteBuffer byteBuffer) throws Exception {
         currentDds = new Dds();
-        try {
-            byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-            currentDds.read(byteBuffer);
-            pngData = decoder.convertToPNG(currentDds);
-            image = new Image(new ByteArrayInputStream(pngData));
-            imageWidthProperty.bind(image.widthProperty());
-            displayPane.setCenter(scrollPane);
-            toolbar.setDisable(false);
-            Platform.runLater(() -> {
-                if (sizeLbl != null && image != null) {
-                    sizeLbl.setText(String.format("%dx%d", (int) image.getWidth(), (int) image.getHeight()));
-                }
-            });
-        } catch (Exception e) {
-            LOGGER.warn("Error decoding DDS file \"" + fileName + "\"", e);
-            String exceptionMsg = e.getMessage();
-            if (exceptionMsg == null) {
-                exceptionMsg = e.getClass().getSimpleName();
-            }
-            Label label = new Label("Error decoding DDS file:\n" + exceptionMsg);
-            label.setAlignment(Pos.CENTER);
-            label.setTextAlignment(TextAlignment.CENTER);
-            label.setPrefWidth(Double.MAX_VALUE);
-
-            displayPane.setCenter(label);
-            toolbar.setDisable(true);
-            return;
-        }
-        layout();
-    }
-
-    private void layout() {
-        imageView.setImage(image);
-    }
-
-
-    @Override
-    public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
-        fileName = pakTreeEntry.getValue().name;
+        currentDds.read(byteBuffer);
+        pngData = decoder.convertToPNG(currentDds);
+        return pngData;
     }
 
     @Override
     public void reset() {
         currentDds = null;
-        if (image != null) {
-            image.cancel();
-            image = null;
-        }
-        imageWidthProperty.unbind();
-    }
-
-    @Override
-    public void setMainUiController(DNPTUIController uiController) {
-        mainUiController = uiController;
+        super.reset();
     }
 }

@@ -47,10 +47,23 @@ public class Viewers {
 
     static {
         //  Register Viewers here
-        registerFXMLViewer(".dds", "/co/phoenixlab/dn/dnptui/assets/viewers/dds.fxml");
+
+        //  Images
+        ImageViewer imageViewer = new ImageViewer();
+        registerFXMLViewer(".png", imageViewer, "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerFXMLViewer(".jpg", imageViewer, "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerFXMLViewer(".jpeg", imageViewer, "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerFXMLViewer(".tga", imageViewer, "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerFXMLViewer(".dds", new DdsViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+
+        //  Text
         registerFXMLViewer(".lua", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".cfg", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".txt", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerFXMLViewer(".xml", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+
+        //  Stage INI
         registerMatcherViewer("sectorsize\\.ini", new StageIniSectorSizeViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("gridinfo\\.ini", new StageIniGridInfoViewer(),
@@ -62,7 +75,11 @@ public class Viewers {
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
-        Viewer viewer = loadFXMLViewer(fxmlPath);
+        registerFXMLViewer(extension, null, fxmlPath);
+    }
+
+    public static void registerFXMLViewer(String extension, Viewer viewer, String fxmlPath) {
+        viewer = loadFXMLViewer(fxmlPath, viewer);
         viewer.init();
         fileExtensionViewers.put(extension, viewer);
     }
