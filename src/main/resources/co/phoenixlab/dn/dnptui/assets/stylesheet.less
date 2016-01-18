@@ -43,6 +43,11 @@
 @size-exit-dialog-width: 270px;
 @size-exit-dialog-height: 90px;
 
+@color-viewer-text-background: #202020;
+@color-viewer-text-background-focus: #282828;
+@color-viewer-text-border: #2C2C2C;
+@color-viewer-text-border-focus: #3C3C3C;
+
 
 .root {
   -fx-background-color: @color-topbar-background, @color-background;
@@ -336,6 +341,30 @@
         .decrement-arrow {
           -fx-background-color: @color-text-light;
         }
+      }
+    }
+  }
+}
+
+.text-viewer {
+  .txt-area {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-text-fill: @color-text-light;
+    -fx-font-family: "Consolas Cambria";
+    -fx-font-size: 12px;
+    .content {
+      -fx-background-color: @color-viewer-text-background;
+      -fx-background-radius: 0;
+      -fx-border-width: 2px;
+      -fx-border-radius: 0;
+      -fx-border-insets: 0;
+      -fx-border-color: @color-viewer-text-border;
+    }
+    &:focused {
+      .content {
+        -fx-border-color: @color-viewer-text-border-focus;
       }
     }
   }

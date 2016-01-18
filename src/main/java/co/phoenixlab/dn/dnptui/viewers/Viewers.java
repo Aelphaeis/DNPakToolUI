@@ -44,6 +44,9 @@ public class Viewers {
     static {
         //  Register Viewers here
         registerFXMLViewer(".dds", "/co/phoenixlab/dn/dnptui/assets/viewers/dds.fxml");
+        registerFXMLViewer(".lua", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerFXMLViewer(".cfg", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerFXMLViewer(".txt", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
