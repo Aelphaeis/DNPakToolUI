@@ -39,8 +39,6 @@ public class DdsViewer extends ImageViewer {
     private Dds currentDds;
     private final DdsImageDecoder decoder;
 
-    private byte[] pngData;
-
 
     public DdsViewer() {
         super();
@@ -54,7 +52,7 @@ public class DdsViewer extends ImageViewer {
     }
 
     protected byte[] getImageData() {
-        return pngData;
+        return imageData;
     }
 
     protected FileChooser.ExtensionFilter getExtensionFilter() {
@@ -69,8 +67,8 @@ public class DdsViewer extends ImageViewer {
     protected byte[] decodeImageData(ByteBuffer byteBuffer) throws Exception {
         currentDds = new Dds();
         currentDds.read(byteBuffer);
-        pngData = decoder.convertToPNG(currentDds);
-        return pngData;
+        imageData = decoder.convertToPNG(currentDds);
+        return imageData;
     }
 
     @Override
