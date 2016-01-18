@@ -26,6 +26,7 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniDefaultViewer;
 import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniGridInfoViewer;
 import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniSectorSizeViewer;
 import javafx.fxml.FXMLLoader;
@@ -52,6 +53,8 @@ public class Viewers {
         registerMatcherViewer("sectorsize\\.ini", new StageIniSectorSizeViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("gridinfo\\.ini", new StageIniGridInfoViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerMatcherViewer("default\\.ini", new StageIniDefaultViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
     }
 
