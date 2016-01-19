@@ -118,6 +118,8 @@ public class StageIniHeightViewer extends ImageViewer {
                 value = value * 0xFF / 0xFFFF;
                 v = value & 0xFF;
             }
+            //  Invert
+            v = 0xFF - v;
             int rgba = 0xFF000000;
             rgba |= v | ((v << 8) & 0xFF00) | ((v << 16) & 0xFF0000);
             int x = i % width;
