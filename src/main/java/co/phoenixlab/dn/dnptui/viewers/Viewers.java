@@ -71,6 +71,8 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("height\\.ini", new StageIniHeightViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
