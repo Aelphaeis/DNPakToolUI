@@ -30,6 +30,7 @@ import co.phoenixlab.dn.dnptui.viewers.stageini.struct.GridInfo;
 import co.phoenixlab.dn.pak.FileInfo;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -64,6 +65,16 @@ public class StageIniAlphaTableViewer extends ImageViewer {
                 break;
             }
         }
+    }
+
+    @Override
+    protected FileChooser.ExtensionFilter getExtensionFilter() {
+        return new FileChooser.ExtensionFilter("PNG Image", "*.png");
+    }
+
+    @Override
+    protected String getDefaultFileName() {
+        return fileName.replace(".ini", ".png");
     }
 
     @Override
