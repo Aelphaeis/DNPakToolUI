@@ -26,10 +26,7 @@ package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
-import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniDefaultViewer;
-import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniGridInfoViewer;
-import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniSectorSizeViewer;
-import co.phoenixlab.dn.dnptui.viewers.stageini.StageIniTexTableViewer;
+import co.phoenixlab.dn.dnptui.viewers.stageini.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 
@@ -72,6 +69,8 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("textable\\.ini", new StageIniTexTableViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerMatcherViewer("height\\.ini", new StageIniHeightViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
