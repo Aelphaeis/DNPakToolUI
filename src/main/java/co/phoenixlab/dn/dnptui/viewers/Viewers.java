@@ -73,6 +73,8 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
         registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerMatcherViewer("triggerdefine\\.ini", new StageIniTriggerDefineViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
