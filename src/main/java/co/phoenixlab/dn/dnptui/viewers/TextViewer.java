@@ -25,6 +25,7 @@
 package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -54,7 +55,10 @@ public class TextViewer implements Viewer {
     @FXML
     protected TextArea textArea;
 
+    private String data;
+
     public TextViewer() {
+        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", 4*1024*1024);
     }
 
 
@@ -70,10 +74,16 @@ public class TextViewer implements Viewer {
 
     @Override
     public void parse(ByteBuffer byteBuffer) {
-        byte[] buf = new byte[byteBuffer.remaining()];
-        byteBuffer.get(buf);
-        String data = new String(buf, StandardCharsets.UTF_8);
-        textArea.setText(data);
+        //  Check size
+        if (byteBuffer.remaining() > maxDisplaySize) {
+            data = "The file you are attempting to view is too large to " +
+                    "display.\nPlease export this file to view in an external text editor";
+        } else {
+            byte[] buf = new byte[byteBuffer.remaining()];
+            byteBuffer.get(buf);
+            data = new String(buf, StandardCharsets.UTF_8);
+        }
+        Platform.runLater(() -> textArea.setText(data));
     }
 
     @Override
@@ -83,7 +93,9 @@ public class TextViewer implements Viewer {
 
     @Override
     public void reset() {
-        //  64 MB default
-        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", 67108864);
+        //  4 MB default
+        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", 4*1024*1024);
+        data = null;
+        textArea.setText(null);
     }
 }
