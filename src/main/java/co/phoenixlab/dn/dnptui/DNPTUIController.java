@@ -566,6 +566,10 @@ public class DNPTUIController {
     }
 
     public void showLoadingPopup(Task task) {
+        showLoadingPopup(task, false);
+    }
+
+    public void showLoadingPopup(Task task, boolean progress) {
         //  Create popup window
         Stage loadingStage = new Stage(StageStyle.TRANSPARENT);
         loadingStage.initOwner(stage);
@@ -573,7 +577,7 @@ public class DNPTUIController {
         loadingStage.setTitle("Loading");
         VBox loadingRoot = new VBox(10);
         loadingRoot.setAlignment(Pos.CENTER);
-        Scene loadingScene = new Scene(loadingRoot, 180, 100, Color.color(0.1, 0.1, 0.1, 0.25));
+        Scene loadingScene = new Scene(loadingRoot, 180, progress ? 140 : 100, Color.color(0.1, 0.1, 0.1, 0.25));
         loadingScene.getStylesheets().add(STYLESHEET);
         loadingRoot.getStyleClass().add("dialog");
         loadingStage.setScene(loadingScene);
@@ -595,9 +599,19 @@ public class DNPTUIController {
         loadingInfoLbl.setTextAlignment(TextAlignment.CENTER);
         loadingInfoLbl.setAlignment(Pos.CENTER);
         loadingRoot.getChildren().addAll(spinner, loadingInfoLbl);
+        //  Progress info
+        Label progressLbl = new Label();
+        progressLbl.setTextAlignment(TextAlignment.CENTER);
+        progressLbl.setAlignment(Pos.CENTER);
+        if (progress) {
+            loadingRoot.getChildren().add(progressLbl);
+        }
         //  Wire up properties
         //  Task information
         loadingInfoLbl.textProperty().bind(task.messageProperty());
+        if (progress) {
+            progressLbl.textProperty().bind(Bindings.format("%.1f%%", Bindings.multiply(task.progressProperty(), 100D)));
+        }
         //  Keep the window centered relative to parent
         ChangeListener<Number> xPosListener = (observable, oldValue, newValue) ->
                 loadingStage.setX(newValue.doubleValue() + stage.getWidth() / 2 - loadingStage.getWidth() / 2);
@@ -609,6 +623,9 @@ public class DNPTUIController {
                     spinnerAnimation.stop();
                     loadingStage.close();
                     loadingInfoLbl.textProperty().unbind();
+                    if (progress) {
+                        progressLbl.textProperty().unbind();
+                    }
                     stage.xProperty().removeListener(xPosListener);
                     stage.yProperty().removeListener(yPosListener);
                 }).play();
@@ -617,6 +634,9 @@ public class DNPTUIController {
         task.setOnFailed(e -> {
             spinnerAnimation.stop();
             loadingInfoLbl.textProperty().unbind();
+            if (progress) {
+                progressLbl.textProperty().unbind();
+            }
             loadingRoot.getChildren().clear();
             //  Cast is necessary - compiler keeps treating getSource() as returning Object
             @SuppressWarnings("RedundantCast")
@@ -778,7 +798,7 @@ public class DNPTUIController {
             return;
         }
         SubfileExportTask exportTask = new SubfileExportTask(handler, entry, exportDir.toPath(), true);
-        showLoadingPopup(exportTask);
+        showLoadingPopup(exportTask, true);
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
 

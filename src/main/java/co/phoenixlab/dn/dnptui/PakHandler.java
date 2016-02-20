@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.DoubleConsumer;
 import java.util.zip.InflaterOutputStream;
 
 public class PakHandler {
@@ -238,17 +239,46 @@ public class PakHandler {
      * @throws IOException If there was an I/O error during exporting
      */
     public void exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath) throws IOException {
+        DoubleConsumer consumer = d -> {};
+        exportDirectory(treeItem, exportPath, consumer);
+    }
+
+    public void exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath, DoubleConsumer prog)
+            throws IOException {
+        long total = count(treeItem);
+        exportDirectory(treeItem, exportPath, prog, 0, total);
+    }
+
+    private long count(TreeItem<PakTreeEntry> treeItem) {
+        long count = 0;
+        for (TreeItem<PakTreeEntry> child : treeItem.getChildren()) {
+            PakTreeEntry entry = child.getValue();
+            if (entry.entry == null) {
+                count += count(child);
+            } else {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    private long exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath,
+                                 DoubleConsumer prog, long done, long total)
+            throws IOException {
         for (TreeItem<PakTreeEntry> child : treeItem.getChildren()) {
             PakTreeEntry entry = child.getValue();
             Path path = exportPath.resolve(entry.name);
             if (entry.entry == null) {
                 Files.createDirectory(path);
-                exportDirectory(child, path);
+                done = exportDirectory(child, path, prog, done, total);
             } else {
                 exportFile(entry, path);
+                ++done;
+                prog.accept((double) done / (double) total);
             }
         }
         LOGGER.info("Subdirectory {} exported to {}", treeItem.getValue().path, exportPath);
+        return done;
     }
 
     /**

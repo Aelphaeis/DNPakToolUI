@@ -32,6 +32,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,9 @@ public class TextViewer implements Viewer {
     protected CheckBox lineWrapToggleChkBox;
 
     @FXML
+    protected HBox toolbar;
+
+    @FXML
     protected TextArea textArea;
 
     private String data;
@@ -65,6 +69,7 @@ public class TextViewer implements Viewer {
     @Override
     public void init() {
         displayNode = displayPane;
+        textArea.wrapTextProperty().bind(lineWrapToggleChkBox.selectedProperty());
     }
 
     @Override

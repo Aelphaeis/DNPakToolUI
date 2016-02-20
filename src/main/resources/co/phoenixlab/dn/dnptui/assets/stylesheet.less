@@ -47,6 +47,7 @@
 @color-viewer-text-background-focus: #282828;
 @color-viewer-text-border: #2C2C2C;
 @color-viewer-text-border-focus: #3C3C3C;
+@color-text-highlight: #666666;
 
 
 .root {
@@ -67,6 +68,12 @@
   -fx-cursor: hand;
   -fx-border-radius: 0;
   -fx-background-radius: 0;
+}
+
+.check-box {
+  -fx-font-family: @font-default;
+  -fx-text-fill: @color-text-light;
+  -fx-font-size: 12px;
 }
 
 #top-drag {
@@ -292,6 +299,34 @@
   -fx-background-color: @color-background;
 }
 
+.spinner {
+  -fx-border-insets: 0;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+  .text-field {
+    -fx-cursor: default;
+    -fx-highlight-fill: @color-text-highlight;
+    -fx-highlight-text-fill: @color-text-light;
+    -fx-text-fill: @color-text-light;
+    -fx-background-color: transparent;
+  }
+  .increment-arrow-button,
+  .decrement-arrow-button {
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+    -fx-background-color: @color-toolbar-button;
+    -fx-background-radius: 0;
+    &:hover {
+      -fx-background-color: @color-toolbar-button-hover;
+    }
+    .increment-arrow,
+    .decrement-arrow {
+      -fx-background-color: @color-text-light;
+    }
+  }
+}
+
 .dds {
   .dds-toolbar {
     -fx-padding: 0 10px;
@@ -316,33 +351,6 @@
       -fx-text-alignment: center;
       -fx-alignment: center;
     }
-    .spinner {
-      -fx-border-insets: 0;
-      -fx-background-color: transparent;
-      -fx-border-color: transparent;
-      -fx-border-width: 0;
-      .text-field {
-        -fx-cursor: default;
-        -fx-highlight-fill: transparent;
-        -fx-highlight-text-fill: @color-text-light;
-        -fx-text-fill: @color-text-light;
-        -fx-background-color: transparent;
-      }
-      .increment-arrow-button,
-      .decrement-arrow-button {
-        -fx-border-width: 0;
-        -fx-border-radius: 0;
-        -fx-background-color: @color-toolbar-button;
-        -fx-background-radius: 0;
-        &:hover {
-          -fx-background-color: @color-toolbar-button-hover;
-        }
-        .increment-arrow,
-        .decrement-arrow {
-          -fx-background-color: @color-text-light;
-        }
-      }
-    }
   }
 }
 
@@ -354,6 +362,7 @@
     -fx-text-fill: @color-text-light;
     -fx-font-family: 'Consolas', 'Cambria';
     -fx-font-size: 12px;
+    -fx-highlight-fill: @color-text-highlight;
     .content {
       -fx-background-color: @color-viewer-text-background;
       -fx-background-radius: 0;

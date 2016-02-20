@@ -49,7 +49,7 @@ public class SubfileExportTask extends Task<Void> {
         updateMessage("Exporting...");
         long startTime = System.currentTimeMillis();
         if (exportAsFolder) {
-            handler.exportDirectory(treeItem, exportPath);
+            handler.exportDirectory(treeItem, exportPath, this::updateProgress);
         } else {
             handler.exportFile(treeItem.getValue(), exportPath);
         }
@@ -60,5 +60,9 @@ public class SubfileExportTask extends Task<Void> {
         }
         updateMessage("Done");
         return null;
+    }
+
+    private void updateProgress(double d) {
+        updateProgress(d, 1D);
     }
 }
