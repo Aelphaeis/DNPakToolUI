@@ -22,47 +22,41 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.struct.msh;
+package co.phoenixlab.dn.dnptui.viewers.struct.skn;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+public class Parameter {
 
-public class Msh {
+    protected String key;
+    protected Object value;
+    protected SknEntry.DataType dataType;
 
-
-    private MshHeader mshHeader;
-    private Bone[] boneData;
-    private Mesh[] meshData;
-
-    public Msh(ByteBuffer byteBuffer) {
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        mshHeader = new MshHeader(byteBuffer);
-        boneData = new Bone[mshHeader.getNumBones()];
-        for (int i = 0; i < boneData.length; i++) {
-            boneData[i] = new Bone(byteBuffer);
-        }
-        boolean hasBones = boneData.length > 0;
-        int version = mshHeader.getVersion();
-        meshData = new Mesh[mshHeader.getNumMesh()];
-        for (int i = 0; i < meshData.length; i++) {
-            try {
-                meshData[i] = new Mesh(byteBuffer, hasBones, version);
-            } catch (Exception e) {
-                System.err.println("mesh " + i + ", header " + mshHeader.toString());
-                throw new RuntimeException(e);
-            }
-        }
+    public Parameter(String name, Object value) {
+        this.key = name;
+        this.value = value;
     }
 
-    public MshHeader getMshHeader() {
-        return mshHeader;
+    public SknEntry.DataType getDataType() {
+        return dataType;
     }
 
-    public Bone[] getBoneData() {
-        return boneData;
+    void setDataType(SknEntry.DataType dataType) {
+        this.dataType = dataType;
     }
 
-    public Mesh[] getMeshData() {
-        return meshData;
+    public String getKey() {
+        return key;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("\"%s\"=%s", key, valueToString());
+    }
+
+    public String valueToString() {
+        return value.toString();
     }
 }

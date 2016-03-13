@@ -22,47 +22,27 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.struct.msh;
+package co.phoenixlab.dn.dnptui.viewers.struct.skn;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+public class FloatParameter extends Parameter {
 
-public class Msh {
+    private float val;
 
-
-    private MshHeader mshHeader;
-    private Bone[] boneData;
-    private Mesh[] meshData;
-
-    public Msh(ByteBuffer byteBuffer) {
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        mshHeader = new MshHeader(byteBuffer);
-        boneData = new Bone[mshHeader.getNumBones()];
-        for (int i = 0; i < boneData.length; i++) {
-            boneData[i] = new Bone(byteBuffer);
-        }
-        boolean hasBones = boneData.length > 0;
-        int version = mshHeader.getVersion();
-        meshData = new Mesh[mshHeader.getNumMesh()];
-        for (int i = 0; i < meshData.length; i++) {
-            try {
-                meshData[i] = new Mesh(byteBuffer, hasBones, version);
-            } catch (Exception e) {
-                System.err.println("mesh " + i + ", header " + mshHeader.toString());
-                throw new RuntimeException(e);
-            }
-        }
+    public FloatParameter(String name, Object value) {
+        this(name, (float) value);
     }
 
-    public MshHeader getMshHeader() {
-        return mshHeader;
+    public FloatParameter(String name, float value) {
+        super(name, value);
+        val = value;
     }
 
-    public Bone[] getBoneData() {
-        return boneData;
+    public float asFloat() {
+        return val;
     }
 
-    public Mesh[] getMeshData() {
-        return meshData;
+    @Override
+    public String valueToString() {
+        return Float.toString(asFloat());
     }
 }

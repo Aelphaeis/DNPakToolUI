@@ -22,47 +22,53 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.struct.msh;
+package co.phoenixlab.dn.dnptui.viewers.stageini.struct;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.StringJoiner;
 
-public class Msh {
+public class PropInfo {
 
+    private int unknownA;
+    private int numEntries;
+    private Prop[] entries;
 
-    private MshHeader mshHeader;
-    private Bone[] boneData;
-    private Mesh[] meshData;
-
-    public Msh(ByteBuffer byteBuffer) {
+    public PropInfo(ByteBuffer byteBuffer) {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        mshHeader = new MshHeader(byteBuffer);
-        boneData = new Bone[mshHeader.getNumBones()];
-        for (int i = 0; i < boneData.length; i++) {
-            boneData[i] = new Bone(byteBuffer);
+        unknownA = byteBuffer.getInt();
+        numEntries = byteBuffer.getInt();
+        entries = new Prop[numEntries];
+        for (int i = 0; i < numEntries; i++) {
+            entries[i] = new Prop(byteBuffer);
         }
-        boolean hasBones = boneData.length > 0;
-        int version = mshHeader.getVersion();
-        meshData = new Mesh[mshHeader.getNumMesh()];
-        for (int i = 0; i < meshData.length; i++) {
-            try {
-                meshData[i] = new Mesh(byteBuffer, hasBones, version);
-            } catch (Exception e) {
-                System.err.println("mesh " + i + ", header " + mshHeader.toString());
-                throw new RuntimeException(e);
-            }
+        Arrays.sort(entries);
+    }
+
+    public int getUnknownA() {
+        return unknownA;
+    }
+
+    public int getNumEntries() {
+        return numEntries;
+    }
+
+    public Prop[] getEntries() {
+        return entries;
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner joiner = new StringJoiner("\n");
+        for (int i = 0, entriesLength = entries.length; i < entriesLength; i++) {
+            Prop entry = entries[i];
+            joiner.add(String.format("%03d: ", entry.getObjectId()) + entry.toString());
         }
-    }
-
-    public MshHeader getMshHeader() {
-        return mshHeader;
-    }
-
-    public Bone[] getBoneData() {
-        return boneData;
-    }
-
-    public Mesh[] getMeshData() {
-        return meshData;
+        return "Prop{" +
+                "unknownA=" + unknownA +
+                ", numEntries=" + numEntries +
+                ", entries=\n" + joiner.toString() +
+                '}';
     }
 }

@@ -38,18 +38,29 @@ public class Mesh {
     private int numIndex;
     private int unknownA;
     private int renderMode;
+    private RenderMode renderModeEnum;
     private MeshData meshData;
 
     public Mesh(ByteBuffer byteBuffer, boolean hasBones, int version) {
         int startPos = byteBuffer.position();
         sceneName = DNStringUtils.readFixedLengthNTString(byteBuffer, 256);
-        meshName = DNStringUtils.readFixedLengthNTString(byteBuffer,  256);
+        meshName = DNStringUtils.readFixedLengthNTString(byteBuffer, 256);
         numVertex = byteBuffer.getInt();
         numIndex = byteBuffer.getInt();
         unknownA = byteBuffer.getInt();
         renderMode = byteBuffer.getInt();
+        renderModeEnum = RenderMode.fromId(renderMode);
         byteBuffer.position(startPos + MESH_INFO_SIZE);
-        meshData = new MeshData(byteBuffer, this, hasBones, version);
+        try {
+            meshData = new MeshData(byteBuffer, this,
+                    hasBones &&
+                            renderMode >= RenderMode.TRIANGLES_ANIM.getId() &&
+                            renderMode < RenderMode.TRIANGLES_UNK.getId(),
+                    version);
+        } catch (Exception e) {
+            System.err.println("startpos " + startPos);
+            throw e;
+        }
     }
 
     public String getSceneName() {
@@ -80,6 +91,10 @@ public class Mesh {
         return meshData;
     }
 
+    public RenderMode getRenderModeEnum() {
+        return renderModeEnum;
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -88,7 +103,7 @@ public class Mesh {
                 ", numVertex=" + numVertex +
                 ", numIndex=" + numIndex +
                 ", unknownA=" + unknownA +
-                ", renderMode=" + renderMode +
+                ", renderMode=" + renderMode + " (" + renderModeEnum + ")" +
                 ",\n\tmeshData=" + meshData +
                 '}';
     }

@@ -29,6 +29,7 @@ import co.phoenixlab.dn.dnptui.viewers.util.DNStringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 public class MeshData {
@@ -40,6 +41,7 @@ public class MeshData {
     private float[] uvData;
     private short[] boneIndex;
     private float[] boneWeight;
+    private int[] unknownA;
     private int boneCount = -1;
     private String[] boneNames;
 
@@ -66,7 +68,16 @@ public class MeshData {
             BufferUtils.skip(byteBuffer, uvData.length * Float.BYTES);
 
             this.hasBones = hasBones;
-            if (this.hasBones) {
+            RenderMode renderModeEnum = parent.getRenderModeEnum();
+            if (renderModeEnum == RenderMode.TRIANGLES_UNK || renderModeEnum == RenderMode.TRIANGLE_STRIP_UNK) {
+                unknownA = new int[parent.getNumVertex()];
+                IntBuffer intBuffer = byteBuffer.asIntBuffer();
+                intBuffer.get(unknownA);
+                BufferUtils.skip(byteBuffer, parent.getNumVertex() * 4);
+                boneIndex = new short[0];
+                boneWeight = new float[0];
+                boneNames = new String[0];
+            } else if (this.hasBones) {
                 boneIndex = new short[parent.getNumVertex() * 4];
                 byteBuffer.asShortBuffer().get(boneIndex);
                 BufferUtils.skip(byteBuffer, boneIndex.length * Short.BYTES);
@@ -86,7 +97,7 @@ public class MeshData {
                 boneNames = new String[0];
             }
         } catch (Exception e) {
-            System.out.printf("pos %s rem %s, parent %s%n",
+            System.err.printf("pos %s rem %s, parent %s%n",
                     byteBuffer.position(), byteBuffer.remaining(),
                     parent.toString());
             throw new RuntimeException(e);
@@ -143,4 +154,9 @@ public class MeshData {
                 ", normalData=" + normalData.length +
                 '}';
     }
+
+    public int[] getUnknownA() {
+        return unknownA;
+    }
+
 }

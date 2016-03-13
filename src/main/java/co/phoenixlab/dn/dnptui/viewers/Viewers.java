@@ -63,6 +63,7 @@ public class Viewers {
 
         registerFXMLViewer(".env", new EnvViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".msh", new MshViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerFXMLViewer(".skn", new SknViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
 
         //  Stage INI
         registerMatcherViewer("sectorsize\\.ini", new StageIniSectorSizeViewer(),
@@ -78,6 +79,8 @@ public class Viewers {
         registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
         registerMatcherViewer("triggerdefine\\.ini", new StageIniTriggerDefineViewer(),
+                "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerMatcherViewer("propinfo\\.ini", new StageIniPropInfoViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
     }
 

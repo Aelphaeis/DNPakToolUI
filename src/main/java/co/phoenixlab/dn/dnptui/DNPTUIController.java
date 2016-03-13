@@ -598,6 +598,7 @@ public class DNPTUIController {
         Label loadingInfoLbl = new Label();
         loadingInfoLbl.setTextAlignment(TextAlignment.CENTER);
         loadingInfoLbl.setAlignment(Pos.CENTER);
+        loadingInfoLbl.setWrapText(true);
         loadingRoot.getChildren().addAll(spinner, loadingInfoLbl);
         //  Progress info
         Label progressLbl = new Label();
@@ -642,8 +643,10 @@ public class DNPTUIController {
             @SuppressWarnings("RedundantCast")
             Throwable taskThrowable = ((Worker) e.getSource()).getException();
             if (taskThrowable != null) {
+                LOGGER.warn("Unexpected error: ", taskThrowable);
                 loadingInfoLbl.setText("Unexpected error: " + taskThrowable.getMessage());
             } else {
+                LOGGER.warn("Unexpected error occurred");
                 loadingInfoLbl.setText("Unknown error occurred");
             }
             Button closeBtn = new Button("Close");

@@ -24,45 +24,32 @@
 
 package co.phoenixlab.dn.dnptui.viewers.struct.msh;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+public enum RenderMode {
+    TRIANGLES(0),
+    TRIANGLE_STRIP(1),
+    TRIANGLES_ANIM(256),
+    TRIANGLE_STRIP_ANIM(257),
+    TRIANGLES_UNK(65536),
+    TRIANGLE_STRIP_UNK(65537),
+    UNKNOWN(-1);
 
-public class Msh {
 
+    private int id;
 
-    private MshHeader mshHeader;
-    private Bone[] boneData;
-    private Mesh[] meshData;
+    RenderMode(int id) {
+        this.id = id;
+    }
 
-    public Msh(ByteBuffer byteBuffer) {
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        mshHeader = new MshHeader(byteBuffer);
-        boneData = new Bone[mshHeader.getNumBones()];
-        for (int i = 0; i < boneData.length; i++) {
-            boneData[i] = new Bone(byteBuffer);
-        }
-        boolean hasBones = boneData.length > 0;
-        int version = mshHeader.getVersion();
-        meshData = new Mesh[mshHeader.getNumMesh()];
-        for (int i = 0; i < meshData.length; i++) {
-            try {
-                meshData[i] = new Mesh(byteBuffer, hasBones, version);
-            } catch (Exception e) {
-                System.err.println("mesh " + i + ", header " + mshHeader.toString());
-                throw new RuntimeException(e);
+    public static RenderMode fromId(int id) {
+        for (RenderMode renderMode : values()) {
+            if (renderMode.id == id) {
+                return renderMode;
             }
         }
+        return UNKNOWN;
     }
 
-    public MshHeader getMshHeader() {
-        return mshHeader;
-    }
-
-    public Bone[] getBoneData() {
-        return boneData;
-    }
-
-    public Mesh[] getMeshData() {
-        return meshData;
+    public int getId() {
+        return id;
     }
 }

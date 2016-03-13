@@ -22,47 +22,36 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.struct.msh;
+package co.phoenixlab.dn.dnptui.viewers.struct.skn;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import org.joml.Vector4f;
 
-public class Msh {
+import java.util.Arrays;
 
+public class Vec4FParameter extends Parameter {
 
-    private MshHeader mshHeader;
-    private Bone[] boneData;
-    private Mesh[] meshData;
+    private Vector4f vector4f;
 
-    public Msh(ByteBuffer byteBuffer) {
-        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        mshHeader = new MshHeader(byteBuffer);
-        boneData = new Bone[mshHeader.getNumBones()];
-        for (int i = 0; i < boneData.length; i++) {
-            boneData[i] = new Bone(byteBuffer);
-        }
-        boolean hasBones = boneData.length > 0;
-        int version = mshHeader.getVersion();
-        meshData = new Mesh[mshHeader.getNumMesh()];
-        for (int i = 0; i < meshData.length; i++) {
-            try {
-                meshData[i] = new Mesh(byteBuffer, hasBones, version);
-            } catch (Exception e) {
-                System.err.println("mesh " + i + ", header " + mshHeader.toString());
-                throw new RuntimeException(e);
-            }
-        }
+    public Vec4FParameter(String name, Object value) {
+        super(name, value);
+        float[] v = asFloatArray();
+        vector4f = new Vector4f(v[0], v[1], v[2], v[3]);
     }
 
-    public MshHeader getMshHeader() {
-        return mshHeader;
+    public Vec4FParameter(String name, float[] value) {
+        super(name, value);
     }
 
-    public Bone[] getBoneData() {
-        return boneData;
+    public float[] asFloatArray() {
+        return (float[]) value;
     }
 
-    public Mesh[] getMeshData() {
-        return meshData;
+    public Vector4f asVector4f() {
+        return vector4f;
+    }
+
+    @Override
+    public String valueToString() {
+        return Arrays.toString(asFloatArray());
     }
 }

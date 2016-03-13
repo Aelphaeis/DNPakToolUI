@@ -46,15 +46,15 @@ public class EnvViewer extends TextViewer {
         builder.append("EnvInfo v").append(majorVersion).append('.').append(minorVersion).append('\n');
 
         String sknName = readLPNTString(byteBuffer, majorVersion, minorVersion);
-        builder.append("SKYDOME\n");
+        builder.append("\nSKYDOME\n");
         builder.append("Skn: ").append(sknName).append('\n');
         int skyDomeUnkA = byteBuffer.getInt();
         int skyDomeUnkB = byteBuffer.getInt();
-        int skyDomeUnkC = byteBuffer.getInt();
+        int skyDomeScale = byteBuffer.getInt();
         int skyDomeUnkD = byteBuffer.getInt();
-        builder.append("OriginX: ").append(unknownIntToString(skyDomeUnkA)).append('\n');
-        builder.append("OriginZ: ").append(unknownIntToString(skyDomeUnkB)).append('\n');
-        builder.append("UnkC: ").append(unknownIntToString(skyDomeUnkC)).append('\n');
+        builder.append("UnkA: ").append(unknownIntToString(skyDomeUnkA)).append('\n');
+        builder.append("UnkB: ").append(unknownIntToString(skyDomeUnkB)).append('\n');
+        builder.append("Scale: ").append(unknownIntToString(skyDomeScale)).append('\n');
         builder.append("UnkD: ").append(unknownIntToString(skyDomeUnkD)).append('\n');
 
         String envTexName = readLPNTString(byteBuffer, majorVersion, minorVersion);

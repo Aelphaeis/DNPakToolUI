@@ -97,6 +97,7 @@ public class PakHandler {
                 if (s.startsWith("\\")) {
                     s = s.substring(1);
                 }
+                s = s.trim();
                 Path path = Paths.get(s);
                 PakTreeEntry entry = new PakTreeEntry(e.name, path, e, pakFile);
                 insert(entry, dirCache);
@@ -239,7 +240,8 @@ public class PakHandler {
      * @throws IOException If there was an I/O error during exporting
      */
     public void exportDirectory(TreeItem<PakTreeEntry> treeItem, Path exportPath) throws IOException {
-        DoubleConsumer consumer = d -> {};
+        DoubleConsumer consumer = d -> {
+        };
         exportDirectory(treeItem, exportPath, consumer);
     }
 
@@ -269,7 +271,9 @@ public class PakHandler {
             PakTreeEntry entry = child.getValue();
             Path path = exportPath.resolve(entry.name);
             if (entry.entry == null) {
-                Files.createDirectory(path);
+                if (!Files.exists(path)) {
+                    Files.createDirectory(path);
+                }
                 done = exportDirectory(child, path, prog, done, total);
             } else {
                 exportFile(entry, path);
