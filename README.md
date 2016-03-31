@@ -29,7 +29,7 @@ This project uses Maven. Simply build the JAR by running `mvn package`.
 
 You may need to include DNPakTool into your local Maven repository by running:
 ```
-mvn install:install-file -Dfile=DNPakTool-1.0.1.jar -DgroupId=co.phoenixlab.dn -DartifactId=DNPakTool -Dversion=1.0.1 -Dpackaging=jar
+mvn install:install-file -Dfile=DNPakTool-1.0.4.jar -DgroupId=co.phoenixlab.dn -DartifactId=DNPakTool -Dversion=1.0.4 -Dpackaging=jar
 ```
 
 ##Dependencies
