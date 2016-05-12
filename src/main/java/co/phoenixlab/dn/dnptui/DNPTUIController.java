@@ -284,6 +284,28 @@ public class DNPTUIController {
         ///////////////////////////
         //  Configure the TreeView and its cells
         treeView.setCellFactory(param -> new TreeCell<PakTreeEntry>() {
+            ContextMenu contextMenu;
+            MenuItem exportMenuItem;
+            {
+                contextMenu = new ContextMenu();
+                exportMenuItem = new MenuItem();
+                contextMenu.getItems().addAll(exportMenuItem);
+                setOnMouseClicked(me -> {
+                    if (me.getButton() == MouseButton.SECONDARY) {
+                        //  Show context menu
+                        PakTreeEntry item = getItem();
+                        if (item != null && item.isDirectory()) {
+                            exportMenuItem.setText("Export Dir...");
+                            exportMenuItem.setOnAction(ae -> exportFolder(ae));
+                        } else {
+                            exportMenuItem.setText("Export File...");
+                            exportMenuItem.setOnAction(ae -> exportFile(ae));
+                        }
+                        contextMenu.show(this, me.getScreenX(), me.getScreenY());
+                    }
+                });
+            }
+
             @Override
             protected void updateItem(PakTreeEntry item, boolean empty) {
                 super.updateItem(item, empty);
