@@ -22,37 +22,23 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.util;
+package co.phoenixlab.dn.dnptui.viewers.struct.ani;
+
+import co.phoenixlab.dn.dnptui.viewers.util.DNStringUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-public class BufferUtils {
+public class AniBoneData {
 
-    public static void nskip(ByteBuffer byteBuffer, int n, int size) {
-        skip(byteBuffer, n * size);
+    private String boneName;
+    private String parentBone;
+
+    public AniBoneData(ByteBuffer byteBuffer) {
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        boneName = DNStringUtils.readFixedLengthString(byteBuffer, 256);
+        parentBone = DNStringUtils.readFixedLengthString(byteBuffer, 768);
+        //  TODO read data
     }
 
-    public static void skip(ByteBuffer byteBuffer, int bytesToSkip) {
-        byteBuffer.position(byteBuffer.position() + bytesToSkip);
-    }
-
-    public static void iskip(ByteBuffer byteBuffer, int intsToSkip) {
-        nskip(byteBuffer, intsToSkip, 4);
-    }
-
-    public static void fskip(ByteBuffer byteBuffer, int floatsToSkip) {
-        nskip(byteBuffer, floatsToSkip, 4);
-    }
-
-    public static void sskip(ByteBuffer byteBuffer, int shortsToSkip) {
-        nskip(byteBuffer, shortsToSkip, 2);
-    }
-
-    public static void lskip(ByteBuffer byteBuffer, int longsToSkip) {
-        nskip(byteBuffer, longsToSkip, 8);
-    }
-
-    public static void dskip(ByteBuffer byteBuffer, int doublesToSkip) {
-        nskip(byteBuffer, doublesToSkip, 8);
-    }
 }

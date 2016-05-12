@@ -22,37 +22,42 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.util;
+package co.phoenixlab.dn.dnptui.viewers.struct.ani;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-public class BufferUtils {
+public class AniHeader {
 
-    public static void nskip(ByteBuffer byteBuffer, int n, int size) {
-        skip(byteBuffer, n * size);
+    private int version;
+    private int numBones;
+    private int numAnimations;
+
+    public AniHeader(ByteBuffer byteBuffer) {
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        version = byteBuffer.getInt();
+        numBones = byteBuffer.getInt();
+        numAnimations = byteBuffer.getInt();
     }
 
-    public static void skip(ByteBuffer byteBuffer, int bytesToSkip) {
-        byteBuffer.position(byteBuffer.position() + bytesToSkip);
+    public int getVersion() {
+        return version;
     }
 
-    public static void iskip(ByteBuffer byteBuffer, int intsToSkip) {
-        nskip(byteBuffer, intsToSkip, 4);
+    public int getNumAnimations() {
+        return numAnimations;
     }
 
-    public static void fskip(ByteBuffer byteBuffer, int floatsToSkip) {
-        nskip(byteBuffer, floatsToSkip, 4);
+    public int getNumBones() {
+        return numBones;
     }
 
-    public static void sskip(ByteBuffer byteBuffer, int shortsToSkip) {
-        nskip(byteBuffer, shortsToSkip, 2);
-    }
-
-    public static void lskip(ByteBuffer byteBuffer, int longsToSkip) {
-        nskip(byteBuffer, longsToSkip, 8);
-    }
-
-    public static void dskip(ByteBuffer byteBuffer, int doublesToSkip) {
-        nskip(byteBuffer, doublesToSkip, 8);
+    @Override
+    public String toString() {
+        return "AniHeader{\n" +
+                "\n\tversion=" + version +
+                "\n\tnumBones=" + numBones +
+                "\n\tnumAnimations=" + numAnimations +
+                "\n}";
     }
 }

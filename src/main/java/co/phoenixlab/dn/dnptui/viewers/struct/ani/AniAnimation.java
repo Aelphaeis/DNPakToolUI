@@ -22,37 +22,38 @@
  * THE SOFTWARE.
  */
 
-package co.phoenixlab.dn.dnptui.viewers.util;
+package co.phoenixlab.dn.dnptui.viewers.struct.ani;
 
-import java.nio.ByteBuffer;
+public class AniAnimation {
 
-public class BufferUtils {
+    private String name;
+    private int numFrames;
 
-    public static void nskip(ByteBuffer byteBuffer, int n, int size) {
-        skip(byteBuffer, n * size);
+    public AniAnimation(String name) {
+        this.name = name;
     }
 
-    public static void skip(ByteBuffer byteBuffer, int bytesToSkip) {
-        byteBuffer.position(byteBuffer.position() + bytesToSkip);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public static void iskip(ByteBuffer byteBuffer, int intsToSkip) {
-        nskip(byteBuffer, intsToSkip, 4);
+    public void setNumFrames(int numFrames) {
+        this.numFrames = numFrames;
     }
 
-    public static void fskip(ByteBuffer byteBuffer, int floatsToSkip) {
-        nskip(byteBuffer, floatsToSkip, 4);
+    public String getName() {
+        return name;
     }
 
-    public static void sskip(ByteBuffer byteBuffer, int shortsToSkip) {
-        nskip(byteBuffer, shortsToSkip, 2);
+    public int getNumFrames() {
+        return numFrames;
     }
 
-    public static void lskip(ByteBuffer byteBuffer, int longsToSkip) {
-        nskip(byteBuffer, longsToSkip, 8);
-    }
-
-    public static void dskip(ByteBuffer byteBuffer, int doublesToSkip) {
-        nskip(byteBuffer, doublesToSkip, 8);
+    @Override
+    public String toString() {
+        return "AniAnimation{" +
+                "name='" + name + '\'' +
+                ", numFrames=" + numFrames +
+                '}';
     }
 }

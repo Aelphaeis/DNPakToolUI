@@ -893,11 +893,12 @@ public class DNPTUIController {
                 //  Set up file information bar
                 FileInfo fileInfo = entry.entry.getFileInfo();
                 fileInfoLbl.setText(String.format("CmpSz 0x%08X | DskSz 0x%08X | " +
-                                "DcmSz 0x%08X | Off 0x%08X | Parent %s",
+                                "DcmSz 0x%08X | Off 0x%08X | Unk 0x%08X | Parent %s",
                         fileInfo.getCompressedSize(),
                         fileInfo.getDiskSize(),
                         fileInfo.getDecompressedSize(),
                         fileInfo.getDiskOffset(),
+                        fileInfo.getUnknown(),
                         entry.parent.getPath().getFileName().toString()));
 
                 //  Prepare the viewer to use

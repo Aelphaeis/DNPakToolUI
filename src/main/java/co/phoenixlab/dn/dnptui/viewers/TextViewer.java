@@ -103,4 +103,20 @@ public class TextViewer implements Viewer {
         data = null;
         textArea.setText(null);
     }
+
+    protected final String indentSpaces(String s, int level) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            builder.append(' ');
+        }
+        return s.replace("\n", "\n" + builder.toString());
+    }
+
+    protected final String indentTabs(String s, int level) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            builder.append('\t');
+        }
+        return s.replace("\n", "\n" + builder.toString());
+    }
 }

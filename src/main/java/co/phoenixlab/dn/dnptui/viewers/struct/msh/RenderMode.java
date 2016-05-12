@@ -24,20 +24,24 @@
 
 package co.phoenixlab.dn.dnptui.viewers.struct.msh;
 
+import java.util.function.IntUnaryOperator;
+
 public enum RenderMode {
-    TRIANGLES(0),
-    TRIANGLE_STRIP(1),
-    TRIANGLES_ANIM(256),
-    TRIANGLE_STRIP_ANIM(257),
-    TRIANGLES_UNK(65536),
-    TRIANGLE_STRIP_UNK(65537),
-    UNKNOWN(-1);
+    TRIANGLES(0, i -> i / 3),
+    TRIANGLE_STRIP(1, i -> i - 2),
+    TRIANGLES_ANIM(256, i -> i / 3),
+    TRIANGLE_STRIP_ANIM(257, i -> i - 2),
+    TRIANGLES_UNK(65536, i -> i / 3),
+    TRIANGLE_STRIP_UNK(65537, i -> i - 2),
+    UNKNOWN(-1, i -> i / 3);
 
 
     private int id;
+    private IntUnaryOperator faceCountConverter;
 
-    RenderMode(int id) {
+    RenderMode(int id, IntUnaryOperator faceCountConverter) {
         this.id = id;
+        this.faceCountConverter = faceCountConverter;
     }
 
     public static RenderMode fromId(int id) {
@@ -51,5 +55,9 @@ public enum RenderMode {
 
     public int getId() {
         return id;
+    }
+
+    public IntUnaryOperator getFaceCountConverter() {
+        return faceCountConverter;
     }
 }
