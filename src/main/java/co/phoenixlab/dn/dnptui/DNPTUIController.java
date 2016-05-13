@@ -246,7 +246,9 @@ public class DNPTUIController {
         //  Property bindings //
         ////////////////////////
         //  Disable the find button when no pak is loaded
-        findBtn.disableProperty().bind(noPakLoadedProperty);
+//        findBtn.disableProperty().bind(noPakLoadedProperty);
+        //  Find doesnt work, disable
+        findBtn.setDisable(true);
 
         //  Disable the export file button when no pak is loaded or the selection is not a file
         exportBtn.disableProperty().bind(noPakLoadedProperty.
