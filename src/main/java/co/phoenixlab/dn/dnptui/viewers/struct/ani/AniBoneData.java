@@ -33,12 +33,16 @@ public class AniBoneData {
 
     private String boneName;
     private String parentBone;
+    private AniBoneDataAniData[] aniData;
 
-    public AniBoneData(ByteBuffer byteBuffer) {
+    public AniBoneData(ByteBuffer byteBuffer, int numAnim, int version) {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         boneName = DNStringUtils.readFixedLengthString(byteBuffer, 256);
         parentBone = DNStringUtils.readFixedLengthString(byteBuffer, 768);
-        //  TODO read data
+        aniData = new AniBoneDataAniData[numAnim];
+        for (int i = 0; i < numAnim; i++) {
+            aniData[i] = new AniBoneDataAniData(byteBuffer, version);
+        }
     }
 
 }
