@@ -113,10 +113,15 @@ public class TextViewer implements Viewer {
     }
 
     protected final String indentTabs(String s, int level) {
+        return indentTabs(s, level, false);
+    }
+
+    protected final String indentTabs(String s, int level, boolean leading) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < level; i++) {
             builder.append('\t');
         }
-        return s.replace("\n", "\n" + builder.toString());
+        String s1 = builder.toString();
+        return (leading ? s1 : "") + s.replace("\n", "\n" + s1);
     }
 }
