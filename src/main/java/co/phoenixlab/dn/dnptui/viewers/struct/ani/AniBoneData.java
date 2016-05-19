@@ -45,4 +45,15 @@ public class AniBoneData {
         }
     }
 
+    public AniBoneDataAniData[] getAniData() {
+        return aniData;
+    }
+
+    public String getBoneName() {
+        return boneName;
+    }
+
+    public String getParentBone() {
+        return parentBone;
+    }
 }

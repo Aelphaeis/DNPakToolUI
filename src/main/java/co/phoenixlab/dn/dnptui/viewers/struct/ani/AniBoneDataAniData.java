@@ -151,4 +151,52 @@ public class AniBoneDataAniData {
         t1 |= t2;
         return Float.intBitsToFloat(t1);
     }
+
+    public float[] getInitialPositionVec3f() {
+        return initialPositionVec3f;
+    }
+
+    public float[] getInitialRotationQuaternionVec4f() {
+        return initialRotationQuaternionVec4f;
+    }
+
+    public float[] getInitialScalingVec3f() {
+        return initialScalingVec3f;
+    }
+
+    public int getNumRotationTransformations() {
+        return numRotationTransformations;
+    }
+
+    public int getNumScalingTransformations() {
+        return numScalingTransformations;
+    }
+
+    public int getNumTranslationTransformations() {
+        return numTranslationTransformations;
+    }
+
+    public int[] getRotationTransformationFrameCount() {
+        return rotationTransformationFrameCount;
+    }
+
+    public float[] getRotationTransformations() {
+        return rotationTransformations;
+    }
+
+    public int[] getScalingTransformationFrameCount() {
+        return scalingTransformationFrameCount;
+    }
+
+    public float[] getScalingTransformations() {
+        return scalingTransformations;
+    }
+
+    public int[] getTranslationTransformationFrameCount() {
+        return translationTransformationFrameCount;
+    }
+
+    public float[] getTranslationTransformations() {
+        return translationTransformations;
+    }
 }

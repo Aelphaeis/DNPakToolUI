@@ -65,9 +65,9 @@ public class Ani {
         for (int i = 0; i < animations.length; i++) {
             animations[i].setNumFrames(byteBuffer.getInt());
         }
-//        for (int i = 0; i < aniHeader.getNumBones(); i++) {
-//            animationData[i] = new AniBoneData(byteBuffer, aniHeader.getNumAnimations(), aniHeader.getVersion());
-//        }
+        for (int i = 0; i < aniHeader.getNumBones(); i++) {
+            animationData[i] = new AniBoneData(byteBuffer, aniHeader.getNumAnimations(), aniHeader.getVersion());
+        }
     }
 
     public AniHeader getAniHeader() {
