@@ -39,6 +39,9 @@ public class Prop implements Comparable<Prop> {
     public static final int TYPE_LIGHT = 0x06C0;
     public static final int TYPE_NORMAL = 0x0678;
     public static final int TYPE_BUFF = 0x0681;
+    public static final int TYPE_COLLISION_A = 0x069E;
+    public static final int TYPE_COLLISION_B = 0x0692;
+    public static final int TYPE_ANIM = 0x069D;
     private int offset;
     private Type type;
     private int typeId;
@@ -50,7 +53,7 @@ public class Prop implements Comparable<Prop> {
     private int objectId;
     private byte[] unknownD;
     private int numTags;
-    private Map<Integer, Integer> tags;
+    private Map<Object, Object> tags;
 
     public Prop(ByteBuffer byteBuffer) {
         tags = new HashMap<>();
@@ -72,6 +75,18 @@ public class Prop implements Comparable<Prop> {
                 tags.put(byteBuffer.getInt(), byteBuffer.getInt());
             }
             BufferUtils.skip(byteBuffer, 2);
+        } else if (type == Type.COLLISION_A || type == Type.COLLISION_B) {
+            numTags = byteBuffer.getInt();
+            for (int i = 0; i < numTags; i++) {
+                tags.put(byteBuffer.getInt(), DNStringUtils.readLPNTString(byteBuffer));
+            }
+        } else if (type == Type.ANIM) {
+            tags.put("unkA", byteBuffer.getInt());
+            tags.put("unkB", byteBuffer.getInt());
+            numTags = byteBuffer.getInt();
+            for (int i = 0; i < numTags; i++) {
+                tags.put(i, DNStringUtils.readLPNTString(byteBuffer));
+            }
         }
         //  TODO
     }
@@ -87,7 +102,7 @@ public class Prop implements Comparable<Prop> {
                 ",\n\tscale=" + scale +
                 ",\n\tunknownB=" + unknownB +
                 ",\n\tobjectId=" + objectId;
-        if (typeId == TYPE_TAGGED) {
+        if (!tags.isEmpty()) {
             s += ",\n\ttags=" + tags.toString();
         }
         s += "\n}";
@@ -134,7 +149,7 @@ public class Prop implements Comparable<Prop> {
         return numTags;
     }
 
-    public Map<Integer, Integer> getTags() {
+    public Map<Object, Object> getTags() {
         return tags;
     }
 
@@ -173,6 +188,9 @@ public class Prop implements Comparable<Prop> {
         TAGGED(TYPE_TAGGED, 1544),
         LIGHT(TYPE_LIGHT, 1620),
         BUFF(TYPE_BUFF, 1557),
+        COLLISION_A(TYPE_COLLISION_A, 1544),
+        COLLISION_B(TYPE_COLLISION_B, 1544),
+        ANIM(TYPE_ANIM, 1544),
         UNKNOWN(0, 1548);
 
         private final int id;
