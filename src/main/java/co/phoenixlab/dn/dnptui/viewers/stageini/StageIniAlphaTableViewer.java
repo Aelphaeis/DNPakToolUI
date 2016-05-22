@@ -117,7 +117,7 @@ public class StageIniAlphaTableViewer extends ImageViewer {
     }
 
     private int expandPixel(int value) {
-        return 0xFF000000 | (value << 16) | (value << 8) | value;
+        return 0xFF000000 | (value * 0x10101);
     }
 
     private GridInfo loadGridInfo() throws Exception {
