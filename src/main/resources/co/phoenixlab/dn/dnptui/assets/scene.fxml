@@ -85,7 +85,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" onAction="#exportFile" text="Export File">
+                  <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" onAction="#exportFile" text="Export File(s)">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>

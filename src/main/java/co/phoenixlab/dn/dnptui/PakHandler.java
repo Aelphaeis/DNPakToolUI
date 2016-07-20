@@ -214,6 +214,10 @@ public class PakHandler {
      * @throws IOException If there was an I/O error during exporting
      */
     public void exportFile(PakTreeEntry entry, Path exportPath) throws IOException {
+        Path parent = exportPath.getParent();
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
+        }
         try (InflaterOutputStream outputStream = new InflaterOutputStream(Files.newOutputStream(exportPath,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))) {
             WritableByteChannel byteChannel = Channels.newChannel(outputStream);

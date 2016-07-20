@@ -322,7 +322,8 @@ public class DNPTUIController {
                 }
             }
         });
-        treeView.setShowRoot(false);
+        treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        treeView.setShowRoot(true);
 
         ////////////////////
         //  Miscellaneous //
@@ -737,6 +738,15 @@ public class DNPTUIController {
      */
     @FXML
     private void exportFile(ActionEvent event) {
+        //  Support multiselect
+        int selectionSize = treeView.getSelectionModel().getSelectedItems().size();
+        if (selectionSize > 1)
+        {
+            TreeItem<PakTreeEntry>[] entries = treeView.getSelectionModel().getSelectedItems().toArray(new TreeItem[selectionSize]);
+            multiExport(entries);
+            return;
+        }
+
         //  Accept iff the selected item is a file. Normally the button is disabled if it isn't, but we
         //  revalidate in case something went wrong or some idiot called this method manually.
         if (selectionTypeProperty.get() == SelectionType.FILE) {
@@ -745,6 +755,24 @@ public class DNPTUIController {
             LOGGER.warn("exportFile() called on an invalid selection (SelectionType = {})",
                     selectionTypeProperty.get());
         }
+    }
+
+    private void multiExport(TreeItem<PakTreeEntry>[] entries)
+    {
+        LOGGER.info("Requesting directory export for multiexport");
+        //  Show directory chooser
+        DirectoryChooser exportDirPathChooser = new DirectoryChooser();
+        exportDirPathChooser.setTitle("Export into...");
+        exportDirPathChooser.setInitialDirectory(lastOpenedDir.toFile());
+        File exportDir = exportDirPathChooser.showDialog(stage);
+        //  User hit cancel
+        if (exportDir == null) {
+            LOGGER.debug("Multiexport cancelled by user");
+            return;
+        }
+        SubfileMultiExportTask exportTask = new SubfileMultiExportTask(handler, entries, exportDir.toPath());
+        showLoadingPopup(exportTask);
+        DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
 
     /**
