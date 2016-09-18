@@ -42,6 +42,7 @@ import java.nio.charset.StandardCharsets;
 public class TextViewer implements Viewer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextViewer.class);
+    public static final int DEFAULT_MAX_SIZE = 1024 * 1024;
 
     private long maxDisplaySize;
 
@@ -62,7 +63,7 @@ public class TextViewer implements Viewer {
     private String data;
 
     public TextViewer() {
-        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", 4*1024*1024);
+        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", DEFAULT_MAX_SIZE);
     }
 
 
@@ -98,8 +99,8 @@ public class TextViewer implements Viewer {
 
     @Override
     public void reset() {
-        //  4 MB default
-        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", 4*1024*1024);
+        //  Default
+        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", DEFAULT_MAX_SIZE);
         data = null;
         textArea.setText(null);
     }

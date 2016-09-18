@@ -59,6 +59,7 @@ public class Viewers {
         registerFXMLViewer(".cfg", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".txt", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".xml", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerFXMLViewer(".dmv", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
 
 
         registerFXMLViewer(".env", new EnvViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
