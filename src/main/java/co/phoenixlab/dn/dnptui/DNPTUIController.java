@@ -939,20 +939,7 @@ public class DNPTUIController {
         if (newValue != null) {
             //  Selection is an actual entry (as in, not an unselection event)
             PakTreeEntry entry = newValue.getValue();
-            if (entry != null && !entry.isDirectory()) {
-                //  Entry is not an empty entry and is not a directory
-
-                //  Set up file information bar
-                FileInfo fileInfo = entry.entry.getFileInfo();
-                fileInfoLbl.setText(String.format("CmpSz 0x%08X | DskSz 0x%08X | " +
-                                "DcmSz 0x%08X | Off 0x%08X | Unk 0x%08X | Parent %s",
-                        fileInfo.getCompressedSize(),
-                        fileInfo.getDiskSize(),
-                        fileInfo.getDecompressedSize(),
-                        fileInfo.getDiskOffset(),
-                        fileInfo.getUnknown(),
-                        entry.parent.getPath().getFileName().toString()));
-
+            if (entry != null) {
                 //  Prepare the viewer to use
                 Viewer viewer = Viewers.getViewer(newValue);
                 currentViewer = Optional.of(viewer);
@@ -961,6 +948,21 @@ public class DNPTUIController {
                 //  Notify viewer that we are about to start loading data
                 viewer.onLoadStart(newValue);
                 LOGGER.debug("Selection changed to {}", entry.path);
+                //  Entry is not an empty entry and is not a directory
+                if (!entry.isDirectory()) {
+                    //  Set up file information bar
+                    FileInfo fileInfo = entry.entry.getFileInfo();
+                    fileInfoLbl.setText(String.format("CmpSz 0x%08X | DskSz 0x%08X | " +
+                            "DcmSz 0x%08X | Off 0x%08X | Unk 0x%08X | Parent %s",
+                        fileInfo.getCompressedSize(),
+                        fileInfo.getDiskSize(),
+                        fileInfo.getDecompressedSize(),
+                        fileInfo.getDiskOffset(),
+                        fileInfo.getUnknown(),
+                        entry.parent.getPath().getFileName().toString()));
+                } else {
+                    fileInfoLbl.setText("Directory");
+                }
 
                 //  Set up loading task
                 Task<Void> task = new SubfileLoadTask(entry, viewer::parse, loadLock, TEMP_DIR);

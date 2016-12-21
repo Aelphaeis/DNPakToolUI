@@ -78,6 +78,10 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("height\\.ini", new StageIniHeightViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerMatcherViewer("heightattribute\\.ini", new StageIniHeightAttributeViewer(),
+            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+        registerMatcherViewer("grasstable\\.ini", new StageIniGrassTableViewer(),
+            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
         registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
         registerMatcherViewer("triggerdefine\\.ini", new StageIniTriggerDefineViewer(),

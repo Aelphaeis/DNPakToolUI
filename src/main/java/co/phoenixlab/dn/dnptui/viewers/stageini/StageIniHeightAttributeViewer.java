@@ -39,12 +39,13 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.NoSuchFileException;
 import java.util.zip.InflaterOutputStream;
 
-public class StageIniHeightViewer extends ImageViewer {
+public class StageIniHeightAttributeViewer extends ImageViewer {
 
     private PakTreeEntry gridInfoEntry;
 
@@ -53,7 +54,7 @@ public class StageIniHeightViewer extends ImageViewer {
     @Override
     public void init() {
         super.init();
-        exportBtn.setText("Export Heightmap (PNG)");
+        exportBtn.setText("Export attribute map (PNG)");
         unknownALbl = new Label();
         toolbar.getChildren().add(unknownALbl);
     }
@@ -91,40 +92,35 @@ public class StageIniHeightViewer extends ImageViewer {
         //  verticies for a grid of width n is n + 1
         //  Each tile also has two samples as well
 
-        final float unknownA = byteBuffer.getFloat();
+        final int unknownA = byteBuffer.getInt();
         int numEntries = byteBuffer.getInt();
-        int gWidth = gridInfo.getGridWidth();
-        int gHeight = gridInfo.getGridLength();
-
-        int density = 2;
-        //  Terrain heightmap is encoded in length * density + 1 strips that are width * density + 1 vertices long
-        int nVSWidth = gWidth * density + 1;
-        int nVSHeight = gHeight * density + 1;
-        int expected = nVSWidth * nVSWidth;
-        if (expected != numEntries) {
-            throw new IllegalArgumentException("Dimensions do not agree: " + expected + " vs " + numEntries);
+        int width = gridInfo.getGridWidth() * 2 + 1;
+        int height = gridInfo.getGridLength() * 2 + 1;
+        if (width * height != numEntries) {
+            throw new IllegalArgumentException("Dimensions do not agree: " + width * height + " vs " + numEntries);
         }
-        BufferedImage image = new BufferedImage(nVSWidth, nVSHeight + 1, BufferedImage.TYPE_INT_ARGB);
-        for (int stripNum = 0; stripNum < nVSHeight; ++stripNum) {
-            for (int vertRow = 0; vertRow < nVSWidth; ++vertRow) {
-                int v0 = 0xFFFF - (byteBuffer.getShort() & 0xFFFF);
-                int v1 = 0xFFFF - (byteBuffer.getShort() & 0xFFFF);
-                //  We'll squish this into one byte each
-                v0 = v0 * 0xFF / 0xFFFF;
-                v1 = v1 * 0xFF / 0xFFFF;
-                int rgba0 = 0xFF000000 | (v0 & 0xFF) | ((v0 << 8) & 0xFF00) | ((v0 << 16) & 0xFF0000);
-                int rgba1 = 0xFF000000 | (v1 & 0xFF) | ((v1 << 8) & 0xFF00) | ((v1 << 16) & 0xFF0000);
-                image.setRGB(vertRow, stripNum, rgba0);
-                image.setRGB(vertRow, stripNum + 1, rgba1);
-            }
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        //  Heightmap data is BIG ENDIAN unlike the rest of DN
+        //  Probably sent to a vertex shader directly
+        byteBuffer.order(ByteOrder.BIG_ENDIAN);
+
+        for (int i = 0; i < numEntries; i++) {
+            int v;
+            v = byteBuffer.get() & 0xFF;
+            int rgba = 0xFF000000;
+            rgba |= v | ((v << 8) & 0xFF00) | ((v << 16) & 0xFF0000);
+            int x = i % width;
+            int y = i / width;
+            image.setRGB(x, y, rgba);
         }
         if (byteBuffer.remaining() != 0) {
             throw new IllegalStateException("Buffer not empty: " + byteBuffer.remaining());
         }
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
         ImageIO.write(image, "PNG", imgOut);
         imageData = imgOut.toByteArray();
-        Platform.runLater(() -> unknownALbl.setText(String.format("%.2f", unknownA)));
+        Platform.runLater(() -> unknownALbl.setText(String.format("0x%08X", unknownA)));
         return imageData;
     }
 
@@ -134,8 +130,8 @@ public class StageIniHeightViewer extends ImageViewer {
         }
         FileInfo fileInfo = gridInfoEntry.entry.getFileInfo();
         ByteArrayOutputStream bao = new ByteArrayOutputStream((int) Math.max(
-                fileInfo.getDecompressedSize(),
-                fileInfo.getCompressedSize()));
+            fileInfo.getDecompressedSize(),
+            fileInfo.getCompressedSize()));
         OutputStream out = new InflaterOutputStream(bao);
         WritableByteChannel writableByteChannel = Channels.newChannel(out);
         gridInfoEntry.parent.openIfNotOpen();

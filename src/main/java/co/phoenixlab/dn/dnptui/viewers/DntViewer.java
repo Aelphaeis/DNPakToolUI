@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Vincent Zhang/PhoenixLAB
+ * Copyright (c) 2016 Vincent Zhang/PhoenixLAB
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,51 +25,15 @@
 package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
-import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 
 import java.nio.ByteBuffer;
 
-public class DefaultViewer implements Viewer {
-
-    private boolean isDirectory;
-    private boolean isBlank;
-    private int children;
-
-    private final Group EMPTY_GROUP;
-    private final Label NO_ITEM_SELECTED;
-    private final Label CANT_DECODE;
-
-    public DefaultViewer() {
-        EMPTY_GROUP = new Group();
-        NO_ITEM_SELECTED = new Label("No file selected");
-        CANT_DECODE = new Label("No decoder registered for file. Export this file to view in another editor.");
-    }
-
+public class DntViewer implements Viewer {
     @Override
     public Node getDisplayNode() {
-        if (isBlank) {
-            return NO_ITEM_SELECTED;
-        } else {
-            if (isDirectory) {
-                //  TODO
-                return new Label(String.format("%,d children", children));
-            } else {
-                //  TODO
-                return CANT_DECODE;
-            }
-        }
-    }
-
-    private int countChildren(TreeItem<PakTreeEntry> entry) {
-        int counter = 0;
-        for (TreeItem<PakTreeEntry> child : entry.getChildren()) {
-            ++counter;
-            counter += countChildren(child);
-        }
-        return counter;
+        return null;
     }
 
     @Override
@@ -78,10 +42,8 @@ public class DefaultViewer implements Viewer {
     }
 
     @Override
-    public void onLoadStart(TreeItem<PakTreeEntry> pakTreeEntry) {
-        isBlank = pakTreeEntry == null || pakTreeEntry.getValue() == null;
-        isDirectory = !isBlank && pakTreeEntry.getValue().isDirectory();
-        children = countChildren(pakTreeEntry);
+    public void onLoadStart(TreeItem<PakTreeEntry> treeItem) {
+
     }
 
     @Override

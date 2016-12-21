@@ -58,6 +58,9 @@ public class SubfileLoadTask extends Task<Void> {
             if (isCancelled()) {
                 return null;
             }
+            if (entry.isDirectory()) {
+                return null;
+            }
             FileInfo fileInfo = entry.entry.getFileInfo();
             if (isCancelled()) {
                 return null;
