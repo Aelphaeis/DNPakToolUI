@@ -31,6 +31,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TreeItem;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -55,7 +56,7 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
 
         //  Text
-        registerFXMLViewer(".lua", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
+        registerFXMLViewer(".lua", new TextViewer(Charset.forName("EUC-KR")), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".cfg", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".txt", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
         registerFXMLViewer(".xml", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
