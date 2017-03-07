@@ -34,7 +34,7 @@ public class Skn {
 
     private String header;
     private String mshFileName;
-    private int unknownA;
+    private int version;
     private int numEntries;
     private byte[] unknownB;
     private SknEntry[] entries;
@@ -46,7 +46,7 @@ public class Skn {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         header = DNStringUtils.readFixedLengthNTString(byteBuffer, 256);
         mshFileName = DNStringUtils.readFixedLengthNTString(byteBuffer, 256);
-        unknownA = byteBuffer.getInt();
+        version = byteBuffer.getInt();
         numEntries = byteBuffer.getInt();
         unknownB = new byte[512 - 8];
         byteBuffer.get(unknownB);
@@ -72,12 +72,12 @@ public class Skn {
         this.mshFileName = mshFileName;
     }
 
-    public int getUnknownA() {
-        return unknownA;
+    public int getVersion() {
+        return version;
     }
 
-    public void setUnknownA(int unknownA) {
-        this.unknownA = unknownA;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public int getNumEntries() {
@@ -105,7 +105,7 @@ public class Skn {
         return "Skn{" +
                 "header='" + header + '\'' +
                 ",\nmshFileName='" + mshFileName + '\'' +
-                ",\nunknownA=" + unknownA +
+                ",\nversion=" + version +
                 ",\nentries=[\n" + joiner.toString() +
                 "\n]}";
     }
