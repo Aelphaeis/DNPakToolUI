@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class TextViewer implements Viewer {
@@ -62,10 +63,16 @@ public class TextViewer implements Viewer {
 
     private String data;
 
+    private Charset charset;
+
     public TextViewer() {
-        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", DEFAULT_MAX_SIZE);
+        this(StandardCharsets.UTF_8);
     }
 
+    public TextViewer(Charset charset) {
+        maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", DEFAULT_MAX_SIZE);
+        this.charset = charset;
+    }
 
     @Override
     public void init() {
@@ -87,7 +94,7 @@ public class TextViewer implements Viewer {
         } else {
             byte[] buf = new byte[byteBuffer.remaining()];
             byteBuffer.get(buf);
-            data = new String(buf, StandardCharsets.UTF_8);
+            data = new String(buf, charset);
         }
         Platform.runLater(() -> textArea.setText(data));
     }
