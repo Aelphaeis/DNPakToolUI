@@ -30,7 +30,7 @@
 
     <groupId>co.phoenixlab.dn</groupId>
     <artifactId>DNPakToolUI</artifactId>
-    <version>1.0.0-BETA</version>
+    <version>1.1.0-BETA</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -157,7 +157,7 @@
         <dependency>
             <groupId>co.phoenixlab.dn</groupId>
             <artifactId>DNSubfile</artifactId>
-            <version>0.2.0-CAM</version>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>co.phoenixlab.dds</groupId>
