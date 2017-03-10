@@ -775,6 +775,18 @@ public class DNPTUIController {
         DNPTApplication.EXECUTOR_SERVICE.submit(exportTask);
     }
 
+    public Path getLastOpenedDir() {
+        return lastOpenedDir;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
     /**
      * Shows a file chooser and exports the selected file to the chosen location.
      *

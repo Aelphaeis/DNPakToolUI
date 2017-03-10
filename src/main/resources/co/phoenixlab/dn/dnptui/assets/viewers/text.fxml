@@ -37,7 +37,7 @@
         <TextArea fx:id="textArea" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" styleClass="txt-area" BorderPane.alignment="CENTER" />
     </center>
     <top>
-        <HBox BorderPane.alignment="CENTER" fx:id="toolbar">
+        <HBox BorderPane.alignment="CENTER" fx:id="toolbar" styleClass="text-toolbar">
          <children>
             <CheckBox fx:id="lineWrapToggleChkBox" mnemonicParsing="false" text="Line Wrap" />
          </children>
