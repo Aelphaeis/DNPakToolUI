@@ -67,6 +67,7 @@ public class Viewers {
         registerFXMLViewer(".msh", new MshViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".skn", new SknViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".ani", new AniViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+        registerFXMLViewer(".cam", new CamViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
 
         //  Stage INI
         registerMatcherViewer("sectorsize\\.ini", new StageIniSectorSizeViewer(),
