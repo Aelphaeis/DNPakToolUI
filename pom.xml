@@ -157,7 +157,7 @@
         <dependency>
             <groupId>co.phoenixlab.dn</groupId>
             <artifactId>DNSubfile</artifactId>
-            <version>0.4.0-STAGETRIGGER</version>
+            <version>0.4.0</version>
         </dependency>
         <dependency>
             <groupId>co.phoenixlab.dds</groupId>
@@ -173,6 +173,11 @@
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
             <version>1.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3.1</version>
         </dependency>
     </dependencies>
 
