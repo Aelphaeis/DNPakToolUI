@@ -25,12 +25,21 @@
 package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
+import co.phoenixlab.dn.subfile.dnt.DntReader;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.BorderPane;
 
 import java.nio.ByteBuffer;
 
 public class DntViewer implements Viewer {
+
+    private BorderPane rootPane;
+
+    public DntViewer() {
+        rootPane = new BorderPane();
+    }
+
     @Override
     public Node getDisplayNode() {
         return null;
@@ -38,6 +47,8 @@ public class DntViewer implements Viewer {
 
     @Override
     public void parse(ByteBuffer byteBuffer) {
+        DntReader reader = new DntReader();
+        DntReader.DntHandle handle = reader.read(byteBuffer);
 
     }
 
