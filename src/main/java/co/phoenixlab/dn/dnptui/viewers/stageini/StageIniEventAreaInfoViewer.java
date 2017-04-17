@@ -25,20 +25,27 @@
 package co.phoenixlab.dn.dnptui.viewers.stageini;
 
 import co.phoenixlab.dn.dnptui.viewers.TextViewer;
+import co.phoenixlab.dn.subfile.stage.eventarea.StageEventAreas;
+import co.phoenixlab.dn.subfile.stage.eventarea.StageEventAreasTestReader;
 import javafx.application.Platform;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
-import java.util.StringJoiner;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 public class StageIniEventAreaInfoViewer extends TextViewer {
 
     @Override
     public void parse(ByteBuffer byteBuffer) {
-        StringJoiner joiner = new StringJoiner("\n");
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
-
-
-        final String content = joiner.toString();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        StageEventAreasTestReader reader = new StageEventAreasTestReader(printStream);
+        StageEventAreas areas = reader.read(byteBuffer);
+        String content = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         Platform.runLater(() -> textArea.setText(content));
     }
 
