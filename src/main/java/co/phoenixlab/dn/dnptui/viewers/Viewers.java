@@ -93,7 +93,7 @@ public class Viewers {
         registerMatcherViewer("trigger\\.ini", new StageIniTriggerViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("eventareainfo\\.ini", new StageIniEventAreaInfoViewer(),
-            "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+            "/co/phoenixlab/dn/dnptui/assets/viewers/eventareainfo.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
