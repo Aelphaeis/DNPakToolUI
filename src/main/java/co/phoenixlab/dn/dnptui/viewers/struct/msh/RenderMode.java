@@ -29,10 +29,10 @@ import java.util.function.IntUnaryOperator;
 public enum RenderMode {
     TRIANGLES(0, i -> i / 3),
     TRIANGLE_STRIP(1, i -> i - 2),
-    TRIANGLES_ANIM(256, i -> i / 3),
-    TRIANGLE_STRIP_ANIM(257, i -> i - 2),
-    TRIANGLES_UNK(65536, i -> i / 3),
-    TRIANGLE_STRIP_UNK(65537, i -> i - 2),
+    TRIANGLES_ANIM(0x100, i -> i / 3),
+    TRIANGLE_STRIP_ANIM(0x101, i -> i - 2),
+    TRIANGLES_UNK(0x10000, i -> i / 3),
+    TRIANGLE_STRIP_UNK(0x10001, i -> i - 2),
     UNKNOWN(-1, i -> i / 3);
 
 

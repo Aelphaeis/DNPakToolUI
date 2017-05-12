@@ -25,10 +25,14 @@
 package co.phoenixlab.dn.dnptui.viewers;
 
 import co.phoenixlab.dn.dnptui.viewers.struct.msh.*;
+import co.phoenixlab.dn.subfile.msh.TestMshReader;
 import javafx.application.Platform;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 import java.util.function.IntUnaryOperator;
 
@@ -43,29 +47,37 @@ public class MshViewer extends TextViewer {
     @Override
     public void parse(ByteBuffer byteBuffer) {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        Msh msh = new Msh(byteBuffer);
 
-        StringBuilder builder = new StringBuilder();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        TestMshReader reader = new TestMshReader(printStream);
+        reader.read(byteBuffer);
+        String content = new String(baos.toByteArray(), StandardCharsets.UTF_8);
 
-        builder.append("======================================================\n");
-        builder.append("HEADER\n");
-        builder.append(toString(msh.getMshHeader())).append("\n");
+//        Msh msh = new Msh(byteBuffer);
+//
+//        StringBuilder builder = new StringBuilder();
+//
+//        builder.append("======================================================\n");
+//        builder.append("HEADER\n");
+//        builder.append(toString(msh.getMshHeader())).append("\n");
+//
+//        Bone[] bones = msh.getBoneData();
+//        builder.append("\n======================================================\n");
+//        builder.append(bones.length).append(" Bones\n");
+//        for (int i = 0; i < bones.length; i++) {
+//            builder.append(String.format("%3d", i)).append(": ").append(indentTabs(toString(bones[i]), 1)).append('\n');
+//        }
+//
+//        Mesh[] meshes = msh.getMeshData();
+//        builder.append("\n======================================================\n");
+//        builder.append(meshes.length).append(" Meshes\n");
+//        for (int i = 0; i < meshes.length; i++) {
+//            builder.append(String.format("%3d", i)).append(": ").append(indentTabs(toString(meshes[i]), 1)).append('\n');
+//        }
+//
+//        final String content = builder.toString();
 
-        Bone[] bones = msh.getBoneData();
-        builder.append("\n======================================================\n");
-        builder.append(bones.length).append(" Bones\n");
-        for (int i = 0; i < bones.length; i++) {
-            builder.append(String.format("%3d", i)).append(": ").append(indentTabs(toString(bones[i]), 1)).append('\n');
-        }
-
-        Mesh[] meshes = msh.getMeshData();
-        builder.append("\n======================================================\n");
-        builder.append(meshes.length).append(" Meshes\n");
-        for (int i = 0; i < meshes.length; i++) {
-            builder.append(String.format("%3d", i)).append(": ").append(indentTabs(toString(meshes[i]), 1)).append('\n');
-        }
-
-        final String content = builder.toString();
         Platform.runLater(() -> textArea.setText(content));
     }
 
