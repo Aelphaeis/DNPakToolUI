@@ -47,7 +47,7 @@ public class TextViewer implements Viewer {
 
     private long maxDisplaySize;
 
-    private Node displayNode;
+    protected Node displayNode;
 
     @FXML
     protected BorderPane displayPane;

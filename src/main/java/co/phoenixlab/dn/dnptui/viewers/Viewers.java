@@ -92,6 +92,10 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("trigger\\.ini", new StageIniTriggerViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+
+        //  Shaders
+        registerMatcherViewer("dnshaders.dat", new ShaderViewer(),
+            "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
     }
 
     public static void registerFXMLViewer(String extension, String fxmlPath) {
