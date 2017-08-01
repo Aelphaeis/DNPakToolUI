@@ -7,16 +7,16 @@ DNPakToolUI
 A GUI application for browsing Eyedentity/Dragon Nest resource pak files, as a UI front for  
 [DNPakTool](https://github.com/vincentzhang96/DNPakTool).
 
-##Download
+## Download
 You may download the latest stable release [here](https://github.com/vincentzhang96/DNPakToolUI/releases/latest).
 
-##Screenshots
+## Screenshots
 
 <img src="http://i.imgur.com/hzxEAT1.png" width="700">
 
 <img src="http://i.imgur.com/b4u6gqb.png" width="700">
 
-##To Do
+## To Do
 - [x] Add a throbber when exporting file(s)
 - [ ] Implement Search
 - [ ] Infrastructure for caching decompressed files to a temp directory
@@ -24,7 +24,7 @@ You may download the latest stable release [here](https://github.com/vincentzhan
 - [ ] Thumbnail view for directories when selected?
 - [ ] Internationalize
 
-##Building
+## Building
 This project uses Maven. Simply build the JAR by running `mvn package`.
 
 You may need to include DNPakTool into your local Maven repository by running:
@@ -32,14 +32,15 @@ You may need to include DNPakTool into your local Maven repository by running:
 mvn install:install-file -Dfile=DNPakTool-1.0.4.jar -DgroupId=co.phoenixlab.dn -DartifactId=DNPakTool -Dversion=1.0.4 -Dpackaging=jar
 ```
 
-##Dependencies
+## Dependencies
 - [DNPakTool](https://github.com/vincentzhang96/DNPakTool)
+- [DNSubfile](https://github.com/vincentzhang96/DNSubfile)
 - Java 8u40
 
-##Contributing
+## Contributing
 Simply submit a pull request and I'll review it for inclusion.
 
-##License
+## License
 
 The MIT License (MIT)
 
