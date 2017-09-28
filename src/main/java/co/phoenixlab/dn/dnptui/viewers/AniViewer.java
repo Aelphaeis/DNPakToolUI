@@ -24,7 +24,12 @@
 
 package co.phoenixlab.dn.dnptui.viewers;
 
-import co.phoenixlab.dn.dnptui.viewers.struct.ani.*;
+import co.phoenixlab.dn.subfile.ani.Ani;
+import co.phoenixlab.dn.subfile.ani.AniBoneData;
+import co.phoenixlab.dn.subfile.ani.AniBoneKeyframes;
+import co.phoenixlab.dn.subfile.ani.AniReader;
+import co.phoenixlab.dn.util.math.Vec3;
+import co.phoenixlab.dn.util.math.Vec4;
 import javafx.application.Platform;
 
 import java.nio.ByteBuffer;
@@ -41,7 +46,9 @@ public class AniViewer extends TextViewer {
     @Override
     public void parse(ByteBuffer byteBuffer) {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        Ani ani = new Ani(byteBuffer);
+        AniReader reader = new AniReader();
+        Ani ani = reader.read(byteBuffer);
+
         StringBuilder builder = new StringBuilder();
         if (ani.isCompound()) {
             builder.append("Compound ANI file\n");
@@ -51,21 +58,23 @@ public class AniViewer extends TextViewer {
         } else {
             builder.append("======================================================\n");
             builder.append("HEADER\n");
-            builder.append(toString(ani.getAniHeader()));
+            builder.append(ani.getMagicString());
+            builder.append(ani.getVersion());
 
             builder.append("\n======================================================\n");
-            builder.append(ani.getAniHeader().getNumAnimations());
+            builder.append(ani.getNumAnimations());
             builder.append(" Animations\n");
-            AniAnimation[] animations = ani.getAnimations();
-            for (int i = 0; i < animations.length; i++) {
+            String[] animationNames = ani.getAnimationNames();
+            int[] animationFrameCounts = ani.getAnimationFrameCounts();
+            for (int i = 0; i < ani.getNumAnimations(); i++) {
                 builder.append(String.format("%3d\n\tname: \"%s\"\n\tframes: %d\n",
                         i,
-                        animations[i].getName(),
-                        animations[i].getNumFrames()));
+                        animationNames[i],
+                        animationFrameCounts[i]));
             }
 
             builder.append("\n======================================================\n");
-            builder.append(ani.getAniHeader().getNumBones());
+            builder.append(ani.getNumBones());
             builder.append(" Bone Data Sections\n");
             AniBoneData[] animationData = ani.getAnimationData();
             for (int i = 0; i < animationData.length; i++) {
@@ -74,7 +83,7 @@ public class AniViewer extends TextViewer {
                         i,
                         aniBoneData.getBoneName(),
                         aniBoneData.getParentBone(),
-                        indentTabs(toString(aniBoneData.getAniData(), animations), 2, true)));
+                        indentTabs(toString(aniBoneData.getKeyframes(), ani), 2, true)));
 
             }
         }
@@ -87,32 +96,33 @@ public class AniViewer extends TextViewer {
         displayPane.setCenter(textArea);
     }
 
-    private String toString(AniHeader header) {
-        return String.format("version: %s\nanimations: %,d\nbones: %,d",
-                header.getVersion(),
-                header.getNumAnimations(),
-                header.getNumBones());
-    }
-
-    private String toString(AniBoneDataAniData[] data, AniAnimation[] anims) {
+    private String toString(AniBoneKeyframes[] data, Ani ani) {
         StringJoiner joiner = new StringJoiner("\n");
         for (int i = 0; i < data.length; i++) {
-            AniBoneDataAniData aniBoneDataAniData = data[i];
+            AniBoneKeyframes aniBoneDataAniData = data[i];
             joiner.add(String.format("%3d (%s)\n%s",
                     i,
-                    anims[i].getName(),
+                    ani.getAnimationNames()[i],
                     indentTabs(toString(aniBoneDataAniData), 1, true)));
         }
         return joiner.toString();
     }
 
-    private String toString(AniBoneDataAniData data) {
-        return "iPos: " + toString(data.getInitialPositionVec3f(), 3) + "\n" +
-                "iRot: " + toString(data.getInitialRotationQuaternionVec4f(), 4) + "\n" +
-                "iSca: " + toString(data.getInitialScalingVec3f(), 3) + "\n" +
-                "posFrames: " + data.getNumTranslationTransformations() + "\n" +
-                "rotFrames: " + data.getNumRotationTransformations() + "\n" +
-                "scaFrames: " + data.getNumScalingTransformations();
+    private String toString(AniBoneKeyframes data) {
+        return "iPos: " + toString(data.getStartPos()) + "\n" +
+                "iRot: " + toString(data.getStartQuat()) + "\n" +
+                "iSca: " + toString(data.getStartScale()) + "\n" +
+                "posFrames: " + data.getNumPosTransform() + "\n" +
+                "rotFrames: " + data.getNumRotTransform() + "\n" +
+                "scaFrames: " + data.getNumScaleTransform();
+    }
+
+    private String toString(Vec3 vec3f) {
+        return String.format("| % .2e % .2e % .2e |", vec3f.getX(), vec3f.getY(), vec3f.getZ());
+    }
+
+    private String toString(Vec4 vec4f) {
+        return String.format("| % .2e % .2e % .2e % .2e |", vec4f.getX(), vec4f.getY(), vec4f.getZ(), vec4f.getW());
     }
 
     private String toString(float[] vec, int components) {
