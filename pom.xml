@@ -157,7 +157,7 @@
         <dependency>
             <groupId>co.phoenixlab.dn</groupId>
             <artifactId>DNSubfile</artifactId>
-            <version>0.4.1-EAI</version>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>co.phoenixlab.dds</groupId>
