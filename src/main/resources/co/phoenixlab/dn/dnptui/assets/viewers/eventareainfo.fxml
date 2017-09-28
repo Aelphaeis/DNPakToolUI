@@ -24,18 +24,19 @@
   ~ THE SOFTWARE.
   -->
 
-<?import javafx.scene.canvas.*?>
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="displayPane" styleClass="text-viewer" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="displayPane" styleClass="text-viewer" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
    <center>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" fx:id="tabPane">
         <tabs>
           <Tab closable="false" text="Rich View">
             <content>
@@ -43,7 +44,11 @@
                      <children>
                         <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <left>
-                              <VBox fx:id="listVbox" minWidth="250.0" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+                                <ScrollPane fitToHeight="true" hbarPolicy="NEVER" pannable="true" prefHeight="2000.0" prefWidth="250.0" vbarPolicy="ALWAYS">
+                                    <content>
+                                        <VBox fx:id="listVbox" minWidth="250.0" maxHeight="1.7976931348623157E308" prefWidth="250.0" BorderPane.alignment="CENTER" />
+                                    </content>
+                                </ScrollPane>
                            </left>
                            <center>
                               <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="ALWAYS" pannable="true" prefHeight="2000.0" prefWidth="2000.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
@@ -56,7 +61,7 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-          <Tab closable="false" text="Text View">
+          <Tab closable="false" text="Text View" fx:id="textTab">
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>

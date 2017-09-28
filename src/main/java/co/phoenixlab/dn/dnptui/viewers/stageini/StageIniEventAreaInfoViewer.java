@@ -26,6 +26,8 @@ package co.phoenixlab.dn.dnptui.viewers.stageini;
 
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsImageDecoder;
+import co.phoenixlab.dn.dnptui.DNPTApplication;
+import co.phoenixlab.dn.dnptui.DNPTUIController;
 import co.phoenixlab.dn.dnptui.PakTreeEntry;
 import co.phoenixlab.dn.dnptui.viewers.Viewer;
 import co.phoenixlab.dn.dnptui.viewers.stageini.struct.GridInfo;
@@ -36,18 +38,17 @@ import co.phoenixlab.dn.subfile.stage.eventarea.StageEventAreas;
 import co.phoenixlab.dn.subfile.stage.eventarea.StageEventAreasTestReader;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.InflaterOutputStream;
 
@@ -79,6 +81,12 @@ public class StageIniEventAreaInfoViewer implements Viewer {
 
     @FXML
     protected BorderPane displayPane;
+
+    @FXML
+    protected TabPane tabPane;
+
+    @FXML
+    protected Tab textTab;
 
     @FXML
     protected CheckBox lineWrapToggleChkBox;
@@ -119,6 +127,7 @@ public class StageIniEventAreaInfoViewer implements Viewer {
     public void init() {
         displayNode = displayPane;
         textArea.wrapTextProperty().bind(lineWrapToggleChkBox.selectedProperty());
+        tabPane.getSelectionModel().selectedItemProperty().addListener(this::tabChanged);
     }
 
     @Override
@@ -190,7 +199,7 @@ public class StageIniEventAreaInfoViewer implements Viewer {
         //  Default
         maxDisplaySize = Long.getLong("co.phoenixlab.dn.dnptui.text.maxSize", DEFAULT_MAX_SIZE);
         data = null;
-        textArea.setText(null);
+        textArea.setText("");
     }
 
     protected final String indentSpaces(String s, int level) {
@@ -212,6 +221,18 @@ public class StageIniEventAreaInfoViewer implements Viewer {
         }
         String s1 = builder.toString();
         return (leading ? s1 : "") + s.replace("\n", "\n" + s1);
+    }
+
+    public void tabChanged(ObservableValue<? extends Tab> ov, Tab oldVal, Tab newVal) {
+        if (oldVal == newVal) {
+            return;
+        }
+
+        if (newVal == textTab) {
+            textArea.setText(data);
+        } else {
+            textArea.setText("");
+        }
     }
 
 
@@ -251,16 +272,35 @@ public class StageIniEventAreaInfoViewer implements Viewer {
                     cell.setSelectedStateCallback(param1 -> param1.selected);
                     return cell;
                 });
-                TitledPane titledPane = new TitledPane("Group " + group.getGroupId(), view);
+                view.setMinHeight(400);
+                view.setMaxHeight(Region.USE_COMPUTED_SIZE);
+
+                VBox vbox = new VBox(4);
+                Button uncheckAll = new Button("Uncheck All");
+                uncheckAll.setOnAction(ae -> view.getItems().forEach(i -> i.selected.set(false)));
+                Button checkAll = new Button("Check All");
+                checkAll.setOnAction(ae -> view.getItems().forEach(i -> i.selected.set(true)));
+                HBox bar = new HBox();
+                bar.setAlignment(Pos.CENTER_LEFT);
+                bar.getChildren().addAll(uncheckAll, checkAll);
+
+                vbox.getChildren().addAll(bar, view);
+
+                TitledPane titledPane = new TitledPane("Group " + group.getGroupId(), vbox);
                 nodes.add(titledPane);
             }
         }
 
+        data = content;
+
         Platform.runLater(() -> {
-            textArea.setText(content);
+            textArea.setText("");
             listVbox.getChildren().clear();
             listVbox.getChildren().addAll(nodes);
-            redrawCanvas();
+
+            DNPTApplication.EXECUTOR_SERVICE.schedule(() -> {
+                Platform.runLater(this::redrawCanvas);
+            }, 1, TimeUnit.SECONDS);
         });
     }
 
@@ -284,8 +324,8 @@ public class StageIniEventAreaInfoViewer implements Viewer {
             int xEnd = rescale(width, canvasWidth, e.area.getBbEndX());
             int zEnd = rescale(width, canvasWidth, e.area.getBbEndZ());
             Rectangle rectangle = new Rectangle(0, 0, Math.abs(xEnd - xStart), Math.abs(zEnd - zStart));
-            rectangle.setFill(Color.rgb(0, 255, 0, 0.0675));
-            rectangle.setStroke(Color.GREEN);
+            rectangle.setFill(Color.rgb(152, 188, 212, 0.0675));
+            rectangle.setStroke(Color.web("#98bcd4"));
             rectangle.setStrokeWidth(1);
             rectangle.setRotate(e.area.getBbRot());
             AnchorPane.setLeftAnchor(rectangle, (double) xStart);
