@@ -63,10 +63,10 @@ public class Viewers {
         registerFXMLViewer(".dmv", "/co/phoenixlab/dn/dnptui/assets/viewers/text.fxml");
 
 
-        registerFXMLViewer(".env", new EnvViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
-        registerFXMLViewer(".msh", new MshViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+//        registerFXMLViewer(".env", new EnvViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+//        registerFXMLViewer(".msh", new MshViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".skn", new SknViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
-        registerFXMLViewer(".ani", new AniViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
+//        registerFXMLViewer(".ani", new AniViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerFXMLViewer(".cam", new CamViewer(), "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
 
         //  Stage INI
@@ -78,14 +78,14 @@ public class Viewers {
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("textable\\.ini", new StageIniTexTableViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
-        registerMatcherViewer("height\\.ini", new StageIniHeightViewer(),
-                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
-        registerMatcherViewer("heightattribute\\.ini", new StageIniHeightAttributeViewer(),
-            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
-        registerMatcherViewer("grasstable\\.ini", new StageIniGrassTableViewer(),
-            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
-        registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
-                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+//        registerMatcherViewer("height\\.ini", new StageIniHeightViewer(),
+//                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+//        registerMatcherViewer("heightattribute\\.ini", new StageIniHeightAttributeViewer(),
+//            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+//        registerMatcherViewer("grasstable\\.ini", new StageIniGrassTableViewer(),
+//            "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
+//        registerMatcherViewer("alphatable\\.ini", new StageIniAlphaTableViewer(),
+//                "/co/phoenixlab/dn/dnptui/assets/viewers/image.fxml");
         registerMatcherViewer("triggerdefine\\.ini", new StageIniTriggerDefineViewer(),
                 "/co/phoenixlab/dn/dnptui/assets/viewers/text-no-controller.fxml");
         registerMatcherViewer("propinfo\\.ini", new StageIniPropInfoViewer(),
