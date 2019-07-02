@@ -93,13 +93,15 @@ public class StageIniHeightViewer extends ImageViewer {
 
         final float unknownA = byteBuffer.getFloat();
         int numEntries = byteBuffer.getInt();
+        int dim = (int) Math.sqrt(numEntries);
+
         int gWidth = gridInfo.getGridWidth();
         int gHeight = gridInfo.getGridLength();
 
-        int density = 2;
+        int density = 1;
         //  Terrain heightmap is encoded in length * density + 1 strips that are width * density + 1 vertices long
-        int nVSWidth = gWidth * density + 1;
-        int nVSHeight = gHeight * density + 1;
+        int nVSWidth = dim * density;
+        int nVSHeight = dim * density;
         int expected = nVSWidth * nVSWidth;
         if (expected != numEntries) {
             throw new IllegalArgumentException("Dimensions do not agree: " + expected + " vs " + numEntries);
@@ -108,19 +110,19 @@ public class StageIniHeightViewer extends ImageViewer {
         for (int stripNum = 0; stripNum < nVSHeight; ++stripNum) {
             for (int vertRow = 0; vertRow < nVSWidth; ++vertRow) {
                 int v0 = 0xFFFF - (byteBuffer.getShort() & 0xFFFF);
-                int v1 = 0xFFFF - (byteBuffer.getShort() & 0xFFFF);
+//                int v1 = 0xFFFF - (byteBuffer.getShort() & 0xFFFF);
                 //  We'll squish this into one byte each
                 v0 = v0 * 0xFF / 0xFFFF;
-                v1 = v1 * 0xFF / 0xFFFF;
+//                v1 = v1 * 0xFF / 0xFFFF;
                 int rgba0 = 0xFF000000 | (v0 & 0xFF) | ((v0 << 8) & 0xFF00) | ((v0 << 16) & 0xFF0000);
-                int rgba1 = 0xFF000000 | (v1 & 0xFF) | ((v1 << 8) & 0xFF00) | ((v1 << 16) & 0xFF0000);
+//                int rgba1 = 0xFF000000 | (v1 & 0xFF) | ((v1 << 8) & 0xFF00) | ((v1 << 16) & 0xFF0000);
                 image.setRGB(vertRow, stripNum, rgba0);
-                image.setRGB(vertRow, stripNum + 1, rgba1);
+//                image.setRGB(vertRow, stripNum + 1, rgba1);
             }
         }
-        if (byteBuffer.remaining() != 0) {
-            throw new IllegalStateException("Buffer not empty: " + byteBuffer.remaining());
-        }
+//        if (byteBuffer.remaining() != 0) {
+//            throw new IllegalStateException("Buffer not empty: " + byteBuffer.remaining());
+//        }
         ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
         ImageIO.write(image, "PNG", imgOut);
         imageData = imgOut.toByteArray();

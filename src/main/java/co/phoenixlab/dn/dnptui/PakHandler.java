@@ -34,10 +34,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.DoubleConsumer;
 import java.util.zip.InflaterOutputStream;
@@ -78,6 +75,10 @@ public class PakHandler {
         this.paks = paks;
     }
 
+    private static final boolean isInvalidPathChar(char var0) {
+        return var0 < ' ' || "<>:\"|?*".indexOf(var0) != -1;
+    }
+
     /**
      * Creates the tree structure for the navigation pane of all the loaded files.
      *
@@ -98,7 +99,25 @@ public class PakHandler {
                     s = s.substring(1);
                 }
                 s = s.trim();
-                Path path = Paths.get(s);
+                Path path;
+                try {
+                    path = Paths.get(s);
+                } catch (InvalidPathException ipe) {
+                    char[] scar = s.toCharArray();
+                    boolean replaced = false;
+                    for (int i = ipe.getIndex(); i < scar.length; i++) {
+                        if (isInvalidPathChar(scar[i])) {
+                            scar[i] = '-';
+                        }
+                    }
+
+                    String ss = new String(scar);
+                    LOGGER.info("Replaced illegal characters in {}, result is {}", s, ss);
+
+                    path = Paths.get(ss);
+                } catch (Exception e1) {
+                    return;
+                }
                 PakTreeEntry entry = new PakTreeEntry(e.name, path, e, pakFile);
                 insert(entry, dirCache);
             });
@@ -273,7 +292,23 @@ public class PakHandler {
             throws IOException {
         for (TreeItem<PakTreeEntry> child : treeItem.getChildren()) {
             PakTreeEntry entry = child.getValue();
-            Path path = exportPath.resolve(entry.name);
+            Path path;
+            try {
+                path = exportPath.resolve(entry.name);
+            } catch (InvalidPathException ipe) {
+                char[] scar = entry.name.toCharArray();
+                for (int i = ipe.getIndex(); i < scar.length; i++) {
+                    if (isInvalidPathChar(scar[i])) {
+                        scar[i] = '-';
+                    }
+                }
+
+                String ss = new String(scar);
+                LOGGER.info("Replaced illegal characters in {}, result is {}", entry.name, ss);
+
+                path = exportPath.resolve(ss);
+            }
+
             if (entry.entry == null) {
                 if (!Files.exists(path)) {
                     Files.createDirectory(path);

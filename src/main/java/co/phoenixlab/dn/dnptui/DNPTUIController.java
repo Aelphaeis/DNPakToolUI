@@ -248,7 +248,7 @@ public class DNPTUIController {
         //  Disable the find button when no pak is loaded
 //        findBtn.disableProperty().bind(noPakLoadedProperty);
         //  Find doesnt work, disable
-        findBtn.setDisable(true);
+//        findBtn.setDisable(true);
 
         //  Disable the export file button when no pak is loaded or the selection is not a file
         exportBtn.disableProperty().bind(noPakLoadedProperty.
@@ -576,6 +576,7 @@ public class DNPTUIController {
         //  Only accept files ending in .pak and not a directory
         BiPredicate<Path, BasicFileAttributes> pakFilter = (p, a) -> p.getFileName().toString().endsWith(".pak");
         pakFilter = pakFilter.and((p, a) -> !a.isDirectory());
+        pakFilter = pakFilter.and((p, a) -> p.getFileName().toString().startsWith("Resource"));
         try (Stream<Path> matches = Files.find(virtualPakDirPath, 1, pakFilter)) {
             acceptedPakPaths = matches.collect(Collectors.toList());
         } catch (IOException e) {

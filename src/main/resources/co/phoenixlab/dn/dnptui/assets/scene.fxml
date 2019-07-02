@@ -76,15 +76,15 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="findBtn" layoutX="98.0" layoutY="10.0" mnemonicParsing="false" onAction="#find" text="Find">
-                     <graphic>
-                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@toolbar/search.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
+<!--                  <Button fx:id="findBtn" layoutX="98.0" layoutY="10.0" mnemonicParsing="false" onAction="#find" text="Find">-->
+<!--                     <graphic>-->
+<!--                        <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">-->
+<!--                           <image>-->
+<!--                              <Image url="@toolbar/search.png" />-->
+<!--                           </image>-->
+<!--                        </ImageView>-->
+<!--                     </graphic>-->
+<!--                  </Button>-->
                   <Button fx:id="exportBtn" layoutX="182.0" layoutY="10.0" mnemonicParsing="false" onAction="#exportFile" text="Export File(s)">
                      <graphic>
                         <ImageView fitHeight="24.0" pickOnBounds="true" preserveRatio="true">
