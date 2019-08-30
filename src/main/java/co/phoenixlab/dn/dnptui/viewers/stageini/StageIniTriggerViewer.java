@@ -9,18 +9,19 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.nio.charset.StandardCharsets.*;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 public class StageIniTriggerViewer extends TextViewer {
 
@@ -50,7 +51,7 @@ public class StageIniTriggerViewer extends TextViewer {
             builder.append(String.format("=== TRIGGER %,d ===\n", i))
                 .append('\t').append(trigger.getTriggerParentName()).append('/')
                 .append(trigger.getTriggerName()).append('\n')
-                    .append("\tunknown3: ").append(trigger.getUnknown3()).append("\n\t")
+                    .append("\tunknown3: ").append(trigger.isRepeatable()).append("\n\t")
                     .append(trigger.getNumConditionCalls()).append(" condition script calls\n");
             appendTriggerScriptCalls(builder, trigger.getConditionCalls());
             builder.append("\t").append(trigger.getNumActionCalls()).append(" action script calls\n");
